@@ -365,14 +365,6 @@ jobs:
           wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-moscow/frontend-cypress/master/docker/Dockerfile
         working-directory: ./e2e
 
-      - name: Remove old e2e image
-        if: ${{ inputs.e2e_tag }}
-        run: |
-          imageId=$(curl -H "Authorization: Bearer $(yc iam create-token)" $URL?repositoryName=${{ inputs.registry_id }}/frontend-e2e | jq -r '.images[] | select(.tags[]? == "${{ env.e2e-tag }}") | .id')
-          curl -X DELETE -H "Authorization: Bearer $(yc iam create-token)" $URL/$imageId
-        env:
-          URL: "https://container-registry.api.cloud.yandex.net/container-registry/v1/images"
-
       - name: Build e2e docker images
         if: ${{ inputs.e2e_tag }}
         run: docker build . -t ${{ env.registry }}/${{ env.e2e-image }}:${{ env.e2e-tag }} -t ${{ env.registry }}/${{ env.e2e-image }}:${{ steps.release-number.outputs.release-number }}
