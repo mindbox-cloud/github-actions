@@ -375,13 +375,13 @@ jobs:
 
       - name: Build e2e docker images
         if: ${{ inputs.e2e_tag }}
-        run: docker build . -t ${{ env.registry }}/${{ env.e2e-image }}:${{ env.e2e-tag }}
+        run: docker build . -t ${{ env.registry }}/${{ env.e2e-image }}:${{ env.e2e-tag }} -t ${{ env.registry }}/${{ env.e2e-image }}:${{ steps.release-number.outputs.release-number }}
         working-directory: ./e2e
 
       - name: Push e2e docker image to registry
         if: ${{ inputs.e2e_tag }}
         run: |
-          docker push ${{ env.registry }}/${{ env.e2e-image }}:${{ env.e2e-tag }}
+          docker push ${{ env.registry }}/${{ env.e2e-image }} --all-tags
 
       - name: Create Release
         id: create-release
