@@ -44,14 +44,10 @@ inputs:
     description: ''
     required: false
     default: ''
-  vaultPresent:
-    description: ''
-    required: false
-    default: "false"
   tokenKeyFile:
     description: ''
     required: false
-    default: "token.json"
+    default: ''
 outputs: {}
 runs:
   using: "composite"
