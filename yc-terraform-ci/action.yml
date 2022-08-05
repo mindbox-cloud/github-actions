@@ -40,6 +40,18 @@ inputs:
     description: 'Legacy ci step for Replace secrets in IAM key file'
     required: false
     default: '0' # 0 == false, 1 == true
+  vaultToken:
+    description: ''
+    required: false
+    default: ''
+  vaultPresent:
+    description: ''
+    required: false
+    default: "false"
+  tokenKeyFile:
+    description: ''
+    required: false
+    default: "token.json"
 outputs: {}
 runs:
   using: "composite"
@@ -81,6 +93,15 @@ runs:
     - name: "Terraform Validate"
       id: validate
       run: terraform validate -no-color
+      working-directory: ${{ inputs.workingDir }}
+      shell: bash
+
+    - name: "Replace secrets in VAULT key file"
+      run: |
+        if  ${{ inputs.vaultToken }} != ""; then
+          echo "--- Replace secrets in key file"
+          sed -i 's:#{VAULT_TOKEN}:'${{ inputs.vaultToken }}':' ${{ inputs.tokenKeyFile }}
+        fi
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
