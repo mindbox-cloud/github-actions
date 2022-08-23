@@ -441,6 +441,7 @@ jobs:
             --tenant=*
             --apikey ${{ secrets.OCTOPUS_API_KEY }}
             --releasenotes "${{ steps.create-release.outputs.release-notes-body }}"
+            --packageVersion ${{ steps.release-number.outputs.release-number }}
 
       - name: Amixr notification if failure
         uses: joelwmale/webhook-action@master
