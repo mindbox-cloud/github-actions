@@ -45,7 +45,7 @@ on:
         required: true
       kube_dev_config_k8:
         description: 'A SA_TOKEN_DTLN_KUBE_CDP_STAGING_MICROFRONTENDS token passed from the caller workflow for new deploy'
-        required: true
+        required: false
       container_registry_key:
         description: 'A CONTAINER_REGISTRY_KEY token passed from the caller workflow'
         required: true
