@@ -254,11 +254,13 @@ jobs:
           sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./deploy-k8.yml
           sed -i "s~CI_COMMIT_SHA~$CI_COMMIT_SHA~g" ./deploy-k8.yml
           sed -i "s~BASE_PROJECT_URL~$BASE_PROJECT_URL~g" ./deploy-k8.yml
+          sed -i "s~PROJECT_FOLDER~$PROJECT_FOLDER~g" ./deploy-k8.yml
         env:
           DOCKER_IMAGE: ${{ env.registry }}/${{ env.image }}-k8/${{ env.ref_name }}:${{ github.sha }}
           HASH_PAYLOAD: ${{ env.hash_payload }}
           CI_COMMIT_SHA: ${{ github.sha }}
           BASE_PROJECT_URL: ${{ inputs.base_project_url }}
+          PROJECT_FOLDER: ${{ env.project_folder }}
 
       - name: Deploy to cluster
         if: ${{ inputs.use_k8_deploy_process }}
