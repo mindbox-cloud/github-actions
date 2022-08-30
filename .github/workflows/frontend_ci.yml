@@ -419,6 +419,7 @@ jobs:
 
 
       - name: Push package to Octopus repository
+        if: ${{ inputs.use_s3_deploy_process }}
         uses: docker://octopusdeploy/octo
         with:
           args: >
