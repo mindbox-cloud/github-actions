@@ -234,6 +234,7 @@ jobs:
           repository: mindbox-moscow/frontend-deploy
           token: ${{ secrets.frontend_gha_full_token }}
           path: ./deploy
+          ref: nikitin/f5-hot-testing-k8
 
       - name: Build and format npm-package for new deploy
         if: ${{ inputs.use_k8_deploy_process }}
