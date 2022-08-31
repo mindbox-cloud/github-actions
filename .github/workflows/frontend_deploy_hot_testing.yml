@@ -224,7 +224,6 @@ jobs:
         with:
           args: kubectl apply -f ./hot_build/hot-testing/kubernetes/deploy.yml
 
-
 # ---------------------- use_k8_deploy_process -------------------
 
       - name: Checkout frontend-deploy repository
@@ -253,7 +252,7 @@ jobs:
       
       - name: Copy Dockerfile to build folder
         if: ${{ inputs.use_k8_deploy_process }}
-        run: cp ./deploy/hot-testing/Dockerfile ./build
+        run: cp ./deploy/mcf-release/Dockerfile ./build
 
       - name: Build docker image
         if: ${{ inputs.use_k8_deploy_process }}
