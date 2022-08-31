@@ -38,6 +38,11 @@ on:
         description: "The project which will be used for downloading all static"
         required: false
         default: test-staging.mindbox.ru
+      target_port:
+        type: number
+        description: "The port for k8 services"
+        required: false
+        default: 8080
     secrets:
       npm_token:
         description: 'A GH_NPM_REGISTRY token passed from the caller workflow'
@@ -273,12 +278,14 @@ jobs:
           sed -i "s~CI_COMMIT_SHA~$CI_COMMIT_SHA~g" ./deploy-k8.yml
           sed -i "s~BASE_PROJECT_URL~$BASE_PROJECT_URL~g" ./deploy-k8.yml
           sed -i "s~PROJECT_FOLDER~$PROJECT_FOLDER~g" ./deploy-k8.yml
+          sed -i "s~TARGET_PORT~$TARGET_PORT~g" ./deploy-k8.yml
         env:
           DOCKER_IMAGE: ${{ env.registry }}/${{ env.image }}-k8/${{ env.ref_name }}:${{ github.sha }}
           HASH_PAYLOAD: ${{ env.hash_payload }}
           CI_COMMIT_SHA: ${{ github.sha }}
           BASE_PROJECT_URL: ${{ inputs.base_project_url }}
           PROJECT_FOLDER: ${{ env.project_folder }}
+          TARGET_PORT: ${{ inputs.target_port }}
 
       - name: Deploy to cluster
         if: ${{ inputs.use_k8_deploy_process }}
