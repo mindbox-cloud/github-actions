@@ -47,7 +47,7 @@ on:
         type: boolean
         description: "True if need to use s3 deployment procedure"
         required: false
-        default: true
+        default: false
       target_port:
         type: number
         description: "The port for k8 services"
