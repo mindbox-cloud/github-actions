@@ -27,12 +27,12 @@ on:
         type: boolean
         description: "True if need to use new deployment procedure"
         required: false
-        default: false
+        default: true
       use_s3_deploy_process:
         type: boolean
         description: "True if need to use s3 deployment procedure"
         required: false
-        default: true
+        default: false
       base_project_url:
         type: string
         description: "The project which will be used for downloading all static"
