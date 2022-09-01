@@ -74,6 +74,7 @@ jobs:
         run: |
           ./scripts/cleaner.sh $(yc iam create-token) ${{ env.ref_name }}
         working-directory: ./hot_build/hot-testing
+        continue-on-error: true
 
       - name: Set variables in hot-testing deployment.yml
         if: ${{ inputs.hot_testing }}
@@ -81,6 +82,7 @@ jobs:
         env:
           HASH_PAYLOAD: ${{ env.hash_payload }}
         working-directory: ./hot_build/hot-testing
+        continue-on-error: true
 
       - name: Cleanup cluster from hot-testing
         if: ${{ inputs.hot_testing }}
@@ -91,6 +93,7 @@ jobs:
           KUBE_CONFIG_DATA: ${{ secrets.kube_dev_config }}
         with:
           args: kubectl delete -f ./hot_build/hot-testing/kubernetes/deploy.yml
+        continue-on-error: true
 
 # ---------------------- use_k8_deploy_process -------------------
 
@@ -100,6 +103,7 @@ jobs:
         env:
           HASH_PAYLOAD: ${{ env.hash_payload }}
         working-directory: ./hot_build/hot-testing
+        continue-on-error: true
 
       - name: Cleanup cluster from hot-testing
         if: ${{ inputs.hot_testing_k8 }}
@@ -110,6 +114,7 @@ jobs:
           KUBE_CONFIG_DATA: ${{ secrets.kube_dev_config_k8 }}
         with:
           args: kubectl delete -f ./hot_build/hot-testing/kubernetes/deploy-k8.yml
+        continue-on-error: true
 
 # ---------------------- END use_k8_deploy_process -------------------
 
@@ -119,6 +124,7 @@ jobs:
         run: |
           ./scripts/cleaner.sh $(yc iam create-token) ${{ env.ref_name }}
         working-directory: ./hot_build/e2e
+        continue-on-error: true
 
       - name: Set variables in hot-testing deployment.yml
         if: ${{ inputs.e2e_testing }}
@@ -126,6 +132,7 @@ jobs:
         env:
           HASH_PAYLOAD: ${{ env.hash_payload }}
         working-directory: ./hot_build/e2e
+        continue-on-error: true
 
       - name: Cleanup cluster from hot-testing
         if: ${{ inputs.e2e_testing }}
@@ -136,3 +143,4 @@ jobs:
           KUBE_CONFIG_DATA: ${{ secrets.kube_dev_config }}
         with:
           args: kubectl delete -f ./hot_build/e2e/kubernetes/deploy.yml
+        continue-on-error: true
