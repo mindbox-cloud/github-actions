@@ -125,7 +125,7 @@ on:
 
 jobs:
   checking:
-    runs-on: ubuntu-latest
+    runs-on: [ self-hosted, Linux, frontend ]
     timeout-minutes: 10
     steps:
       - name: Checkout the repository
