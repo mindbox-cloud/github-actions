@@ -10,7 +10,7 @@ on:
         required: false
 jobs:
   phrase-push:
-    runs-on: ubuntu-latest
+    runs-on: [ self-hosted, Linux, frontend ]
     timeout-minutes: 10
     env:
       amixrWebhookUrl: ${{ secrets.amixrWebhookUrl }}
