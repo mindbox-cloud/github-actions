@@ -297,12 +297,15 @@ jobs:
           sudo curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
           sudo ln -s /home/runner/yandex-cloud/bin/yc /bin/yc
 
-      - name: Create e2e tests list
-        if: ${{ inputs.use_s3_deploy_process }}
+      - name: Create yc profile
         run: |
           yc config profile create frontend-ci
           echo '${{ secrets.container_registry_key }}' >> iam_key.json | yc config set service-account-key iam_key.json
           rm iam_key.json
+
+      - name: Create e2e tests list
+        if: ${{ inputs.use_s3_deploy_process }}
+        run: |
           curl -s -H "Authorization: Bearer $(yc iam create-token)" $URL?repositoryName=${{ inputs.registry_id }}/frontend-e2e | jq -r ".images[].tags[]" | sed 's/-latest//g'  > ./build/e2e_tests.txt
         env:
           URL: "https://container-registry.api.cloud.yandex.net/container-registry/v1/images"
@@ -345,9 +348,6 @@ jobs:
       - name: Create e2e tests list for k8
         if: ${{ inputs.use_k8_deploy_process }}
         run: |
-          yc config profile create frontend-ci
-          echo '${{ secrets.container_registry_key }}' >> iam_key.json | yc config set service-account-key iam_key.json
-          rm iam_key.json
           curl -s -H "Authorization: Bearer $(yc iam create-token)" $URL?repositoryName=${{ inputs.registry_id }}/frontend-e2e | jq -r ".images[].tags[]" | sed 's/-latest//g'  > ./build/e2e_tests.txt
         env:
           URL: "https://container-registry.api.cloud.yandex.net/container-registry/v1/images"
