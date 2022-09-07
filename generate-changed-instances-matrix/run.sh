@@ -27,14 +27,14 @@ function get_tag_version {
   get_tag_version_output=""
   local latest_sha=$(git rev-list -n 1 "$1-latest" 2>/dev/null)
   if [[ -z "$latest_sha" ]]; then
-    get_tag_version_output="1.0.0"
+    get_tag_version_output="1.1.0"
     return 11
   fi
 
   local latest_tags=($(git tag --points-at "$latest_sha" | grep "$1-[0-9]"))
   if [[ "${#latest_tags[@]}" != 1 ]]; 
   then
-    local latest_version="1.0.0"
+    local latest_version="1.1.0"
   else
     local latest_version=$(echo ${latest_tags[0]} | sed "s/$1-//")
   fi
