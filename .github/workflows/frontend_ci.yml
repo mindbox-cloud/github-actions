@@ -233,8 +233,10 @@ jobs:
         run: |
           if [[ $REPOSITORY == "frontend-core-v2" ]]; then
             echo "octopus_project_name=CoreFrontend" >> $GITHUB_ENV
+            echo "project_name=core" >> $GITHUB_ENV
           else
             echo "octopus_project_name=$REPOSITORY" >> $GITHUB_ENV
+            echo "project_name=$REPOSITORY" >> $GITHUB_ENV
           fi
         env:
           REPOSITORY: ${{ steps.set_variables.outputs.repository_name }}
@@ -314,6 +316,8 @@ jobs:
         if: ${{ inputs.use_s3_deploy_process }}
         run: zip -r ${{ env.octopus_project_name }}.${{ steps.release-number.outputs.release-number }}.zip ./build
 
+# ---------------- start use_k8_deploy_process ---------------------
+
       - name: Authenticate in yandex registry
         if: ${{ inputs.e2e_tag }} || ${{ inputs.use_k8_deploy_process }}
         run: echo '${{ secrets.container_registry_key }}' | docker login -u json_key --password-stdin cr.yandex
@@ -367,13 +371,15 @@ jobs:
 
       - name: Build release docker image
         if: ${{ inputs.use_k8_deploy_process }}
-        run: docker build . -t ${{ env.registry }}/${{ env.octopus_project_name }}:${{ steps.release-number.outputs.release-number }} -t ${{ env.registry }}/${{ env.octopus_project_name }}:latest
+        run: docker build . -t ${{ env.registry }}/${{ env.project_name }}:${{ steps.release-number.outputs.release-number }} -t ${{ env.registry }}/${{ env.project_name }}:latest
         working-directory: ./build
 
       - name: Push release docker image to registry
         if: ${{ inputs.use_k8_deploy_process }}
         run: |
-          docker push ${{ env.registry }}/${{ env.octopus_project_name }} --all-tags
+          docker push ${{ env.registry }}/${{ env.project_name }} --all-tags
+
+# ------------------------- use_k8_deploy_process ------------------
 
       - name: Install e2e deps
         if: ${{ inputs.e2e_tag }}
@@ -460,7 +466,7 @@ jobs:
           args: >
             create-release
             --server ${{ secrets.OCTOPUS_SERVER }}
-            --project "${{ env.octopus_project_name }}"-k8-deploy
+            --project "${{ steps.set_variables.outputs.repository_name }}"-k8-deploy
             --version ${{ steps.release-number.outputs.release-number }}
             --channel Default
             --tenant=*
