@@ -104,8 +104,10 @@ jobs:
           project_name=$(cat ./package.json | jq .name | sed -s 's/@mindbox-moscow\///g' | sed -s 's/-/_/g' | sed -s 's/"//g')
           if [[ $project_name == "frontend_core_v2" ]]; then
             echo "project_folder=core" >> $GITHUB_ENV
+            echo "frontend_core_service=hot-testing-service-${{ env.hash_payload }}" >> $GITHUB_ENV
           else
             echo "project_folder=$project_name" >> $GITHUB_ENV
+            echo "frontend_core_service=core-service-staging" >> $GITHUB_ENV
           fi
         id: set_project
 
@@ -140,6 +142,7 @@ jobs:
           repository: mindbox-moscow/frontend-deploy
           token: ${{ secrets.frontend_gha_full_token }}
           path: ./hot_build
+          
 
       - name: Create proto-html folder
         if: ${{ inputs.use_s3_deploy_process}}
@@ -279,6 +282,7 @@ jobs:
           sed -i "s~BASE_PROJECT_URL~$BASE_PROJECT_URL~g" ./deploy-k8.yml
           sed -i "s~PROJECT_FOLDER~$PROJECT_FOLDER~g" ./deploy-k8.yml
           sed -i "s~TARGET_PORT~$TARGET_PORT~g" ./deploy-k8.yml
+          sed -i "s~FRONTEND_CORE_SERVICE_NAME~$FRONTEND_CORE_SERVICE_NAME~g" ./deploy-k8.yml
         env:
           DOCKER_IMAGE: ${{ env.registry }}/${{ env.image }}-k8/${{ env.ref_name }}:${{ github.sha }}
           HASH_PAYLOAD: ${{ env.hash_payload }}
@@ -286,6 +290,7 @@ jobs:
           BASE_PROJECT_URL: ${{ inputs.base_project_url }}
           PROJECT_FOLDER: ${{ env.project_folder }}
           TARGET_PORT: ${{ inputs.target_port }}
+          FRONTEND_CORE_SERVICE_NAME: ${{ env.frontend_core_service }}
 
       - name: Deploy to cluster
         if: ${{ inputs.use_k8_deploy_process }}
