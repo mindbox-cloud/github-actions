@@ -22,7 +22,7 @@ inputs:
     default: bulldozer
 runs:
   using: 'docker'
-  image: 'docker://mindboxmoscow/phrase-integration-gha:441e533063b7653f9e29fc0035ee748404deae3e'
+  image: 'docker://mindboxmoscow/phrase-integration-gha:83c1c5d8fd12e9b991a273697f4792b8d4bf682a'
   args:
    - pull
   env:
