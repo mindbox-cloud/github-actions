@@ -323,7 +323,7 @@ jobs:
 
       - name: Echo comments
         run: |
-          curl -sL \
+          curl -siL \
             -H "Content-Type: application/json" \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             https://api.github.com/repos/mindbox-moscow/${{ env.repository_name }}/commits/${{ github.sha }}/comments
@@ -332,7 +332,7 @@ jobs:
       - name: Add comment to commit if the job has completed
         run: |
           jq -nc '{"body": ":heavy_check_mark: You can check your **Frontend** changes at\nhttps://hot-testing-${{ env.hash_payload }}-staging.mindbox.ru"}' | \
-          curl -sL -X POST -d @- \
+          curl -siL -X POST -d @- \
             -H "Content-Type: application/json" \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             https://api.github.com/repos/mindbox-moscow/${{ env.repository_name }}/commits/${{ github.sha }}/comments
