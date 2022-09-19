@@ -40,7 +40,7 @@ jobs:
           phraseAppToken: ${{ secrets.phraseAppToken }}
 
       - name: phrase pull
-        uses: mindbox-moscow/github-actions/localization/phrase-pull@master
+        uses: mindbox-moscow/github-actions/localization/phrase-pull@zlebnik-patch-1
         with:
           gitHubToken: ${{ secrets.gitHubToken }}
           phraseAppToken: ${{ secrets.phraseAppToken }}
