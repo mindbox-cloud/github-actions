@@ -90,7 +90,7 @@ on:
         type: boolean
         description: "True if need to use old deployment procedure"
         required: false
-        default: true
+        default: false
     secrets:
       npm_token:
         description: 'A GH_NPM_REGISTRY token passed from the caller workflow'
