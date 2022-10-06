@@ -11,11 +11,11 @@ outputs: {}
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v1.0.0
     - name: Setup helmfile
       uses: mamezou-tech/setup-helmfile@v1.0.0
       with:
-        kubectl-version: "v1.21.11"
+        install-kubectl: no
+        install-helm-plugins: no
         helm-version: "v3.8.2"
         helmfile-version: "v0.143.0"
 
@@ -24,16 +24,18 @@ runs:
       run: |
         helmfile --version
         helm version
-        kubectl version --client
 
     - name: Prepare K8s manifests
       shell: bash
       run: |
         cd ${{ inputs.validatedResource }}
         helmfile template > test.yaml
+        ls -la
 
     - name: Validate policies
       uses: gbaeke/kyverno-cli@v1
       with:
         command: |
+          cd ${{ inputs.validatedResource }}
+          ls -la
           kyverno apply ${{ inputs.kyvernoPolicies }} --resource=test.yaml
