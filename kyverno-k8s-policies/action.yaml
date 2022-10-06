@@ -1,0 +1,18 @@
+name: 'Kyverno K8s policies'
+description: 'Action to check K8s manifests to consist policies'
+inputs:
+  kyvernoPolicies:
+    description: ''
+    required: true
+  validatedResource:
+    description: ''
+    required: true
+outputs: {}
+runs:
+  using: "composite"
+  steps:
+    - name: Validate policies
+      uses: gbaeke/kyverno-cli@v1
+      with:
+        command: |
+          kyverno apply ${{ inputs.kyvernoPolicies }} --resource=${{ inputs.validatedResource }}
