@@ -20,12 +20,14 @@ runs:
         helmfile-version: "v0.143.0"
 
     - name: Test
+      shell: bash
       run: |
         helmfile --version
         helm version
         kubectl version --client
 
     - name: Prepare K8s manifests
+      shell: bash
       run: |
         cd ${{ inputs.validatedResource }}
         helmfile template > test.yaml
