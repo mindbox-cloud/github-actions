@@ -15,4 +15,4 @@ runs:
       uses: gbaeke/kyverno-cli@v1
       with:
         command: |
-          kyverno apply ${{ inputs.kyvernoPolicies }} --resource=${{ inputs.validatedResource }} --v 5
+          kyverno apply ${{ inputs.kyvernoPolicies }} --resource=${{ inputs.validatedResource }} --v 3
