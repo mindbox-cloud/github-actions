@@ -15,5 +15,6 @@ runs:
       uses: gbaeke/kyverno-cli@v1
       with:
         command: |
-          ls -la
+          ls -la ./kyverno
+          cat ${{ inputs.validatedResource }}
           kyverno apply ${{ inputs.kyvernoPolicies }} --resource=${{ inputs.validatedResource }}
