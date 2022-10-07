@@ -18,6 +18,8 @@ runs:
       uses: actions/checkout@master
       with:
         repository: mindbox-moscow/kubernetes-system-layer
+        path: kubernetes-system-layer
+        ref: loskutov/add_kyverno_policies
 
     - name: Validate policies
       uses: gbaeke/kyverno-cli@v1
