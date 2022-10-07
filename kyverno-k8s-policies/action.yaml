@@ -18,6 +18,7 @@ runs:
       uses: actions/checkout@master
       with:
         repository: mindbox-moscow/kubernetes-system-layer.git
+        token: ${{ inputs.mindboxOrgGithubToken }}
         path: kubernetes-system-layer
         ref: loskutov/add_kyverno_policies
 
