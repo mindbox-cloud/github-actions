@@ -21,7 +21,7 @@ runs:
         repository: mindbox-moscow/kubernetes-system-layer.git
         token: ${{ inputs.mindboxOrgGithubToken }}
         path: kubernetes-system-layer
-        ref: loskutov/add_kyverno_policies
+        ref: master
 
     - name: Validate policies
       uses: gbaeke/kyverno-cli@v1
