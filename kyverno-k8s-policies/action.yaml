@@ -7,12 +7,28 @@ inputs:
   validatedResource:
     description: ''
     required: true
+  mindboxOrgGithubToken:
+    description: 'Used to download organization wide resources, like terraform-modules repo'
+    required: true
 outputs: {}
 runs:
   using: "composite"
   steps:
+    - name: "Setup GitHub token for repo with policies"
+      run: |
+        git config --local --remove-section http."https://github.com/"
+        git config --global url."https://octopus-mindbox:${OCTOPUS_MINDBOX_GITHUB_TOKEN}@github.com/mindbox-moscow".insteadOf "https://github.com/mindbox-moscow"
+      env:
+        OCTOPUS_MINDBOX_GITHUB_TOKEN: ${{ inputs.mindboxOrgGithubToken }}
+      shell: bash
+
+    - name: "Download Kyverno policies"
+      run: |
+        git clone https://github.com/mindbox-moscow/kubernetes-system-layer.git
+      shell: bash
+
     - name: Validate policies
       uses: gbaeke/kyverno-cli@v1
       with:
         command: |
-          kyverno apply ${{ inputs.kyvernoPolicies }} --resource=${{ inputs.validatedResource }} --v 3
+          kyverno apply kubernetes-system-layer/charts/kyverno-extend/templates --resource=${{ inputs.validatedResource }} --v 3
