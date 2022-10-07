@@ -1,12 +1,13 @@
 name: 'Kyverno K8s policies'
 description: 'Action to check K8s manifests to consist policies'
 inputs:
-  kyvernoPolicies:
-    description: ''
-    required: true
   validatedResource:
     description: ''
     required: true
+  verboseLevel:
+    description: ''
+    required: false
+    default: '1'
   mindboxOrgGithubToken:
     description: 'Used to download organization wide resources, like terraform-modules repo'
     required: true
@@ -14,8 +15,8 @@ outputs: {}
 runs:
   using: "composite"
   steps:
-    - name: "Download Kyverno policies"
-      uses: actions/checkout@master
+    - name: "Clone repo with Kyverno policies"
+      uses: actions/checkout@v2
       with:
         repository: mindbox-moscow/kubernetes-system-layer.git
         token: ${{ inputs.mindboxOrgGithubToken }}
@@ -26,4 +27,4 @@ runs:
       uses: gbaeke/kyverno-cli@v1
       with:
         command: |
-          kyverno apply kubernetes-system-layer/charts/kyverno-extend/templates --resource=${{ inputs.validatedResource }} --v 3
+          kyverno apply kubernetes-system-layer/charts/kyverno-extend/templates --resource=${{ inputs.validatedResource }} --v ${{ inputs.verboseLevel }}
