@@ -61,7 +61,7 @@ jobs:
         run: echo "hash_payload=$(echo $BRANCH_AND_REPO | md5sum | sed 's/  -//g')"  >> $GITHUB_ENV
         id: branch_and_repo_hash
         env:
-          BRANCH_AND_REPO: "${{ env.repository_name }}-${{ env.ref_name }}"
+          BRANCH_AND_REPO: "${{ env.repository_name }} ${{ env.ref_name }}"
 
       - name: Install YC
         run: |
