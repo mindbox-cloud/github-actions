@@ -53,7 +53,7 @@ jobs:
 
       - name: Set variables
         run: |
-          echo "ref_name=$(cat $GITHUB_EVENT_PATH | jq '.ref' | sed 's/refs\/heads\///g')" >> $GITHUB_ENV
+          echo "ref_name=$(cat $GITHUB_EVENT_PATH | jq '.ref' | sed 's/refs\/heads\///g' | sed 's/\"//g')" >> $GITHUB_ENV
           echo "repository_name=$(cat $GITHUB_EVENT_PATH | jq '.repository.name' | sed 's/\"//g')" >> $GITHUB_ENV
         id: set_variables
 
