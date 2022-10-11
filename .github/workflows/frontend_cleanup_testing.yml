@@ -58,10 +58,8 @@ jobs:
         id: set_variables
 
       - name: Get branch and repo names hash
-        run: echo "hash_payload=$(echo $BRANCH_AND_REPO | md5sum | sed 's/  -//g')"  >> $GITHUB_ENV && echo $BRANCH_AND_REPO
+        run: echo "hash_payload=$(echo $GITHUB_ACTION_REPOSITORY $GITHUB_REF_NAME | md5sum | sed 's/  -//g')"  >> $GITHUB_ENV && echo $GITHUB_REF_NAME
         id: branch_and_repo_hash
-        env:
-          BRANCH_AND_REPO: "${{ env.repository_name }} ${{ env.ref_name }}"
 
       - name: Install YC
         run: |
