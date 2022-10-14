@@ -80,7 +80,7 @@ jobs:
       - name: Remove Hot-Testing Docker Image
         if: ${{ inputs.hot_testing }}
         run: |
-          ./scripts/cleaner.sh $(yc iam create-token) ${{ env.ref_name }}
+          ./scripts/cleaner.sh $(yc iam create-token) ${{ env.ref_name | tr '[A-Z]' '[a-z]' }}
         working-directory: ./hot_build/hot-testing
         continue-on-error: true
 
@@ -108,7 +108,7 @@ jobs:
       - name: Remove E2E-Testing Docker Image
         if: ${{ inputs.e2e_testing }}
         run: |
-          ./scripts/cleaner.sh $(yc iam create-token) ${{ env.ref_name }}
+          ./scripts/cleaner.sh $(yc iam create-token) ${{ env.ref_name | tr '[A-Z]' '[a-z]' }}
         working-directory: ./hot_build/e2e
         continue-on-error: true
 
