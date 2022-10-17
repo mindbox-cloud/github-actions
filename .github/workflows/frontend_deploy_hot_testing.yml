@@ -89,7 +89,7 @@ jobs:
 
       - name: Set variables
         run: |
-          echo "ref_name=$GITHUB_HEAD_REF" >> $GITHUB_ENV
+          echo "ref_name=$(cat GITHUB_HEAD_REF | tr '[A-Z]' '[a-z]')" >> $GITHUB_ENV
           echo "repository_name=$(cat $GITHUB_EVENT_PATH | jq '.repository.name' | sed 's/\"//g')" >> $GITHUB_ENV
         id: set_variables
 
@@ -201,14 +201,14 @@ jobs:
         if: ${{ inputs.use_s3_deploy_process}}
         working-directory: ./hot_build/proto-html/
         run: |
-          docker build . -t ${{ env.registry }}/${{ env.image }}/${{ env.ref_name | tr '[A-Z]' '[a-z]' }}:${{ github.sha }}
+          docker build . -t ${{ env.registry }}/${{ env.image }}/${{ env.ref_name }}:${{ github.sha }}
 
       - name: Authenticate in yandex registry
         run: echo '${{ secrets.container_registry_key }}' | docker login -u json_key --password-stdin cr.yandex
 
       - name: Push docker image
         if: ${{ inputs.use_s3_deploy_process}}
-        run: docker push ${{ env.registry }}/${{ env.image }}/${{ env.ref_name | tr '[A-Z]' '[a-z]' }}:${{ github.sha }}
+        run: docker push ${{ env.registry }}/${{ env.image }}/${{ env.ref_name }}:${{ github.sha }}
 
       - name: Set variables in deployment.yaml
         if: ${{ inputs.use_s3_deploy_process}}
@@ -218,7 +218,7 @@ jobs:
           sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./deploy.yml
           sed -i "s~CI_COMMIT_SHA~$CI_COMMIT_SHA~g" ./deploy.yml
         env:
-          DOCKER_IMAGE: ${{ env.registry }}/${{ env.image }}/${{ env.ref_name | tr '[A-Z]' '[a-z]' }}:${{ github.sha }}
+          DOCKER_IMAGE: ${{ env.registry }}/${{ env.image }}/${{ env.ref_name }}:${{ github.sha }}
           HASH_PAYLOAD: ${{ env.hash_payload }}
           CI_COMMIT_SHA: ${{ github.sha }}
 
@@ -266,11 +266,11 @@ jobs:
         if: ${{ inputs.use_k8_deploy_process }}
         working-directory: ./build
         run: |
-          docker build . -t ${{ env.registry }}/${{ env.image }}-k8/${{ env.ref_name | tr '[A-Z]' '[a-z]' }}:${{ github.sha }}
+          docker build . -t ${{ env.registry }}/${{ env.image }}-k8/${{ env.ref_name }}:${{ github.sha }}
 
       - name: Push docker image
         if: ${{ inputs.use_k8_deploy_process }}
-        run: docker push ${{ env.registry }}/${{ env.image }}-k8/${{ env.ref_name | tr '[A-Z]' '[a-z]' }}:${{ github.sha }}
+        run: docker push ${{ env.registry }}/${{ env.image }}-k8/${{ env.ref_name }}:${{ github.sha }}
 
       - name: Set variables in deployment.yaml
         if: ${{ inputs.use_k8_deploy_process }}
@@ -284,7 +284,7 @@ jobs:
           sed -i "s~TARGET_PORT~$TARGET_PORT~g" ./deploy-k8.yml
           sed -i "s~FRONTEND_CORE_SERVICE_NAME~$FRONTEND_CORE_SERVICE_NAME~g" ./deploy-k8.yml
         env:
-          DOCKER_IMAGE: ${{ env.registry }}/${{ env.image }}-k8/${{ env.ref_name | tr '[A-Z]' '[a-z]' }}:${{ github.sha }}
+          DOCKER_IMAGE: ${{ env.registry }}/${{ env.image }}-k8/${{ env.ref_name }}:${{ github.sha }}
           HASH_PAYLOAD: ${{ env.hash_payload }}
           CI_COMMIT_SHA: ${{ github.sha }}
           BASE_PROJECT_URL: ${{ inputs.base_project_url }}
