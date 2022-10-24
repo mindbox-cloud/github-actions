@@ -320,7 +320,6 @@ jobs:
   e2e-tests:
     runs-on: ubuntu-latest
     needs: prepare-site
-    id: e2e-tests
     timeout-minutes: ${{ inputs.e2e-timeout }}
     if: ${{ always() && !cancelled() && !contains(github.ref, 'LocalizationPull') && !inputs.core_project }}
     env:
@@ -465,7 +464,6 @@ jobs:
   core-e2e-tests-runner:
     runs-on: ubuntu-latest
     needs: core-e2e-tests-matrix
-    id: core-e2e-tests-runner
     strategy:
       matrix:
         project: ${{ fromJSON(needs.core-e2e-tests-matrix.outputs.matrix) }}
