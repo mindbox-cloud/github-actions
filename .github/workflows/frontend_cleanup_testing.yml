@@ -36,9 +36,6 @@ on:
       kube_dev_config_k8:
         description: 'A SA_TOKEN_DTLN_KUBE_CDP_STAGING_MICROFRONTENDS token passed from the caller workflow for new deploy'
         required: false
-      ref_name:
-        description: 'A branch name in lowercase'
-        required: false
 
 jobs:
   cleanup:
@@ -56,7 +53,7 @@ jobs:
 
       - name: Set variables
         run: |
-          echo "ref_name=$([[ ! -z "$INPUT_REF" ]] && echo "$INPUT_REF" || cat $GITHUB_EVENT_PATH | jq '.ref' | sed 's/refs\/heads\///g' | sed 's/\"//g' | tr '[A-Z]' '[a-z]')" >> $GITHUB_ENV
+          echo "ref_name=$([[ ! -z "$GITHUB_HEAD_REF" ]] && (echo $GITHUB_HEAD_REF | tr '[A-Z]' '[a-z]')  || (cat $GITHUB_EVENT_PATH | jq '.ref' | sed 's/refs\/heads\///g' | sed 's/\"//g' | tr '[A-Z]' '[a-z]'))" >> $GITHUB_ENV
           echo "repository_name=$(cat $GITHUB_EVENT_PATH | jq '.repository.name' | sed 's/\"//g')" >> $GITHUB_ENV
         id: set_variables
         env:

@@ -568,7 +568,6 @@ jobs:
       hot_testing_k8: false
       e2e_testing: true
       e2e_testing_k8: true
-      ref_name: ${{ $GITHUB_HEAD_REF }} | tr '[A-Z]' '[a-z]'
     secrets:
       frontend_gha_full_token: ${{ secrets.FRONTEND_GHA_FULL_TOKEN }}
       kube_dev_config: ${{ secrets.DEV_FRONTEND_GHA_KUBE_CONFIG_DATA }}
