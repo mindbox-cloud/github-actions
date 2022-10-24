@@ -569,8 +569,8 @@ jobs:
       e2e_testing: true
       e2e_testing_k8: true
     secrets:
-      frontend_gha_full_token: ${{ secrets.FRONTEND_GHA_FULL_TOKEN }}
-      kube_dev_config: ${{ secrets.DEV_FRONTEND_GHA_KUBE_CONFIG_DATA }}
-      container_registry_key: ${{ secrets.CONTAINER_REGISTRY_KEY }}
-      kube_dev_config_k8: ${{ secrets.SA_TOKEN_DTLN_KUBE_CDP_STAGING_MICROFRONTENDS }}
+      frontend_gha_full_token: ${{ secrets.frontend_gha_full_token }}
+      kube_dev_config: "nothing here"
+      container_registry_key: ${{ secrets.container_registry_key }}
+      kube_dev_config_k8: ${{ secrets.kube_dev_config_k8 }}
 
