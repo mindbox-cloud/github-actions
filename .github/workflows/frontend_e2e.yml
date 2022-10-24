@@ -565,14 +565,14 @@ jobs:
     needs: [ e2e-tests, core-e2e-tests-runner ]
     if: ${{ success() }}
     uses: mindbox-moscow/github-actions/.github/workflows/frontend_cleanup_testing.yml@master
-      with:
-        hot_testing: false
-        hot_testing_k8: false
-        e2e_testing: true
-        e2e_testing_k8: true
-      secrets:
-        frontend_gha_full_token: ${{ secrets.FRONTEND_GHA_FULL_TOKEN }}
-        kube_dev_config: ${{ secrets.DEV_FRONTEND_GHA_KUBE_CONFIG_DATA }}
-        container_registry_key: ${{ secrets.CONTAINER_REGISTRY_KEY }}
-        kube_dev_config_k8: ${{ secrets.SA_TOKEN_DTLN_KUBE_CDP_STAGING_MICROFRONTENDS }}
+    with:
+      hot_testing: false
+      hot_testing_k8: false
+      e2e_testing: true
+      e2e_testing_k8: true
+    secrets:
+      frontend_gha_full_token: ${{ secrets.FRONTEND_GHA_FULL_TOKEN }}
+      kube_dev_config: ${{ secrets.DEV_FRONTEND_GHA_KUBE_CONFIG_DATA }}
+      container_registry_key: ${{ secrets.CONTAINER_REGISTRY_KEY }}
+      kube_dev_config_k8: ${{ secrets.SA_TOKEN_DTLN_KUBE_CDP_STAGING_MICROFRONTENDS }}
 
