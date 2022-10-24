@@ -36,6 +36,9 @@ on:
       kube_dev_config_k8:
         description: 'A SA_TOKEN_DTLN_KUBE_CDP_STAGING_MICROFRONTENDS token passed from the caller workflow for new deploy'
         required: false
+      ref_name:
+        description: 'A branch name in lowercase'
+        required: false
 
 jobs:
   cleanup:
@@ -53,9 +56,11 @@ jobs:
 
       - name: Set variables
         run: |
-          echo "ref_name=$(cat $GITHUB_EVENT_PATH | jq '.ref' | sed 's/refs\/heads\///g' | sed 's/\"//g' | tr '[A-Z]' '[a-z]')" >> $GITHUB_ENV
+          echo "ref_name=$([[ ! -z "$INPUT_REF" ]] && echo "$INPUT_REF" || cat $GITHUB_EVENT_PATH | jq '.ref' | sed 's/refs\/heads\///g' | sed 's/\"//g' | tr '[A-Z]' '[a-z]')" >> $GITHUB_ENV
           echo "repository_name=$(cat $GITHUB_EVENT_PATH | jq '.repository.name' | sed 's/\"//g')" >> $GITHUB_ENV
         id: set_variables
+        env:
+          INPUT_REF: ${{ inputs.ref_name }}
 
       - name: Get branch and repo names hash
         run: echo "hash_payload=$(echo $BRANCH_AND_REPO | md5sum | sed 's/  -//g')"  >> $GITHUB_ENV
@@ -154,7 +159,7 @@ jobs:
 
 # ---------------------- e2e_testing_k8 -------------------
 
-      - name: Set variables in hot-testing deployment.yml
+      - name: Set variables in e2e deployment.yml
         if: ${{ inputs.e2e_testing_k8 }}
         run: sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/deploy-k8.yml
         env:
@@ -162,7 +167,7 @@ jobs:
         working-directory: ./hot_build/e2e
         continue-on-error: true
 
-      - name: Cleanup cluster from hot-testing
+      - name: Cleanup cluster from e2e
         if: ${{ inputs.e2e_testing_k8 }}
         uses: wahyd4/kubectl-helm-action@master
         env:
