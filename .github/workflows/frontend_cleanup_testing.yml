@@ -53,7 +53,7 @@ jobs:
 
       - name: Set variables
         run: |
-          echo "ref_name=$(cat $GITHUB_EVENT_PATH | jq '.ref' | sed 's/refs\/heads\///g' | sed 's/\"//g' | tr '[A-Z]' '[a-z]')" >> $GITHUB_ENV
+          echo "ref_name=$([[ ! -z "$GITHUB_HEAD_REF" ]] && (echo $GITHUB_HEAD_REF | tr '[A-Z]' '[a-z]')  || (cat $GITHUB_EVENT_PATH | jq '.ref' | sed 's/refs\/heads\///g' | sed 's/\"//g' | tr '[A-Z]' '[a-z]'))" >> $GITHUB_ENV
           echo "repository_name=$(cat $GITHUB_EVENT_PATH | jq '.repository.name' | sed 's/\"//g')" >> $GITHUB_ENV
         id: set_variables
 
@@ -154,7 +154,7 @@ jobs:
 
 # ---------------------- e2e_testing_k8 -------------------
 
-      - name: Set variables in hot-testing deployment.yml
+      - name: Set variables in e2e deployment.yml
         if: ${{ inputs.e2e_testing_k8 }}
         run: sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/deploy-k8.yml
         env:
@@ -162,7 +162,7 @@ jobs:
         working-directory: ./hot_build/e2e
         continue-on-error: true
 
-      - name: Cleanup cluster from hot-testing
+      - name: Cleanup cluster from e2e
         if: ${{ inputs.e2e_testing_k8 }}
         uses: wahyd4/kubectl-helm-action@master
         env:

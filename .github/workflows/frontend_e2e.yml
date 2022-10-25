@@ -559,3 +559,18 @@ jobs:
             -H "Content-Type: application/json" \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/commits/${{ github.sha }}/comments"
+  clean-up-e2e-tests:
+    needs: [ e2e-tests, core-e2e-tests-runner ]
+    if: ${{ always() && ( needs.e2e-tests.result == 'success' || needs.core-e2e-tests-runner.result == 'success' ) }}
+    uses: mindbox-moscow/github-actions/.github/workflows/frontend_cleanup_testing.yml@master
+    with:
+      hot_testing: false
+      hot_testing_k8: false
+      e2e_testing: true
+      e2e_testing_k8: true
+    secrets:
+      frontend_gha_full_token: ${{ secrets.frontend_gha_full_token }}
+      kube_dev_config: "nothing here"
+      container_registry_key: ${{ secrets.container_registry_key }}
+      kube_dev_config_k8: ${{ secrets.kube_dev_config_k8 }}
+
