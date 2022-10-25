@@ -56,8 +56,6 @@ jobs:
           echo "ref_name=$([[ ! -z "$GITHUB_HEAD_REF" ]] && (echo $GITHUB_HEAD_REF | tr '[A-Z]' '[a-z]')  || (cat $GITHUB_EVENT_PATH | jq '.ref' | sed 's/refs\/heads\///g' | sed 's/\"//g' | tr '[A-Z]' '[a-z]'))" >> $GITHUB_ENV
           echo "repository_name=$(cat $GITHUB_EVENT_PATH | jq '.repository.name' | sed 's/\"//g')" >> $GITHUB_ENV
         id: set_variables
-        env:
-          INPUT_REF: ${{ inputs.ref_name }}
 
       - name: Get branch and repo names hash
         run: echo "hash_payload=$(echo $BRANCH_AND_REPO | md5sum | sed 's/  -//g')"  >> $GITHUB_ENV
