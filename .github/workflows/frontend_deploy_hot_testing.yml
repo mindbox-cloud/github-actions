@@ -27,7 +27,7 @@ on:
         type: boolean
         description: "True if need to use new deployment procedure"
         required: false
-        default: false
+        default: true
       use_s3_deploy_process:
         type: boolean
         description: "True if need to use s3 deployment procedure"
@@ -81,6 +81,8 @@ jobs:
       template_folder: ${{ inputs.template_folder }}
 
     steps:
+      - name: View PR author
+        run: echo "This PR is opened by ${{ github.event.pull_request.user.login }} ."
 
       - name: Checkout the repository
         uses: actions/checkout@v2
