@@ -24,6 +24,9 @@ changelog=" - ${changelog//$'\r'/'%0D'}"
 lastcommit_url="$repo_url/commit/$lastcommit"
 lastcommit_hyperlink="[View latest commit in Github]($lastcommit_url)"
 
-changelog=$lastcommit_hyperlink$'<br/>'$changelog
+lastcommits_url="$repo_url/commits/$lastcommit"
+lastcommits_hyperlink="[View latest commits in Github]($lastcommits_url)"
+
+changelog=$lastcommit_hyperlink$'<br/>'$lastcommits_hyperlink$'<br/>'$changelog
 
 echo "::set-output name=changelog::$changelog"
