@@ -85,7 +85,7 @@ on:
 jobs:
   prepare-site:
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.ref, 'LocalizationPull') }}
+    if: ${{ !contains(github.head_ref, 'LocalizationPull') }}
     env:
       retries: ${{ inputs.retries }}
       CYPRESS_username: "${{ secrets.cypress_login }}"
@@ -321,7 +321,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: prepare-site
     timeout-minutes: ${{ inputs.e2e-timeout }}
-    if: ${{ always() && !cancelled() && !contains(github.ref, 'LocalizationPull') && !inputs.core_project }}
+    if: ${{ always() && !cancelled() && !contains(github.head_ref, 'LocalizationPull') && !inputs.core_project }}
     env:
       retries: ${{ inputs.retries }}
       CYPRESS_username: "${{ secrets.cypress_login }}"
@@ -398,7 +398,7 @@ jobs:
   core-e2e-tests-matrix:
     runs-on: ubuntu-latest
     needs: prepare-site
-    if: ${{ !contains(github.ref, 'LocalizationPull') && inputs.core_project }}
+    if: ${{ !contains(github.head_ref, 'LocalizationPull') && inputs.core_project }}
     env:
       retries: ${{ inputs.retries }}
       CYPRESS_username: "${{ secrets.cypress_login }}"
@@ -469,7 +469,7 @@ jobs:
         project: ${{ fromJSON(needs.core-e2e-tests-matrix.outputs.matrix) }}
       max-parallel: 4
     timeout-minutes: ${{ inputs.e2e-timeout }}
-    if: ${{ always() && !cancelled() && !contains(github.ref, 'LocalizationPull') && inputs.core_project }}
+    if: ${{ always() && !cancelled() && !contains(github.head_ref, 'LocalizationPull') && inputs.core_project }}
     env:
       retries: ${{ inputs.retries }}
       CYPRESS_username: "${{ secrets.cypress_login }}"
