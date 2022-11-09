@@ -115,7 +115,9 @@ runs:
 
     # FIXME: 
     # https://github.com/actions/runner/issues/646
-    - run: echo "TEMP_DIR=$(mktemp -d)" >> $GITHUB_ENV
+    - name: "create log dir"
+      run: echo "TEMP_DIR=$(mktemp -d)" >> $GITHUB_ENV
+      shell: bash
     
     - name: "Terraform Plan"
       id: plan
@@ -130,7 +132,9 @@ runs:
       working-directory: ${{ inputs.workingDir }}
       shell: bash
       
-      - run: cat ${{ env.TEMP_DIR}}/terraform.log
+      - name: "show log"
+        run: cat ${{ env.TEMP_DIR}}/terraform.log
+        shell: bash
       
       - name: Remove File
       uses: JesseTG/rm@v1.0.3
