@@ -137,9 +137,9 @@ runs:
         shell: bash
       
       - name: Remove File
-      uses: JesseTG/rm@v1.0.3
-      with:
-        path: "${{ env.TEMP_DIR}}"
+        uses: JesseTG/rm@v1.0.3
+        with:
+          path: "${{ env.TEMP_DIR}}"
 
     - name: "Fail if plan failed"
       id: failIfPlanFailed
