@@ -11,8 +11,6 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - run: apt install tree jq -y
-      shell: bash
     - id: set-folders
       shell: bash
       run: |
