@@ -11,7 +11,7 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - run: apt update && apt install tree jq -y
+    - run: apt install tree jq -y
       shell: bash
     - id: set-folders
       shell: bash
@@ -20,3 +20,5 @@ runs:
         folders=$(tree -J -d -L 1 | jq -c '.[0].contents | map(.name)')
         echo $folders
         echo "::set-output name=folders::$folders"
+
+#     - run: apt update && apt install tree jq -y
