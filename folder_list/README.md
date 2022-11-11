@@ -33,9 +33,9 @@ jobs:
       - uses: actions/checkout@v1
 
       - id: jobs
-        uses: philips-labs/list-folders-action@v1
+        uses: mindbox-moscow/github-actions/folder_list@master
         with:
-          path: ./path/to/folder
+          path: ${{ github.workspace }}
 
   matrix:
     name: Matrix Jobs
