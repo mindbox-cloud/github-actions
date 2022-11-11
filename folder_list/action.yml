@@ -17,17 +17,8 @@ runs:
         cd ${{ inputs.path }}
         folders=$(tree -J -d -L 1 | jq -c '.[0].contents | map(.name)')
         echo $folders
-#        echo "::set-output name=folders::$folders"
-        echo "{folders}={$folders}" >> $GITHUB_OUTPUT
+        echo "::set-output name=folders::$folders"
+#        echo "{folders}={$folders}" >> $GITHUB_OUTPUT
 
 #     - run: apt update && apt install tree jq -y
 
-
-
-# - name: Set output
-#   run: echo "::set-output name={name}::{value}"
-# should be updated to write to the new GITHUB_STATE and GITHUB_OUTPUT environment files:
-
-
-# - name: Set output
-#   run: echo "{name}={value}" >> $GITHUB_OUTPUT
