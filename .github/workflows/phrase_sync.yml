@@ -15,6 +15,11 @@ on:
         description: Auto merge strategy. Posible values is github or bulldozer.
         required: false
         default: bulldozer
+      commitEmail:
+        type: string
+        description: Email of token's user
+        required: false
+        default: 'action-ci@mindbox.ru'
     secrets:
       phraseAppToken:
         description: 'Token to access PhraseApp'
@@ -43,6 +48,7 @@ jobs:
         uses: mindbox-moscow/github-actions/localization/phrase-pull@master
         with:
           gitHubToken: ${{ secrets.gitHubToken }}
+          commitEmail: ${{ inputs.commitEmail }}
           phraseAppToken: ${{ secrets.phraseAppToken }}
           baseBranch: ${{ inputs.baseBranch }}
           autoMerge: ${{ inputs.autoMerge }}
