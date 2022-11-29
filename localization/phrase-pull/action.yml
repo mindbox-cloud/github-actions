@@ -20,6 +20,10 @@ inputs:
     description: Auto merge strategy. Posible values is github or bulldozer.
     required: false
     default: bulldozer
+  commitEmail:
+    description: Email for user to commit localization
+    required: false
+    default: 'action-ci@mindbox.ru'
 runs:
   using: 'docker'
   image: 'docker://mindboxmoscow/phrase-integration-gha'
@@ -31,3 +35,4 @@ runs:
     baseBranch: ${{ inputs.baseBranch }}
     autoMerge: ${{ inputs.autoMerge }}
     allowCyrillicSymbolsInCSharpComments: ${{ inputs.allowCyrillicSymbolsInCSharpComments }}
+    commitEmail: ${{ inputs.commitEmail }}
