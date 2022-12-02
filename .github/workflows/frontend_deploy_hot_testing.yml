@@ -323,21 +323,19 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.slack_webhook_url }}
 
-      - name: Echo comments
-        run: |
-          curl -siL \
-            -H "Content-Type: application/json" \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/mindbox-moscow/${{ env.repository_name }}/commits/${{ github.sha }}/comments
-
-
       - name: Add comment to commit if the job has completed
-        run: |
-          jq -nc '{"body": ":heavy_check_mark: You can check your **Frontend** changes at\nhttps://hot-testing-${{ env.hash_payload }}-staging.mindbox.ru"}' | \
-          curl -siL -X POST -d @- \
-            -H "Content-Type: application/json" \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/mindbox-moscow/${{ env.repository_name }}/commits/${{ github.sha }}/comments
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: ":heavy_check_mark: You can check your **Frontend** changes at\nhttps://hot-testing-${{ env.hash_payload }}-staging.mindbox.ru"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add comment to commit if the job has failed
+        if: ${{ failure() }}
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: ":negative_squared_cross_mark: Your **Frontend** deploy failed. Check logs at\nhttps://github.com/mindbox-moscow/${{ env.repository_name }}/actions/runs/${{ github.run_id }}"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
 
       - name: Slack notification if the job has failed
         if: ${{ failure() }}
@@ -355,12 +353,3 @@ jobs:
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.slack_webhook_url }}
-
-      - name: Add comment to commit if the job has failed
-        if: ${{ failure() }}
-        run: |
-          jq -nc '{"body": ":negative_squared_cross_mark: Your **Frontend** deploy failed. Check logs at\nhttps://github.com/mindbox-moscow/${{ env.repository_name }}/actions/runs/${{ github.run_id }}"}' | \
-          curl -sL -X POST -d @- \
-            -H "Content-Type: application/json" \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/mindbox-moscow/${{ env.repository_name }}/commits/${{ github.sha }}/comments"
