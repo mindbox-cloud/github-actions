@@ -146,6 +146,9 @@ runs:
       env:
         PLAN: "${{ steps.show.outputs.stdout }}"
       run: |
-        echo "$PLAN" | grep -oP '(?!# module\.kafka.*broker\[)(".*")+(?=\]\..*in\-place)' | sort -u | wc -l
+        if test "$(echo "$PLAN" | grep -oP '(?!# module\.kafka.*broker\[)(".*")+(?=\]\..*in\-place)' | sort -u | wc -l)" -gt 1; then
+          echo "debug plan failed"
+          exit 1
+        fi
       working-directory: ${{ inputs.workingDir }}
       shell: bash
