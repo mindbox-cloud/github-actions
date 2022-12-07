@@ -129,7 +129,9 @@ runs:
 
     - name: "Kafka check"
       id: kafkaCheck
+      env:
+        PLAN: "${{ steps.show.outputs.stdout }}"
       run: |
-        echo ${{ steps.plan.outputs.stdout }} | grep -oEP '(?!# module\.kafka.*broker\[)(".*")+(?=\]\..*in\-place)' | sort -u | wc -l
+        echo '$PLAN' | grep -oP '(?!# module\.kafka.*broker\[)(".*")+(?=\]\..*in\-place)' | sort -u | wc -l
       working-directory: ${{ inputs.workingDir }}
       shell: bash
