@@ -126,24 +126,10 @@ runs:
         fi
       working-directory: ${{ inputs.workingDir }}
       shell: bash
-    
-    - name: "Setup Terraform"
-      uses: hashicorp/setup-terraform@v1
-      with:
-          terraform_version: ${{ inputs.terraformVersion }}
-
-    - name: "Terraform Show"
-      id: show
-      run: |
-        if [[ ${{ steps.plan.outputs.planExitCode }} -ne 0 ]]; then
-          terraform show -no-color plan.tfplan
-        fi
-      working-directory: ${{ inputs.workingDir }}
-      shell: bash
 
     - name: "Kafka check"
       id: kafkaCheck
       run: |
-        echo ${{ steps.show.outputs.stdout }} | grep -oEP '(?!# module\.kafka.*broker\[)(".*")+(?=\]\..*in\-place)' | sort -u | wc -l
+        echo ${{ steps.plan.outputs.stdout }} | grep -oEP '(?!# module\.kafka.*broker\[)(".*")+(?=\]\..*in\-place)' | sort -u | wc -l
       working-directory: ${{ inputs.workingDir }}
       shell: bash
