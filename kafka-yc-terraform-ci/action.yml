@@ -132,6 +132,6 @@ runs:
       env:
         PLAN: "${{ steps.show.outputs.stdout }}"
       run: |
-        echo '$PLAN' | grep -oP '(?!# module\.kafka.*broker\[)(".*")+(?=\]\..*in\-place)' | sort -u | wc -l
+        grep -oP '(?!# module\.kafka.*broker\[)(".*")+(?=\]\..*in\-place)' plan.tfplan | sort -u | wc -l
       working-directory: ${{ inputs.workingDir }}
       shell: bash
