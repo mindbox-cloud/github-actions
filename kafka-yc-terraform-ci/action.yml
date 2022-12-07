@@ -145,8 +145,9 @@ runs:
       id: kafkaCheck
       env:
         PLAN: "${{ steps.show.outputs.stdout }}"
+        REGEX: '# module\.kafka.*[broker|zookeeper]\[\K(".*")(?=\]\..*updated in\-place)'
       run: |
-        if test "$(echo "$PLAN" | grep -oP '# module\.kafka.*[broker|zookeeper]\[\K(".*")+(?=\]\..*in\-place)' | sort -u | wc -l)" -gt 1; then
+        if test "$(echo "$PLAN" | grep -oP "$REGEX" | sort -u | wc -l)" -gt 1; then
           RED='\033[0;31m'
           echo -e "${RED} You must update kafka brokers one by one only!"
           exit 1
