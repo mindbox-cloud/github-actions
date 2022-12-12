@@ -3,6 +3,11 @@ name: Deploy Hot-testing container
 on:
   workflow_call:
     inputs:
+      node_version:
+        description: "Node.js version"
+        default: "14.x"
+        required: false
+        type: string
       registry_id:
         description: "YC registry ID"
         default: "crpo9tj76o3c7pi8i72n"
@@ -117,7 +122,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           always-auth: true
-          node-version: "12.x"
+          node-version: ${{ inputs.node_version }}
           registry-url: "https://npm.pkg.github.com/mindbox-moscow"
 
       - name: Get node modules from cache
