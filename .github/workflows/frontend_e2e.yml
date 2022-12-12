@@ -3,6 +3,11 @@ name: e2e tests
 on:
   workflow_call:
     inputs:
+      node_version:
+        description: "Node.js version"
+        default: "14.x"
+        required: false
+        type: string
       e2e-timeout:
         description: "Timeout in minutes"
         default: 20
@@ -129,7 +134,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           always-auth: true
-          node-version: "12.x"
+          node-version: ${{ inputs.node_version }}
           registry-url: "https://npm.pkg.github.com/mindbox-moscow"
 
       - name: Get node modules from cache
@@ -369,7 +374,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           always-auth: true
-          node-version: "12.x"
+          node-version: ${{ inputs.node_version }}
           registry-url: "https://npm.pkg.github.com/mindbox-moscow"
 
       - name: Run E2E tests on not core project.
@@ -442,7 +447,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           always-auth: true
-          node-version: "12.x"
+          node-version: ${{ inputs.node_version }}
           registry-url: "https://npm.pkg.github.com/mindbox-moscow"
 
       - name: Install YC
@@ -516,7 +521,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           always-auth: true
-          node-version: "12.x"
+          node-version: ${{ inputs.node_version }}
           registry-url: "https://npm.pkg.github.com/mindbox-moscow"
 
       - name: Authenticate in yandex registry
