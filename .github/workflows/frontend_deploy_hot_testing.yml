@@ -224,10 +224,22 @@ jobs:
           sed -i "s~DOCKER_IMAGE~$DOCKER_IMAGE~g" ./deploy.yml
           sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./deploy.yml
           sed -i "s~CI_COMMIT_SHA~$CI_COMMIT_SHA~g" ./deploy.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./s3-chart/Chart.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./s3-chart/values.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./s3-chart/templates/deployment.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./s3-chart/templates/ingressRoute.yml
+          sed -i "s~PROJECT_FOLDER~$PROJECT_FOLDER~g" ./s3-chart/templates/ingressRoute.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./s3-chart/templates/middleware.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./s3-chart/templates/service.yml
+
         env:
           DOCKER_IMAGE: ${{ env.registry }}/${{ env.image }}/${{ env.ref_name }}:${{ github.sha }}
           HASH_PAYLOAD: ${{ env.hash_payload }}
           CI_COMMIT_SHA: ${{ github.sha }}
+          BASE_PROJECT_URL: ${{ inputs.base_project_url }}
+          PROJECT_FOLDER: ${{ env.project_folder }}
+          TARGET_PORT: ${{ inputs.target_port }}
+          FRONTEND_CORE_SERVICE_NAME: ${{ env.frontend_core_service }}
 
       - name: Deploy to cluster
         if: ${{ inputs.use_s3_deploy_process}}
@@ -237,7 +249,7 @@ jobs:
             # https://cloud.yandex.ru/docs/managed-kubernetes/operations/create-static-conf
           KUBE_CONFIG_DATA: ${{ secrets.kube_dev_config }}
         with:
-          args: kubectl apply -f ./hot_build/hot-testing/kubernetes/deploy.yml
+          args: helm install --set ciCommitSha=${{ github.sha }} dockerImage=${{ env.registry }}/${{ env.image }}/${{ env.ref_name }}:${{ github.sha }} targetPort=${{ inputs.target_port }} frontendCoreServiceName=${{ env.frontend_core_service }} baseProjectUrl=${{ inputs.base_project_url }} ./hot_build/hot-testing/kubernetes/s3-chart/Chart.yml
 
 # ---------------------- use_k8_deploy_process -------------------
 
@@ -290,6 +302,13 @@ jobs:
           sed -i "s~PROJECT_FOLDER~$PROJECT_FOLDER~g" ./deploy-k8.yml
           sed -i "s~TARGET_PORT~$TARGET_PORT~g" ./deploy-k8.yml
           sed -i "s~FRONTEND_CORE_SERVICE_NAME~$FRONTEND_CORE_SERVICE_NAME~g" ./deploy-k8.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./k8-chart/Chart.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./k8-chart/values.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./k8-chart/templates/deployment.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./k8-chart/templates/ingressRoute.yml
+          sed -i "s~PROJECT_FOLDER~$PROJECT_FOLDER~g" ./k8-chart/templates/ingressRoute.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./k8-chart/templates/middleware.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./k8-chart/templates/service.yml
         env:
           DOCKER_IMAGE: ${{ env.registry }}/${{ env.image }}-k8/${{ env.ref_name }}:${{ github.sha }}
           HASH_PAYLOAD: ${{ env.hash_payload }}
@@ -307,7 +326,8 @@ jobs:
             # https://cloud.yandex.ru/docs/managed-kubernetes/operations/create-static-conf
           KUBE_CONFIG_DATA: ${{ secrets.kube_dev_config_k8 }}
         with:
-          args: kubectl apply -f ./deploy/hot-testing/kubernetes/deploy-k8.yml
+          args: helm install --set ciCommitSha=${{ github.sha }} dockerImage=${{ env.registry }}/${{ env.image }}/${{ env.ref_name }}:${{ github.sha }} targetPort=${{ inputs.target_port }} frontendCoreServiceName=${{ env.frontend_core_service }} baseProjectUrl=${{ inputs.base_project_url }} ./hot_build/hot-testing/kubernetes/k8-chart/Chart.yml
+
 
 # ---------------------- END use_k8_deploy_process -------------------
 

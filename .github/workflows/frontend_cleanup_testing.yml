@@ -86,9 +86,19 @@ jobs:
 
       - name: Set variables in hot-testing deployment.yml
         if: ${{ inputs.hot_testing }}
-        run: sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/deploy.yml
+        run: |
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/deploy.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/s3-chart/Chart.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/s3-chart/values.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/s3-chart/templates/deployment.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/s3-chart/templates/ingressRoute.yml
+          sed -i "s~PROJECT_FOLDER~$PROJECT_FOLDER~g" ./kubernetes/s3-chart/templates/ingressRoute.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/s3-chart/templates/middleware.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/s3-chart/templates/service.yml
+
         env:
           HASH_PAYLOAD: ${{ env.hash_payload }}
+          PROJECT_FOLDER: ${{ env.project_folder }}
         working-directory: ./hot_build/hot-testing
         continue-on-error: true
 
@@ -100,7 +110,8 @@ jobs:
             # https://cloud.yandex.ru/docs/managed-kubernetes/operations/create-static-conf
           KUBE_CONFIG_DATA: ${{ secrets.kube_dev_config }}
         with:
-          args: kubectl delete -f ./hot_build/hot-testing/kubernetes/deploy.yml
+          args: helm uninstall --set ciCommitSha=${{ github.sha }} dockerImage=${{ env.registry }}/${{ env.image }}/${{ env.ref_name }}:${{ github.sha }} targetPort=${{ inputs.target_port }} frontendCoreServiceName=${{ env.frontend_core_service }} baseProjectUrl=${{ inputs.base_project_url }} ./hot_build/hot-testing/kubernetes/s3-chart/Chart.yml
+
         continue-on-error: true
 
 # ---------------------- e2e_testing -------------------
@@ -114,9 +125,18 @@ jobs:
 
       - name: Set variables in hot-testing deployment.yml
         if: ${{ inputs.e2e_testing }}
-        run: sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/deploy.yml
+        run: | 
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/deploy.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/s3-chart/Chart.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/s3-chart/values.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/s3-chart/templates/deployment.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/s3-chart/templates/ingressRoute.yml
+          sed -i "s~PROJECT_FOLDER~$PROJECT_FOLDER~g" ./kubernetes/s3-chart/templates/ingressRoute.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/s3-chart/templates/middleware.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/s3-chart/templates/service.yml
         env:
           HASH_PAYLOAD: ${{ env.hash_payload }}
+          PROJECT_FOLDER: ${{ env.project_folder }}
         working-directory: ./hot_build/e2e
         continue-on-error: true
 
@@ -128,14 +148,23 @@ jobs:
             # https://cloud.yandex.ru/docs/managed-kubernetes/operations/create-static-conf
           KUBE_CONFIG_DATA: ${{ secrets.kube_dev_config }}
         with:
-          args: kubectl delete -f ./hot_build/e2e/kubernetes/deploy.yml
+          args: helm uninstall --set ciCommitSha=${{ github.sha }} dockerImage=${{ env.registry }}/${{ env.image }}/${{ env.ref_name }}:${{ github.sha }} targetPort=${{ inputs.target_port }} frontendCoreServiceName=${{ env.frontend_core_service }} baseProjectUrl=${{ inputs.base_project_url }} ./hot_build/e2e/kubernetes/s3-chart/Chart.yml
+
         continue-on-error: true
 
 # ---------------------- hot_testing_k8 -------------------
 
       - name: Set variables in hot-testing deployment.yml
         if: ${{ inputs.hot_testing_k8 }}
-        run: sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/deploy-k8.yml
+        run: |
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/deploy-k8.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/k8-chart/Chart.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/k8-chart/values.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/k8-chart/templates/deployment.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/k8-chart/templates/ingressRoute.yml
+          sed -i "s~PROJECT_FOLDER~$PROJECT_FOLDER~g" ./kubernetes/k8-chart/templates/ingressRoute.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/k8-chart/templates/middleware.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/k8-chart/templates/service.yml
         env:
           HASH_PAYLOAD: ${{ env.hash_payload }}
         working-directory: ./hot_build/hot-testing
@@ -149,16 +178,26 @@ jobs:
             # https://cloud.yandex.ru/docs/managed-kubernetes/operations/create-static-conf
           KUBE_CONFIG_DATA: ${{ secrets.kube_dev_config_k8 }}
         with:
-          args: kubectl delete -f ./hot_build/hot-testing/kubernetes/deploy-k8.yml
+          args: helm uninstall --set ciCommitSha=${{ github.sha }} dockerImage=${{ env.registry }}/${{ env.image }}/${{ env.ref_name }}:${{ github.sha }} targetPort=${{ inputs.target_port }} frontendCoreServiceName=${{ env.frontend_core_service }} baseProjectUrl=${{ inputs.base_project_url }} ./hot_build/hot-testing/kubernetes/k8-chart/Chart.yml
+
         continue-on-error: true
 
 # ---------------------- e2e_testing_k8 -------------------
 
       - name: Set variables in e2e deployment.yml
         if: ${{ inputs.e2e_testing_k8 }}
-        run: sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/deploy-k8.yml
+        run: |
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/deploy-k8.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/k8-chart/Chart.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/k8-chart/values.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/k8-chart/templates/deployment.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/k8-chart/templates/ingressRoute.yml
+          sed -i "s~PROJECT_FOLDER~$PROJECT_FOLDER~g" ./kubernetes/k8-chart/templates/ingressRoute.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/k8-chart/templates/middleware.yml
+          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/k8-chart/templates/service.yml
         env:
           HASH_PAYLOAD: ${{ env.hash_payload }}
+          PROJECT_FOLDER: ${{ env.project_folder }}
         working-directory: ./hot_build/e2e
         continue-on-error: true
 
@@ -171,6 +210,8 @@ jobs:
           KUBE_CONFIG_DATA: ${{ secrets.kube_dev_config_k8 }}
         with:
           args: kubectl delete -f ./hot_build/e2e/kubernetes/deploy-k8.yml
+          args: helm uninstall --set ciCommitSha=${{ github.sha }} dockerImage=${{ env.registry }}/${{ env.image }}/${{ env.ref_name }}:${{ github.sha }} targetPort=${{ inputs.target_port }} frontendCoreServiceName=${{ env.frontend_core_service }} baseProjectUrl=${{ inputs.base_project_url }} ./hot_build/e2e/kubernetes/k8-chart/Chart.yml
+
         continue-on-error: true
 
 # ---------------------- END e2e_testing_k8 -------------------
