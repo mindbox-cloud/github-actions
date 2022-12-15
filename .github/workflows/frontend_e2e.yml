@@ -89,7 +89,7 @@ on:
 
 jobs:
   prepare-site:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, frontend]
     if: ${{ !contains(github.head_ref, 'LocalizationPull') }}
     env:
       retries: ${{ inputs.retries }}
@@ -323,7 +323,7 @@ jobs:
 # ---------------------- END use_k8_deploy_process -------------------
 
   e2e-tests:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, frontend]
     needs: prepare-site
     timeout-minutes: ${{ inputs.e2e-timeout }}
     if: ${{ always() && !cancelled() && !contains(github.head_ref, 'LocalizationPull') && !inputs.core_project }}
@@ -401,7 +401,7 @@ jobs:
           retention-days: 1
 
   core-e2e-tests-matrix:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, frontend]
     needs: prepare-site
     if: ${{ !contains(github.head_ref, 'LocalizationPull') && inputs.core_project }}
     env:
@@ -467,7 +467,7 @@ jobs:
           URL: "https://container-registry.api.cloud.yandex.net/container-registry/v1/images"
 
   core-e2e-tests-runner:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, frontend]
     needs: core-e2e-tests-matrix
     strategy:
       matrix:
@@ -553,7 +553,7 @@ jobs:
           retention-days: 1
 
   post-e2e-tests:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, frontend]
     needs: [e2e-tests, core-e2e-tests-runner]
     if: ${{ failure() }}
     steps:
