@@ -469,6 +469,7 @@ jobs:
   core-e2e-tests-runner:
     runs-on: [self-hosted, frontend]
     needs: core-e2e-tests-matrix
+    continue-on-error: true
     strategy:
       matrix:
         project: ${{ fromJSON(needs.core-e2e-tests-matrix.outputs.matrix) }}
