@@ -76,7 +76,7 @@ on:
 
 jobs:
   hot-testing:
-    runs-on: [self-hosted, Linux, frontend]
+    runs-on: [self-hosted, frontend]
     timeout-minutes: 10
     if: ${{ !contains(github.head_ref, 'LocalizationPull') && github.event.pull_request.user.login != 'renovate[bot]' }}
     env:
