@@ -174,25 +174,29 @@ jobs:
         if: ${{ inputs.use_k8_deploy_process }}
         run: docker push ${{ env.registry }}/${{ env.image }}-k8/${{ env.ref_name }}:${{ github.sha }}
 
-      - name: Set variables in deployment.yaml
-        if: ${{ inputs.use_k8_deploy_process }}
-        working-directory: ./deploy/hot-testing/kubernetes
-        run: |
-          sed -i "s~DOCKER_IMAGE~$DOCKER_IMAGE~g" ./deploy-k8.yml
-          sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./deploy-k8.yml
-          sed -i "s~CI_COMMIT_SHA~$CI_COMMIT_SHA~g" ./deploy-k8.yml
-          sed -i "s~BASE_PROJECT_URL~$BASE_PROJECT_URL~g" ./deploy-k8.yml
-          sed -i "s~PROJECT_FOLDER~$PROJECT_FOLDER~g" ./deploy-k8.yml
-          sed -i "s~TARGET_PORT~$TARGET_PORT~g" ./deploy-k8.yml
-          sed -i "s~FRONTEND_CORE_SERVICE_NAME~$FRONTEND_CORE_SERVICE_NAME~g" ./deploy-k8.yml
-        env:
-          DOCKER_IMAGE: ${{ env.registry }}/${{ env.image }}-k8/${{ env.ref_name }}:${{ github.sha }}
-          HASH_PAYLOAD: ${{ env.hash_payload }}
-          CI_COMMIT_SHA: ${{ github.sha }}
-          BASE_PROJECT_URL: ${{ inputs.base_project_url }}
-          PROJECT_FOLDER: ${{ env.project_folder }}
-          TARGET_PORT: ${{ inputs.target_port }}
-          FRONTEND_CORE_SERVICE_NAME: ${{ env.frontend_core_service }}
+      - name: Set variables in values
+        uses: DamianReeves/write-file-action@master
+        with:
+          path: ./deploy/hot-testing/kubernetes/helm/values.yaml
+          contents: |
+            DOCKER_IMAGE: ${{ env.registry }}/${{ env.image }}-k8/${{ env.ref_name }}:${{ github.sha }}
+            HASH_PAYLOAD: ${{ env.hash_payload }}
+            CI_COMMIT_SHA: ${{ github.sha }}
+            BASE_PROJECT_URL: ${{ inputs.base_project_url }}
+            PROJECT_FOLDER: ${{ env.project_folder }}
+            TARGET_PORT: ${{ inputs.target_port }}
+            FRONTEND_CORE_SERVICE_NAME: ${{ env.frontend_core_service }}
+          write-mode: append
+
+      - name: read file
+        run: cat ./deploy/hot-testing/kubernetes/helm/values.yaml
+
+      - name: Create Helm chart
+        id: create-deploy-template
+        run: helmfile template -f ./deploy/hot-testing/kubernetes/helm/helmfile.yaml -e hotTesting >> ./deploy/hot-testing/kubernetes/helm/deploy.yml
+    
+      - name: print
+        run: cat ./deploy.yml
 
       - name: Deploy to cluster
         if: ${{ inputs.use_k8_deploy_process }}
@@ -202,7 +206,7 @@ jobs:
             # https://cloud.yandex.ru/docs/managed-kubernetes/operations/create-static-conf
           KUBE_CONFIG_DATA: ${{ secrets.kube_dev_config_k8 }}
         with:
-          args: kubectl apply -f ./deploy/hot-testing/kubernetes/deploy-k8.yml
+          args: kubectl apply -f ./deploy/hot-testing/kubernetes/helm/deploy.yml
 
 # ---------------------- END use_k8_deploy_process -------------------
 
