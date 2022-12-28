@@ -278,7 +278,9 @@ jobs:
       
       - name: Copy Dockerfile to build folder
         if: ${{ inputs.use_k8_deploy_process }}
-        run: cp ./deploy/mcf-release/Dockerfile ./build
+        run: | 
+          cp ./deploy/mcf-release/Dockerfile ./build
+          cp ./deploy/mcf-release/nginx.conf ./build
 
       - name: Build docker image
         if: ${{ inputs.use_k8_deploy_process }}
