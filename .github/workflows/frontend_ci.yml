@@ -86,11 +86,6 @@ on:
         description: "True if need to use new deployment procedure"
         required: false
         default: false
-      use_s3_deploy_process:
-        type: boolean
-        description: "True if need to use old deployment procedure"
-        required: false
-        default: false
     secrets:
       npm_token:
         description: 'A GH_NPM_REGISTRY token passed from the caller workflow'
@@ -268,32 +263,6 @@ jobs:
       - name: Disable Lefthook
         run: echo "LEFTHOOK=0" >> $GITHUB_ENV
 
-      - name: Build and format npm-package
-        if: ${{ inputs.use_s3_deploy_process }}
-        run: npm run build
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.npm_token }}
-          SENTRY_MAIN_AUTH_TOKEN: ${{ secrets.sentry_main_auth_token }}
-          SENTRY_MAIN_DSN: ${{ secrets.sentry_main_dsn }}
-          SENTRY_MAIN_ENABLED: ${{ inputs.sentry_main_enabled }}
-          SENTRY_MAIN_ORG: ${{ env.sentry_main_org }}
-          SENTRY_MAIN_PROJECT: ${{ inputs.sentry_main_project }}
-          SENTRY_MAIN_URL: ${{ env.sentry_main_url }}
-          SENTRY_MAIN_RELEASE: ${{ steps.release-number.outputs.release-number }} (${{ github.sha }})
-          SENTRY_AUTOBUGS_AUTH_TOKEN: ${{ secrets.sentry_autobugs_auth_token }}
-          SENTRY_AUTOBUGS_DSN: ${{ secrets.sentry_autobugs_dsn }}
-          SENTRY_AUTOBUGS_ENABLED: ${{ inputs.sentry_autobugs_enabled }}
-          SENTRY_AUTOBUGS_ORG: ${{ env.sentry_autobugs_org }}
-          SENTRY_AUTOBUGS_PROJECT: ${{ inputs.sentry_autobugs_project }}
-          SENTRY_AUTOBUGS_URL: ${{ env.sentry_autobugs_url }}
-          SENTRY_AUTOBUGS_RELEASE: ${{ steps.release-number.outputs.release-number }} (${{ github.sha }})
-
-      - name: Copy package.json to build folder
-        if: ${{ inputs.use_s3_deploy_process }}
-        run: cp ./package.json ./build/
-
       - name: Install YC
         run: |
           sudo curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
@@ -304,17 +273,6 @@ jobs:
           yc config profile create frontend-ci
           echo '${{ secrets.container_registry_key }}' >> iam_key.json | yc config set service-account-key iam_key.json
           rm iam_key.json
-
-      - name: Create e2e tests list
-        if: ${{ inputs.use_s3_deploy_process }}
-        run: |
-          curl -s -H "Authorization: Bearer $(yc iam create-token)" $URL?repositoryName=${{ inputs.registry_id }}/frontend-e2e | jq -r ".images[].tags[]" | sed 's/-latest//g'  > ./build/e2e_tests.txt
-        env:
-          URL: "https://container-registry.api.cloud.yandex.net/container-registry/v1/images"
-
-      - name: Create artifact
-        if: ${{ inputs.use_s3_deploy_process }}
-        run: zip -r ${{ env.octopus_project_name }}.${{ steps.release-number.outputs.release-number }}.zip ./build
 
 # ---------------- start use_k8_deploy_process ---------------------
 
@@ -434,31 +392,6 @@ jobs:
           file_pattern: package.json
           commit_message: 'chore: upd release version ${{ steps.release-number.outputs.release-number }} [ci skip]'
           commit_options: '--no-verify'
-
-
-      - name: Push package to Octopus repository
-        if: ${{ inputs.use_s3_deploy_process }}
-        uses: docker://octopusdeploy/octo
-        with:
-          args: >
-            push
-            --package="./${{ env.octopus_project_name }}.${{ steps.release-number.outputs.release-number }}.zip"
-            --server ${{ secrets.octopus_server }}
-            --apikey ${{ secrets.octopus_api_key }}
-
-      - name: Create Octopus Release
-        if: ${{ inputs.use_s3_deploy_process }}
-        uses: docker://octopusdeploy/octo
-        with:
-          args: >
-            create-release
-            --server ${{ secrets.octopus_server }}
-            --project "${{ env.octopus_project_name }}"
-            --version ${{ steps.release-number.outputs.release-number }}
-            --channel Default
-            --tenant=*
-            --apikey ${{ secrets.octopus_api_key }}
-            --releasenotes "${{ steps.create-release.outputs.release-notes-body }}"
 
       - name: Create Octopus k8 Release
         if: ${{ inputs.use_k8_deploy_process }}
