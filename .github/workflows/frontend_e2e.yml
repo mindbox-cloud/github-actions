@@ -298,8 +298,6 @@ jobs:
         if: ${{ inputs.cypress_v5 }}
         uses: cypress-io/github-action@v5
         with:
-          command: npm run e2e:ci
-          wait-on: 'https://e2e-testing-${{ env.hash_payload }}-staging.mindbox.ru'
           install: true
           config: baseUrl=https://e2e-testing-${{ env.hash_payload }}-staging.mindbox.ru,retries=${{ env.retries }},videoUploadOnPasses=false,videoCompression=false
           working-directory: e2e
