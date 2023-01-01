@@ -299,7 +299,7 @@ jobs:
         uses: cypress-io/github-action@v5
         with:
           command: npm run e2e:ci
-          wait-on: ${{ env.E2E_URL }}
+          wait-on: '${{ env.E2E_URL }}'
           install: true
           config: baseUrl=${{ env.E2E_URL }},retries=${{ env.retries }},videoUploadOnPasses=false,videoCompression=false
           working-directory: e2e
