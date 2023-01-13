@@ -200,7 +200,7 @@ jobs:
         run: helmfile template -f ./deploy/hot-testing/kubernetes/helm/helmfile.yaml -e hotTesting >> ./deploy/hot-testing/kubernetes/helm/deploy.yml
 
       - name: print
-        run: cat ./deploy.yml
+        run: cat ./deploy/hot-testing/kubernetes/helm/deploy.yml
 
       - name: Deploy to cluster
         if: ${{ inputs.use_k8_deploy_process }}
