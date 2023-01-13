@@ -48,11 +48,6 @@ on:
         description: "True if need to use new deployment procedure"
         required: false
         default: true
-      use_s3_deploy_process:
-        type: boolean
-        description: "True if need to use s3 deployment procedure"
-        required: false
-        default: false
       target_port:
         type: number
         description: "The port for k8 services"

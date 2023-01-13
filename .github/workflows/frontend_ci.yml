@@ -86,11 +86,6 @@ on:
         description: "True if need to use new deployment procedure"
         required: false
         default: false
-      use_s3_deploy_process:
-        type: boolean
-        description: "True if need to use old deployment procedure"
-        required: false
-        default: false
     secrets:
       npm_token:
         description: 'A GH_NPM_REGISTRY token passed from the caller workflow'
