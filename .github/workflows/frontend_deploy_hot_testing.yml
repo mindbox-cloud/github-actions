@@ -140,6 +140,7 @@ jobs:
         with:
           repository: mindbox-moscow/frontend-deploy
           token: ${{ secrets.frontend_gha_full_token }}
+          ref: nikitin/helmchart
           path: ./deploy
 
       - name: Build and format npm-package for new deploy
