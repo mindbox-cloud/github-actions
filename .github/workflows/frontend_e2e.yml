@@ -446,13 +446,15 @@ jobs:
         run: |
           [ -d ./cypress/${{ matrix.project }} ] && mkdir -p ./cypress/${{ matrix.project }}
           mkdir -p ./cypress/${{ matrix.project }}/videos && mkdir -p ./cypress/${{ matrix.project }}/screenshots
-
           docker run -i \
             --pull always \
             -e BASE_URL="${{ env.E2E_URL }}" \
             -e RETRIES="${{ env.retries }}" \
             -e CYPRESS_username=${{ secrets.cypress_login }} \
             -e CYPRESS_password=${{ secrets.cypress_pass }} \
+            -e CYPRESS_grepTags="@smoke" \
+            -e CYPRESS_grepFilterSpecs=true \
+            -e CYPRESS_grepOmitFiltered=true \
             -v $(pwd)/cypress/${{ matrix.project }}/videos:/e2e/cypress/videos \
             -v $(pwd)/cypress/${{ matrix.project }}/screenshots:/e2e/cypress/screenshots \
             cr.yandex/${{ inputs.registry_id }}/frontend-e2e:${{ matrix.project }}-latest 2>&1
