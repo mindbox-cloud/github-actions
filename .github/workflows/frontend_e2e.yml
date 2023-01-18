@@ -309,7 +309,6 @@ jobs:
 
       - name: Upload test results artifacts
         uses: actions/upload-artifact@v2
-        if: failure()
         with:
           name: cypress-${{ env.project_name }}
           path: e2e/cypress
