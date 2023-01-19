@@ -57,7 +57,7 @@ on:
         type: boolean
         description: "Use cypress action v5 action"
         required: false
-        default: false
+        default: true
     secrets:
       npm_token:
         description: 'A GH_NPM_REGISTRY token passed from the caller workflow'
