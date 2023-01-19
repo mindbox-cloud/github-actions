@@ -299,6 +299,7 @@ jobs:
         uses: cypress-io/github-action@v5
         with:
           install: true
+          build: npm run info
           config: baseUrl=https://e2e-testing-${{ env.hash_payload }}-staging.mindbox.ru,retries=${{ env.retries }},videoUploadOnPasses=false,videoCompression=false
           working-directory: e2e
           browser: chrome
