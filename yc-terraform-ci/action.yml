@@ -151,7 +151,34 @@ runs:
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
-    - name: "Kafka check"
+    - name: "Kafka check 1"
+      id: kafkaCheck
+      env:
+        PLAN: "${{ steps.show.outputs.stdout }}"
+      run: |
+        echo $PLAN
+      working-directory: ${{ inputs.workingDir }}
+      shell: bash
+
+    - name: "Kafka check 2"
+      id: kafkaCheck
+      env:
+        PLAN: "${{ steps.show.outputs.stdout }}"
+      run: |
+        echo $PLAN | grep -oP '# module\.kafka.*[broker|zookeeper]\[\K(".*")(?=\]\..*updated in\-place)'
+      working-directory: ${{ inputs.workingDir }}
+      shell: bash
+
+    - name: "Kafka check 3"
+      id: kafkaCheck
+      env:
+        PLAN: "${{ steps.show.outputs.stdout }}"
+      run: |
+        echo $PLAN | grep -oP '# module\.kafka.*[broker|zookeeper]\[\K(".*")(?=\]\..*updated in\-place)' | sort -u
+      working-directory: ${{ inputs.workingDir }}
+      shell: bash
+
+    - name: "Kafka check 4"
       id: kafkaCheck
       env:
         PLAN: "${{ steps.show.outputs.stdout }}"
