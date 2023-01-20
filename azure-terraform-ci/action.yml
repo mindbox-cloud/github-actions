@@ -139,8 +139,6 @@ runs:
 
     - name: "Kafka check"
       id: kafkaCheck
-      env:
-        PLAN: "${{ steps.show.outputs.stdout }}"
       run: |
         if [[ ${{ steps.plan.outputs.planExitCode }} -ne 0 ]]; then
           if test "$(terraform show -no-color plan.tfplan | grep -oP '# module\.kafka.*[broker|zookeeper]\[\K(".*")(?=\]\..*updated in\-place)' | sort -u | wc -l)" -gt 1; then
