@@ -87,6 +87,9 @@ on:
         description: 'A SA_TOKEN_DTLN_KUBE_CDP_STAGING_MICROFRONTENDS token passed from the caller workflow for new deploy'
         required: false
 
+env:
+  NODE_OPTIONS: --unhandled-rejections=strict
+
 jobs:
   prepare-site:
     runs-on: [self-hosted, frontend]
