@@ -151,42 +151,15 @@ runs:
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
-    - name: "Kafka check 1"
-      id: kafkaCheck1
-      env:
-        PLAN: "${{ steps.show.outputs.stdout }}"
+    - name: "Kafka check"
+      id: kafkaCheck
       run: |
-        echo $PLAN
-      working-directory: ${{ inputs.workingDir }}
-      shell: bash
-
-    - name: "Kafka check 2"
-      id: kafkaCheck2
-      env:
-        PLAN: "${{ steps.show.outputs.stdout }}"
-      run: |
-        echo $PLAN | grep -oP '# module\.kafka.*[broker|zookeeper]\[\K(".*")(?=\]\..*updated in\-place)'
-      working-directory: ${{ inputs.workingDir }}
-      shell: bash
-
-    - name: "Kafka check 3"
-      id: kafkaCheck3
-      env:
-        PLAN: "${{ steps.show.outputs.stdout }}"
-      run: |
-        echo $PLAN | grep -oP '# module\.kafka.*[broker|zookeeper]\[\K(".*")(?=\]\..*updated in\-place)' | sort -u
-      working-directory: ${{ inputs.workingDir }}
-      shell: bash
-
-    - name: "Kafka check 4"
-      id: kafkaCheck4
-      env:
-        PLAN: "${{ steps.show.outputs.stdout }}"
-      run: |
-        if test "$(echo $PLAN | grep -oP '# module\.kafka.*[broker|zookeeper]\[\K(".*")(?=\]\..*updated in\-place)' | sort -u | wc -l)" -gt 1; then
-          RED='\033[0;31m'
-          echo -e "${RED} You must update kafka brokers and zookeepers one by one only!"
-          exit 1
+        if [[ ${{ steps.plan.outputs.planExitCode }} -ne 0 ]]; then
+          if test "$(terraform show -no-color plan.tfplan | grep -oP '# module\.kafka.*[broker|zookeeper]\[\K(".*")(?=\]\..*updated in\-place)' | sort -u | wc -l)" -gt 1; then
+            RED='\033[0;31m'
+            echo -e "${RED} You must update kafka brokers and zookeepers one by one only!"
+            exit 1
+          fi 
         fi
       working-directory: ${{ inputs.workingDir }}
       shell: bash
