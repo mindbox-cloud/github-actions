@@ -152,7 +152,7 @@ runs:
       shell: bash
 
     - name: "Kafka check 1"
-      id: kafkaCheck
+      id: kafkaCheck1
       env:
         PLAN: "${{ steps.show.outputs.stdout }}"
       run: |
@@ -161,7 +161,7 @@ runs:
       shell: bash
 
     - name: "Kafka check 2"
-      id: kafkaCheck
+      id: kafkaCheck2
       env:
         PLAN: "${{ steps.show.outputs.stdout }}"
       run: |
@@ -170,7 +170,7 @@ runs:
       shell: bash
 
     - name: "Kafka check 3"
-      id: kafkaCheck
+      id: kafkaCheck3
       env:
         PLAN: "${{ steps.show.outputs.stdout }}"
       run: |
@@ -179,7 +179,7 @@ runs:
       shell: bash
 
     - name: "Kafka check 4"
-      id: kafkaCheck
+      id: kafkaCheck4
       env:
         PLAN: "${{ steps.show.outputs.stdout }}"
       run: |
