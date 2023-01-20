@@ -156,7 +156,7 @@ runs:
       env:
         PLAN: "${{ steps.show.outputs.stdout }}"
       run: |
-        if test "$(echo "$PLAN" | grep -oP '# module\.kafka.*[broker|zookeeper]\[\K(".*")(?=\]\..*updated in\-place)' | sort -u | wc -l)" -gt 1; then
+        if test "$(echo $PLAN | grep -oP '# module\.kafka.*[broker|zookeeper]\[\K(".*")(?=\]\..*updated in\-place)' | sort -u | wc -l)" -gt 1; then
           RED='\033[0;31m'
           echo -e "${RED} You must update kafka brokers and zookeepers one by one only!"
           exit 1
