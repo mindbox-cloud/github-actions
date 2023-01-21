@@ -312,7 +312,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.npm_token }}
-          DEBUG: cypress:server:util:process_profiler
 
       - name: Upload test results artifacts
         uses: actions/upload-artifact@v2
