@@ -225,6 +225,7 @@ jobs:
 
   e2e-tests:
     runs-on: [self-hosted, frontend]
+    container: cypress/browsers:node16.16.0-chrome107-ff107
     needs: prepare-site
     timeout-minutes: ${{ inputs.e2e-timeout }}
     if: ${{ always() && !cancelled() && !contains(github.head_ref, 'LocalizationPull') && !inputs.core_project }}
@@ -270,13 +271,6 @@ jobs:
             echo "project_name=$project_name" >> $GITHUB_ENV
           fi
         id: set_project
-
-      - name: Setup Node.JS
-        uses: actions/setup-node@v1
-        with:
-          always-auth: true
-          node-version: ${{ inputs.node_version }}
-          registry-url: "https://npm.pkg.github.com/mindbox-moscow"
 
       - name: Run E2E tests on not core project (v5).
         uses: cypress-io/github-action@v5
