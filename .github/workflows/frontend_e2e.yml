@@ -229,7 +229,7 @@ jobs:
 # ---------------------- END use_k8_deploy_process -------------------
 
   e2e-tests:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, frontend]
     needs: prepare-site
     timeout-minutes: ${{ inputs.e2e-timeout }}
     if: ${{ always() && !cancelled() && !contains(github.head_ref, 'LocalizationPull') && !inputs.core_project }}
