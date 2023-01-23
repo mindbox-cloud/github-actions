@@ -272,6 +272,13 @@ jobs:
           fi
         id: set_project
 
+      - name: Setup Node.JS
+        uses: actions/setup-node@v1
+        with:
+          always-auth: true
+          node-version: ${{ inputs.node_version }}
+          registry-url: "https://npm.pkg.github.com/mindbox-moscow"
+
       - name: Run E2E tests on not core project (v5).
         uses: cypress-io/github-action@v5
         with:
