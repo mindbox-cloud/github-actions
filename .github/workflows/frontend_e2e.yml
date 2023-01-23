@@ -244,6 +244,9 @@ jobs:
         if: env.WORKFLOW_CONCLUSION == 'failure'
         run: echo "previous steps are failed" && exit 1
 
+      - name: install additional tools
+        run: sudo apt-get install jq
+
       - name: Checkout the repository
         uses: actions/checkout@v2
 
