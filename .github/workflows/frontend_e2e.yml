@@ -53,11 +53,6 @@ on:
         description: "The port for k8 services"
         required: false
         default: 8080
-      cypress_browser:
-        description: "Cypress browser"
-        default: "chrome"
-        required: false
-        type: string
     secrets:
       npm_token:
         description: 'A GH_NPM_REGISTRY token passed from the caller workflow'
@@ -289,7 +284,6 @@ jobs:
         uses: cypress-io/github-action@v5
         with:
           install: true
-          build: npm run info
           config: baseUrl=https://e2e-testing-${{ env.hash_payload }}-staging.mindbox.ru,retries=${{ env.retries }},videoUploadOnPasses=false,videoCompression=false
           working-directory: e2e
           browser: chrome
