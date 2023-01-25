@@ -223,7 +223,12 @@ jobs:
 
   e2e-tests:
     runs-on: [self-hosted, frontend]
-    container: cypress/browsers:node16.16.0-chrome107-ff107
+    container:
+      image: cypress/browsers:node16.16.0-chrome107-ff107
+      env:
+        CYPRESS_CACHE_FOLDER: /cypress-cache
+      volumes:
+        - /cypress-cache:~/.cache/Cypress
     needs: prepare-site
     timeout-minutes: ${{ inputs.e2e-timeout }}
     if: ${{ always() && !cancelled() && !contains(github.head_ref, 'LocalizationPull') && !inputs.core_project }}
