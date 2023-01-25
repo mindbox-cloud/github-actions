@@ -265,7 +265,6 @@ jobs:
         env:
           BRANCH_AND_REPO: "${{ env.repository_name }} ${{ env.ref_name }}"
 
-
       - name: Set project path
         run: |
           project_name=$(cat ./package.json | jq .name | sed -s 's/@mindbox-moscow\///g' | sed -s 's/-/_/g' | sed -s 's/"//g')
@@ -284,6 +283,9 @@ jobs:
           always-auth: true
           node-version: ${{ inputs.node_version }}
           registry-url: "https://npm.pkg.github.com/mindbox-moscow"
+
+      - name: Check cypress cache path
+        run: npm run cachepath
 
       - name: Run E2E tests on not core project (v5).
         uses: cypress-io/github-action@v5
