@@ -173,6 +173,10 @@ runs:
         github-token: ${{ inputs.githubToken }}
         script: |
           if (process.env.CONDITION == "2") {
+            const planMessage = process.env.PLAN.length < 128000
+              ? `\`\`\`terraform\n ${process.env.PLAN} \n\`\`\``
+              : "Plan is too long. Please, refer to [Github Action logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})";
+
             const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
             #### Terraform Validation 🤖${{ steps.validate.outputs.stdout }}
@@ -180,9 +184,7 @@ runs:
             
             <details><summary>Show Plan</summary>
             
-            \`\`\`terraform\n
-            ${process.env.PLAN}
-            \`\`\`
+            ${planMessage}
             
             </details>
 
