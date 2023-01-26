@@ -173,7 +173,7 @@ runs:
         github-token: ${{ inputs.githubToken }}
         script: |
           if (process.env.CONDITION == "2") {
-            const planMessage = process.env.PLAN.length < 128000
+            const planMessage = process.env.PLAN.length < 65000
               ? `\`\`\`terraform\n ${process.env.PLAN} \n\`\`\``
               : "Plan is too long. Please, refer to [Github Action logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})";
 
