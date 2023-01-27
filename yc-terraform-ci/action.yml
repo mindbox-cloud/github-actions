@@ -164,18 +164,29 @@ runs:
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
+    - name: "Truncate plan"
+      id: truncate-plan
+      run: |
+        plan="${{ steps.show.outputs.stdout }}"
+        echo "plan=${plan:0:65536}" >> $GITHUB_OUTPUT
+        original_length=${#plan}
+        if (($original_length > 65536)); then truncated=true; else truncated=false; fi
+        echo "truncated=${truncated}" >> $GITHUB_OUTPUT
+        cat $GITHUB_OUTPUT
+
     - uses: actions/github-script@0.9.0
       name: "Comment plan"
       env:
-        PLAN: "${{ steps.show.outputs.stdout }}"
+        PLAN: "${{ steps.truncate-plan.outputs.plan }}"
+        SHOW_PLAN: ${{ steps.truncate-plan.outputs.truncated != 'true' }}
         CONDITION: "${{ steps.plan.outputs.planExitCode }}"
       with:
         github-token: ${{ inputs.githubToken }}
         script: |
           if (process.env.CONDITION == "2") {
-            const planMessage = process.env.PLAN.length < 65000
+            const planMessage = process.env.SHOW_PLAN == "true"
               ? `\`\`\`terraform\n ${process.env.PLAN} \n\`\`\``
-              : "Plan is too long. Please, refer to [Github Action logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})";
+              : "Please, refer to [Github Action logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})";
 
             const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
