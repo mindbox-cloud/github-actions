@@ -164,21 +164,21 @@ runs:
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
-    - name: "Truncate plan"
-      id: truncate-plan
-      run: |
-        plan="${{ steps.show.outputs.stdout }}"
-        echo "plan=${plan:0:65536}" >> $GITHUB_OUTPUT
-        original_length=${#plan}
-        if (($original_length > 65536)); then truncated=true; else truncated=false; fi
-        echo "truncated=${truncated}" >> $GITHUB_OUTPUT
-      shell: bash
+#    - name: "Truncate plan"
+#      id: truncate-plan
+#      run: |
+#        plan="${{ steps.show.outputs.stdout }}"
+#        echo "plan=${plan:0:65536}" >> $GITHUB_OUTPUT
+#        original_length=${#plan}
+#        if (($original_length > 65536)); then truncated=true; else truncated=false; fi
+#        echo "truncated=${truncated}" >> $GITHUB_OUTPUT
+#      shell: bash
 
     - uses: actions/github-script@0.9.0
       name: "Comment plan"
       env:
-        PLAN: "${{ steps.truncate-plan.outputs.plan }}"
-        SHOW_PLAN: ${{ steps.truncate-plan.outputs.truncated != 'true' }}
+        PLAN: "${{ steps.show.outputs.stdout }}"
+        SHOW_PLAN: true #${{ steps.truncate-plan.outputs.truncated != 'true' }}
         CONDITION: "${{ steps.plan.outputs.planExitCode }}"
       with:
         github-token: ${{ inputs.githubToken }}
