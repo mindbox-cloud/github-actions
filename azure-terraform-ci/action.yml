@@ -158,7 +158,7 @@ runs:
         original_length=${#plan}
         if (($original_length > 65536)); then truncated=true; else truncated=false; fi
         echo "truncated=${truncated}" >> $GITHUB_OUTPUT
-        cat $GITHUB_OUTPUT
+      shell: bash
 
     - uses: actions/github-script@0.9.0
       name: "Comment plan"
