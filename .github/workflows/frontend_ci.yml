@@ -129,7 +129,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run translation checker
-        uses: mindbox-moscow/github-actions/localization/translation-checker@master
+        uses: mindbox-cloud/github-actions/localization/translation-checker@master
         with:
           skipInclusionCheck: true
 
@@ -137,7 +137,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ inputs.node_version }}
-          registry-url: "https://npm.pkg.github.com/mindbox-moscow"
+          registry-url: "https://npm.pkg.github.com/mindbox-cloud"
 
       - name: Clean cache
         run: npm cache clean -f
@@ -238,7 +238,7 @@ jobs:
 
       - name: Generate release number
         id: release-number
-        uses: mindbox-moscow/gha-release-number@v1.0.1
+        uses: mindbox-cloud/gha-release-number@v1.0.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -247,7 +247,7 @@ jobs:
         with:
           always-auth: true
           node-version: ${{ inputs.node_version }}
-          registry-url: "https://npm.pkg.github.com/mindbox-moscow"
+          registry-url: "https://npm.pkg.github.com/mindbox-cloud"
           
       - name: Cache node modules
         uses: actions/cache@v3
@@ -323,8 +323,8 @@ jobs:
       - name: Download release Dockerfile
         if: ${{ inputs.use_k8_deploy_process }}
         run: |
-          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-moscow/frontend-deploy/master/mcf-release/Dockerfile
-          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-moscow/frontend-deploy/master/mcf-release/nginx.conf
+          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/master/mcf-release/Dockerfile
+          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/master/mcf-release/nginx.conf
         working-directory: ./build
 
         # needed for frontend discovery(build initial.js)
@@ -356,7 +356,7 @@ jobs:
       - name: Download e2e tests Dockerfile
         if: ${{ inputs.e2e_tag }}
         run: |
-          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-moscow/frontend-cypress/master/docker/Dockerfile
+          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-cypress/master/docker/Dockerfile
         working-directory: ./e2e
 
       - name: Remove old e2e image
@@ -379,7 +379,7 @@ jobs:
 
       - name: Create Release
         id: create-release
-        uses: mindbox-moscow/github-actions/create-github-release@master
+        uses: mindbox-cloud/github-actions/create-github-release@master
         with:
           release-number: ${{ steps.release-number.outputs.release-number }}
           checkout: false

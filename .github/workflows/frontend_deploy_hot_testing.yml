@@ -103,7 +103,7 @@ jobs:
 
       - name: Set project path
         run: |
-          project_name=$(cat ./package.json | jq .name | sed -s 's/@mindbox-moscow\///g' | sed -s 's/-/_/g' | sed -s 's/"//g')
+          project_name=$(cat ./package.json | jq .name | sed -s 's/@mindbox-cloud\///g' | sed -s 's/-/_/g' | sed -s 's/"//g')
           if [[ $project_name == "frontend_core_v2" ]]; then
             echo "project_folder=core" >> $GITHUB_ENV
             echo "frontend_core_service=hot-testing-service-${{ env.hash_payload }}" >> $GITHUB_ENV
@@ -118,7 +118,7 @@ jobs:
         with:
           always-auth: true
           node-version: ${{ inputs.node_version }}
-          registry-url: "https://npm.pkg.github.com/mindbox-moscow"
+          registry-url: "https://npm.pkg.github.com/mindbox-cloud"
 
       - name: Get node modules from cache
         uses: actions/cache@v2
@@ -138,7 +138,7 @@ jobs:
         if: ${{ inputs.use_k8_deploy_process }}
         uses: actions/checkout@v2
         with:
-          repository: mindbox-moscow/frontend-deploy
+          repository: mindbox-cloud/frontend-deploy
           token: ${{ secrets.frontend_gha_full_token }}
           path: ./deploy
 
@@ -217,7 +217,7 @@ jobs:
                 fallback: 'fallback',
                 color: 'good',
                 title: "Repository: ${{ env.repository_name }}",
-              text: "You can check your *Frontend* changes at\nhttps://hot-testing-${{ env.hash_payload }}-staging.mindbox.ru\n\nand check your PR at \nhttps://github.com/mindbox-moscow/${{ env.repository_name }}/commit/${{ github.sha }}"
+              text: "You can check your *Frontend* changes at\nhttps://hot-testing-${{ env.hash_payload }}-staging.mindbox.ru\n\nand check your PR at \nhttps://github.com/mindbox-cloud/${{ env.repository_name }}/commit/${{ github.sha }}"
               }]
             }
         env:
@@ -233,7 +233,7 @@ jobs:
         if: ${{ failure() }}
         uses: mshick/add-pr-comment@v2
         with:
-          message: ":negative_squared_cross_mark: Your **Frontend** deploy failed. Check logs at\nhttps://github.com/mindbox-moscow/${{ env.repository_name }}/actions/runs/${{ github.run_id }}"
+          message: ":negative_squared_cross_mark: Your **Frontend** deploy failed. Check logs at\nhttps://github.com/mindbox-cloud/${{ env.repository_name }}/actions/runs/${{ github.run_id }}"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
 
@@ -248,7 +248,7 @@ jobs:
                 "author_name": "Author: ${{ github.actor }}",
                 color: "#FF0000",
                 title: "Repository: ${{ env.repository_name }}",
-              text: "Your *Frontend* deploy failed. Check logs at\nhttps://github.com/mindbox-moscow/${{ env.repository_name }}/actions/runs/${{ github.run_id }}"
+              text: "Your *Frontend* deploy failed. Check logs at\nhttps://github.com/mindbox-cloud/${{ env.repository_name }}/actions/runs/${{ github.run_id }}"
               }]
             }
         env:
