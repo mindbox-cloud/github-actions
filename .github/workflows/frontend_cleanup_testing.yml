@@ -47,7 +47,7 @@ jobs:
       - name: Checkout frontend-deploy repository
         uses: actions/checkout@v2
         with:
-          repository: mindbox-moscow/frontend-deploy
+          repository: mindbox-cloud/frontend-deploy
           token: ${{ secrets.frontend_gha_full_token }}
           path: ./hot_build
 

@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: phrase push
-        uses: mindbox-moscow/github-actions/localization/phrase-push@master
+        uses: mindbox-cloud/github-actions/localization/phrase-push@master
         with:
           phraseAppToken: ${{ secrets.phraseAppToken }}
       

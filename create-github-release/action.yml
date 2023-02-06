@@ -33,12 +33,12 @@ runs:
     - name: generate release number
       if: ${{ inputs.release-number == 'empty' }}
       id: release-number
-      uses: mindbox-moscow/gha-release-number@v1.0.1
+      uses: mindbox-cloud/gha-release-number@v1.0.1
       with:
         token: ${{ github.token }}
 
     - name: Changelog
-      uses: mindbox-moscow/github-actions/generate-release-changelog@master
+      uses: mindbox-cloud/github-actions/generate-release-changelog@master
       id: changelog
       env:
         REPO: ${{ github.repository }}
