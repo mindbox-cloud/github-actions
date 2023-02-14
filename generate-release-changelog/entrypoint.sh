@@ -21,8 +21,8 @@ changelog="${changelog//'%'/'%25'}"
 changelog="${changelog//$'\n'/'%0A' - }"
 changelog=" - ${changelog//$'\r'/'%0D'}"
 
-lastcommit_url="$repo_url/commit/$lastcommit"
-lastcommit_hyperlink="[View latest commit in Github]($lastcommit_url)"
+lastcommit_url="$repo_url/commits/$lastcommit"
+lastcommit_hyperlink="[View latest commits in Github]($lastcommit_url)"
 
 changelog=$lastcommit_hyperlink$'<br/>'$changelog
 
