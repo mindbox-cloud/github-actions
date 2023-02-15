@@ -38,6 +38,7 @@ jobs:
       amixrWebhookUrl: ${{ secrets.amixrWebhookUrl }}
     steps:
       - uses: actions/checkout@v3
+      - run: sudo chown -R root:root $GITHUB_WORKSPACE
 
       - name: phrase push
         uses: mindbox-cloud/github-actions/localization/phrase-push@master
