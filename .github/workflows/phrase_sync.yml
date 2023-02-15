@@ -38,7 +38,7 @@ jobs:
       amixrWebhookUrl: ${{ secrets.amixrWebhookUrl }}
     steps:
       - uses: actions/checkout@v3
-      - run: sudo git config --system --add safe.directory /runner/_work/frontend-customers/frontend-customers
+      - run: sudo git config --system --add safe.directory /github/workspace
 
       - name: phrase push
         uses: mindbox-cloud/github-actions/localization/phrase-push@master
