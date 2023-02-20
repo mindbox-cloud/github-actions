@@ -47,6 +47,12 @@ runs:
     - name: Create AWS repositories if not exist
       shell: bash
       working-directory: ${{ github.action_path }}
+      run: |
+        aws ecr describe-repositories --repository-names ${{ inputs.repositoryName }} || { echo 2 && echo 1 }
+
+    - name: Create AWS repositories if not exist
+      shell: bash
+      working-directory: ${{ github.action_path }}
       run: >
         aws ecr describe-repositories --repository-names ${{ inputs.repositoryName }} || {
         aws ecr create-repository --repository-name ${{ inputs.repositoryName }}
