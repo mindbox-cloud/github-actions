@@ -45,6 +45,7 @@ runs:
         include: "${{ github.action_path }}/ecr-policy.json"
 
     - name: Create AWS repositories if not exist
+      shell: bash
       run: |
         aws ecr describe-repositories --repository-names ${{ inputs.repositoryName }} || { \
           aws ecr create-repository --repository-name ${{ inputs.repositoryName }} \
@@ -53,11 +54,13 @@ runs:
     - name: Tag docker images
       env:
         registry: ${{ steps.login-ecr.outputs.registry }}
+      shell: bash
       run: |
         docker tag ${{ inputs.localTag }} ${{ env.registry }}/${{ inputs.repositoryName }}:${{ inputs.targetTag }}
     
     - name: Docker push
       env:
         registry: ${{ steps.login-ecr.outputs.registry }}
+      shell: bash
       run: |
         docker push ${{ env.registry }}/${{ inputs.repositoryName }}:${{ inputs.targetTag }}
