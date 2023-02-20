@@ -39,11 +39,10 @@ runs:
 
     - name: Prepare policy file
       uses: jacobtomlinson/gha-find-replace@v3
-      working-directory: ${{ github.action_path }}
       with:
         find: "ORGANIZATION_ID"
         replace: ${{ inputs.awsOrganizationId }}
-        include: "**"
+        include: "${{ github.action_path }}/ecr-policy.json"
 
     - name: Create AWS repositories if not exist
       shell: bash
