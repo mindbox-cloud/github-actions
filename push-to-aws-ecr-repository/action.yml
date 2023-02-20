@@ -48,8 +48,8 @@ runs:
       shell: bash
       run: >
         aws ecr describe-repositories --repository-names ${{ inputs.repositoryName }} || {
-          aws ecr create-repository --repository-name ${{ inputs.repositoryName }}
-          && aws ecr set-repository-policy --repository-name ${{ inputs.repositoryName }} --policy-text file://${{ github.action_path }}/ecr-policy.json }
+        aws ecr create-repository --repository-name ${{ inputs.repositoryName }}
+        && aws ecr set-repository-policy --repository-name ${{ inputs.repositoryName }} --policy-text file://${{ github.action_path }}/ecr-policy.json }
     
     - name: Tag docker images
       env:
