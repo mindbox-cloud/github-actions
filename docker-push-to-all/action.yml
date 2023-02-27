@@ -75,7 +75,7 @@ runs:
         for repo in "${array[@]}"
         do
             try_create_aws_ecr "$repo"
-            docker tag local/$repo/${{ inputs.localTag }} ${{ env.registry }}/$repo:${{ inputs.targetTag }}
+            docker tag local/$repo:${{ inputs.localTag }} ${{ env.registry }}/$repo:${{ inputs.targetTag }}
             docker push ${{ env.registry }}/$repo:${{ inputs.targetTag }}
         done
     
@@ -93,6 +93,6 @@ runs:
         IFS=',' read -r -a array <<< "${{ inputs.repositories }}"
         for repo in "${array[@]}"
         do
-            docker tag local/$repo/${{ inputs.localTag }} ${{ env.registry }}/$repo:${{ inputs.targetTag }}
+            docker tag local/$repo:${{ inputs.localTag }} ${{ env.registry }}/$repo:${{ inputs.targetTag }}
             docker push ${{ env.registry }}/$repo:${{ inputs.targetTag }}
         done
