@@ -69,7 +69,7 @@ runs:
       working-directory: ${{ github.action_path }}
       env:
         registry: ${{ steps.login-ecr.outputs.registry }}
-      run: >
+      run: |
         source /tmp/rc
         IFS=',' read -r -a array <<< "${{ inputs.repositories }}"
         for repo in "${array[@]}"
@@ -89,7 +89,7 @@ runs:
       shell: bash
       env:
         registry: cr.yandex/crpo9tj76o3c7pi8i72n
-      run: >
+      run: |
         IFS=',' read -r -a array <<< "${{ inputs.repositories }}"
         for repo in "${array[@]}"
         do
