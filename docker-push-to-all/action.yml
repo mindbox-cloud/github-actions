@@ -10,6 +10,7 @@ inputs:
   awsRegion: 
     description: 'Required if "aws" registry is set.'
     required: false
+    default: 'eu-central-1'
   awsOrganizationId: 
     description: 'Required if "aws" registry is set.'
     required: false
@@ -25,8 +26,8 @@ inputs:
   localTag: 
     description: 'Tag for locally built image.'
     required: true
-  targetTag: 
-    description: ''
+  targetTags: 
+    description: 'Comma separated (e.g. a,b,c).'
     required: true
 outputs: {}
 runs:
@@ -73,10 +74,14 @@ runs:
         source /tmp/rc
         IFS=',' read -r -a array <<< "${{ inputs.repositories }}"
         for repo in "${array[@]}"
-        do
+        do          
           try_create_aws_ecr "$repo"
-          docker tag local/$repo:${{ inputs.localTag }} ${{ env.registry }}/$repo:${{ inputs.targetTag }}
-          docker push ${{ env.registry }}/$repo:${{ inputs.targetTag }}
+          IFS=',' read -r -a tags <<< "${{ inputs.targetTags }}"
+          for targetTag in "${tags[@]}"
+          do
+            docker tag local/$repo:${{ inputs.localTag }} ${{ env.registry }}/$repo:targetTag
+            docker push ${{ env.registry }}/$repo:targetTag
+          done
         done
     
     - name: authenticate in yandex registry
@@ -93,6 +98,10 @@ runs:
         IFS=',' read -r -a array <<< "${{ inputs.repositories }}"
         for repo in "${array[@]}"
         do
-          docker tag local/$repo:${{ inputs.localTag }} ${{ env.registry }}/$repo:${{ inputs.targetTag }}
-          docker push ${{ env.registry }}/$repo:${{ inputs.targetTag }}
+          IFS=',' read -r -a tags <<< "${{ inputs.targetTags }}"
+          for targetTag in "${tags[@]}"
+          do
+            docker tag local/$repo:${{ inputs.localTag }} ${{ env.registry }}/$repo:targetTag
+            docker push ${{ env.registry }}/$repo:targetTag
+          done
         done
