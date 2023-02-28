@@ -1,0 +1,98 @@
+name: 'Push to AWS ECR & yandex container registry'
+description: 'Push to AWS ECR & yandex container registry'
+inputs:
+  awsAccessKey:
+    description: 'Required if "aws" registry is set.'
+    required: false
+  awsSecretKey: 
+    description: 'Required if "aws" registry is set.'
+    required: false
+  awsRegion: 
+    description: 'Required if "aws" registry is set.'
+    required: false
+  awsOrganizationId: 
+    description: 'Required if "aws" registry is set.'
+    required: false
+  yandexContainerRegistryKey:
+    description: 'Required if "yc" registry is set.'
+    required: false
+  registries:
+    description: 'Comma separated registries. Valid values are: "yc", "aws"'
+    required: true
+  repositories: 
+    description: 'Comma separated (e.g. a,b,c). Images local/repo[0]/localTag MUST be pre-built'
+    required: true
+  localTag: 
+    description: 'Tag for locally built image.'
+    required: true
+  targetTag: 
+    description: ''
+    required: true
+outputs: {}
+runs:
+  using: "composite"
+  steps:
+    - name: Configure AWS Credentials
+      if: contains(${{ inputs.registries }}, 'aws')
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ inputs.awsAccessKey }}
+        aws-secret-access-key: ${{ inputs.awsSecretKey }}
+        aws-region: ${{ inputs.awsRegion }}
+
+    - name: Login to Amazon ECR Private
+      if: contains(${{ inputs.registries }}, 'aws')
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Prepare policy file
+      if: contains(${{ inputs.registries }}, 'aws')
+      working-directory: ${{ github.action_path }}
+      shell: bash
+      run: |
+        sed -i -e 's/ORGANIZATION_ID/${{ inputs.awsOrganizationId }}/g' ecr-policy.json
+
+    - name: Define try create AWS repositories function
+      if: contains(${{ inputs.registries }}, 'aws')
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: >
+        rc=/tmp/rc
+
+        echo 'function try_create_aws_ecr { aws ecr describe-repositories --repository-names $1 || {
+        aws ecr create-repository --repository-name $1
+        && aws ecr set-repository-policy --repository-name $1 --policy-text file://ecr-policy.json; }; }' >> $rc
+
+    - name: Push to AWS ECR
+      if: contains(${{ inputs.registries }}, 'aws')
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      env:
+        registry: ${{ steps.login-ecr.outputs.registry }}
+      run: |
+        source /tmp/rc
+        IFS=',' read -r -a array <<< "${{ inputs.repositories }}"
+        for repo in "${array[@]}"
+        do
+          try_create_aws_ecr "$repo"
+          docker tag local/$repo:${{ inputs.localTag }} ${{ env.registry }}/$repo:${{ inputs.targetTag }}
+          docker push ${{ env.registry }}/$repo:${{ inputs.targetTag }}
+        done
+    
+    - name: authenticate in yandex registry
+      if: contains(${{ inputs.registries }}, 'yc')
+      shell: bash
+      run: echo '${{ inputs.yandexContainerRegistryKey }}' | docker login -u json_key --password-stdin cr.yandex
+
+    - name: Push to yandex CR
+      if: contains(${{ inputs.registries }}, 'yc')
+      shell: bash
+      env:
+        registry: cr.yandex/crpo9tj76o3c7pi8i72n
+      run: |
+        IFS=',' read -r -a array <<< "${{ inputs.repositories }}"
+        for repo in "${array[@]}"
+        do
+          docker tag local/$repo:${{ inputs.localTag }} ${{ env.registry }}/$repo:${{ inputs.targetTag }}
+          docker push ${{ env.registry }}/$repo:${{ inputs.targetTag }}
+        done
