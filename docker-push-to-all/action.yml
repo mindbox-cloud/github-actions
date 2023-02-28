@@ -79,8 +79,8 @@ runs:
           IFS=',' read -r -a tags <<< "${{ inputs.targetTags }}"
           for targetTag in "${tags[@]}"
           do
-            docker tag local/$repo:${{ inputs.localTag }} ${{ env.registry }}/$repo:targetTag
-            docker push ${{ env.registry }}/$repo:targetTag
+            docker tag local/$repo:${{ inputs.localTag }} ${{ env.registry }}/$repo:$targetTag
+            docker push ${{ env.registry }}/$repo:$targetTag
           done
         done
     
@@ -101,7 +101,7 @@ runs:
           IFS=',' read -r -a tags <<< "${{ inputs.targetTags }}"
           for targetTag in "${tags[@]}"
           do
-            docker tag local/$repo:${{ inputs.localTag }} ${{ env.registry }}/$repo:targetTag
-            docker push ${{ env.registry }}/$repo:targetTag
+            docker tag local/$repo:${{ inputs.localTag }} ${{ env.registry }}/$repo:$targetTag
+            docker push ${{ env.registry }}/$repo:$targetTag
           done
         done
