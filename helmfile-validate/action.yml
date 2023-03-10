@@ -7,7 +7,8 @@ inputs:
     default: helmfile/helmfile.yaml
   environment:
     description: Helmfile environment
-    required: true
+    required: false
+    default: default
 
 outputs: {}
 
