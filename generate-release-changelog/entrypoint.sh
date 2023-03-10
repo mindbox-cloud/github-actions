@@ -26,4 +26,4 @@ lastcommit_hyperlink="[View latest commits in Github]($lastcommit_url)"
 
 changelog=$lastcommit_hyperlink$'<br/>'$changelog
 
-echo "::set-output name=changelog::$changelog"
+echo "changelog=$changelog" >> $GITHUB_OUTPUT
