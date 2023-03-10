@@ -31,7 +31,7 @@ jobs:
     timeout-minutes: 10
     env:
       amixrWebhookUrl: ${{ secrets.amixrWebhookUrl }}
-      
+
     steps:
       - uses: actions/checkout@v3
 

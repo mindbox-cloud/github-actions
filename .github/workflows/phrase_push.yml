@@ -22,7 +22,7 @@ jobs:
         uses: mindbox-cloud/github-actions/localization/phrase-push@master
         with:
           phraseAppToken: ${{ secrets.phraseAppToken }}
-      
+
       - name: Amixr notification if failure
         uses: joelwmale/webhook-action@master
         if: ${{ env.amixrWebhookUrl != '' && failure() }}

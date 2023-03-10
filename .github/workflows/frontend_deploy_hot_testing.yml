@@ -157,7 +157,7 @@ jobs:
         run: |
           find . -type f -name "remoteEntry.js" -exec cp {} ./v2_static/ \;
         working-directory: ./build
-      
+
       - name: Copy Dockerfile to build folder
         if: ${{ inputs.use_k8_deploy_process }}
         run: | 

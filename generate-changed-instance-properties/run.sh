@@ -70,6 +70,6 @@ if [[ $first_time == "no" ]]; then
   fi
 fi
 
-echo "::set-output name=continue::${continue}"
-echo "::set-output name=version::${version}"
-echo "::set-output name=first_time::${first_time}"
+echo "continue=${continue}" >> $GITHUB_OUTPUT
+echo "version=${version}" >> $GITHUB_OUTPUT
+echo "first_time=${first_time}" >> $GITHUB_OUTPUT

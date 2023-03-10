@@ -179,7 +179,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
         working-directory: ./e2e
-        
+
       - name: Cache E2E node modules
         if: ${{ inputs.e2e_typechecking || inputs.e2e_linters }}
         uses: actions/cache@v3
@@ -217,7 +217,7 @@ jobs:
       - name: Set variables
         id: set_variables
         run: |
-          echo "##[set-output name=repository_name;]$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}')"
+          echo "repository_name=$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}')" >> $GITHUB_OUTPUT
 
       - name: Checkout the repository
         uses: actions/checkout@v2
@@ -248,7 +248,7 @@ jobs:
           always-auth: true
           node-version: ${{ inputs.node_version }}
           registry-url: "https://npm.pkg.github.com/mindbox-cloud"
-          
+
       - name: Cache node modules
         uses: actions/cache@v3
         with:

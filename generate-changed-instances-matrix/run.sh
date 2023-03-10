@@ -127,5 +127,5 @@ else
   fi
 fi
 
-echo "::set-output name=continue::${continue}"
-echo "::set-output name=matrix::${matrix}"
+echo "continue=${continue}" >> $GITHUB_OUTPUT
+echo "matrix=${matrix}" >> $GITHUB_OUTPUT
