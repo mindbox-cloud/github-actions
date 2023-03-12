@@ -33,7 +33,7 @@ runs:
   using: "composite"
   steps:
     - name: "Setup Terraform"
-      uses: hashicorp/setup-terraform@v1
+      uses: hashicorp/setup-terraform@v2
       with:
           terraform_version: ${{ inputs.terraformVersion }}
           terraform_wrapper: false
@@ -90,7 +90,7 @@ runs:
       shell: bash
 
     - name: "Setup Terraform"
-      uses: hashicorp/setup-terraform@v1
+      uses: hashicorp/setup-terraform@v2
       with:
           terraform_version: ${{ inputs.terraformVersion }}
 
