@@ -33,7 +33,7 @@ runs:
     - name: generate release number
       if: ${{ inputs.release-number == 'empty' }}
       id: release-number
-      uses: mindbox-cloud/gha-release-number@v1.0.1
+      uses: mindbox-cloud/gha-release-number@master
       with:
         token: ${{ github.token }}
 
