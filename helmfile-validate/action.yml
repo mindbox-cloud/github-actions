@@ -15,9 +15,6 @@ outputs: {}
 runs:
   using: "composite"
   steps:
-    - name: Setup helmfile
-      uses: mamezou-tech/setup-helmfile@v1.0.0
-
     - name: Helmfile lint
       shell: bash
       run: helmfile -f ${{ inputs.path }} --environment ${{ inputs.environment }} lint --args "--strict --quiet"
