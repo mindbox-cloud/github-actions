@@ -127,9 +127,10 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Test
+        if: ${{ secrets.pipelines_release_submit_token }}
         run: |
           curl --location --request POST 'https://pipelines-services.mindbox.ru/releases/submit-data' \
-            --header 'Authorization: Bearer ${{secret.pipelines_release_submit_token}}' \
+            --header 'Authorization: Bearer ${{secrets.pipelines_release_submit_token}}' \
             --header 'Content-Type: application/json' \
             --data-raw '{
               "serviceName": "${GITHUB_REPOSITORY#*/}",
@@ -429,10 +430,10 @@ jobs:
             --packageVersion ${{ steps.release-number.outputs.release-number }}
             
       - name: Post release to pipelines
-        if: ${{ secret.pipelines_release_submit_token }}
+        if: ${{ secrets.pipelines_release_submit_token }}
         run: |
           curl --location --request POST 'https://pipelines-services.mindbox.ru/releases/submit-data' \
-            --header 'Authorization: Bearer ${{secret.pipelines_release_submit_token}}' \
+            --header 'Authorization: Bearer ${{secrets.pipelines_release_submit_token}}' \
             --header 'Content-Type: application/json' \
             --data-raw '{
               "serviceName": "${GITHUB_REPOSITORY#*/}",
