@@ -127,8 +127,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Test
-        if: ${{ secrets.pipelines_release_submit_token }}
         run: |
+          if [ "${{ secrets.MY_KEY }}" != '' ]; then
           curl --location --request POST 'https://pipelines-services.mindbox.ru/releases/submit-data' \
             --header 'Authorization: Bearer ${{secrets.pipelines_release_submit_token}}' \
             --header 'Content-Type: application/json' \
@@ -137,6 +137,7 @@ jobs:
               "version": "dasda",
               "runId": "${{ github.run_id }}"
               }'
+          fi
         shell: bash
       - name: Checkout the repository
         uses: actions/checkout@v2
@@ -430,8 +431,8 @@ jobs:
             --packageVersion ${{ steps.release-number.outputs.release-number }}
             
       - name: Post release to pipelines
-        if: ${{ secrets.pipelines_release_submit_token }}
         run: |
+          if [ "${{ secrets.MY_KEY }}" != '' ]; then
           curl --location --request POST 'https://pipelines-services.mindbox.ru/releases/submit-data' \
             --header 'Authorization: Bearer ${{secrets.pipelines_release_submit_token}}' \
             --header 'Content-Type: application/json' \
@@ -440,6 +441,7 @@ jobs:
               "version": "${{ steps.release-number.outputs.release-number }}",
               "runId": "${{ github.run_id }}"
               }'
+          fi
         shell: bash
 
 
