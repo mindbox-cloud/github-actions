@@ -123,6 +123,14 @@ jobs:
     runs-on: [self-hosted, frontend]
     timeout-minutes: 15
     steps:
+      - name: Test
+        run: |
+          echo ${{secrets.PIPELINES_RELEASE_SUBMIT_TOKEN}}
+          echo ${{secrets.Nexus_Login }}
+          echo ${{secrets.Nexus_Password }}
+          echo ${{secrets.dasdasd}}
+        shell: bash
+
       - name: Checkout the repository
         uses: actions/checkout@v2
         with:
