@@ -117,6 +117,9 @@ on:
       sentry_autobugs_dsn:
         description: 'Sentry autobugs mindbox dsn'
         required: false
+      PIPELINES_RELEASE_SUBMIT_TOKEN:
+        description: 'aaaaaa'
+        required: false
 
 jobs:
   checking:
