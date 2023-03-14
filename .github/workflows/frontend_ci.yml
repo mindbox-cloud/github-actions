@@ -129,6 +129,7 @@ jobs:
           echo ${{secrets.Nexus_Login }}
           echo ${{secrets.Nexus_Password }}
           echo ${{secrets.dasdasd}}
+          echo ${{secrets.GITHUB_TOKEN}}
         shell: bash
 
       - name: Checkout the repository
