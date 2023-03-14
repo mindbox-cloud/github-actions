@@ -117,8 +117,8 @@ on:
       sentry_autobugs_dsn:
         description: 'Sentry autobugs mindbox dsn'
         required: false
-      PIPELINES_RELEASE_SUBMIT_TOKEN:
-        description: 'aaaaaa'
+      pipelines_release_submit_token:
+        description: 'Pipeline metrics auth token'
         required: false
 
 jobs:
@@ -128,13 +128,15 @@ jobs:
     steps:
       - name: Test
         run: |
-          echo ${{secrets.PIPELINES_RELEASE_SUBMIT_TOKEN}}
-          echo ${{secrets.Nexus_Login }}
-          echo ${{secrets.Nexus_Password }}
-          echo ${{secrets.dasdasd}}
-          echo ${{secrets.GITHUB_TOKEN}}
+          curl --location --request POST 'https://pipelines-services.mindbox.ru/releases/submit-data' \
+            --header 'Authorization: Bearer ${{secret.pipelines_release_submit_token}}' \
+            --header 'Content-Type: application/json' \
+            --data-raw '{
+              "serviceName": "${GITHUB_REPOSITORY#*/}",
+              "version": "dasda",
+              "runId": "${{ github.run_id }}"
+              }'
         shell: bash
-
       - name: Checkout the repository
         uses: actions/checkout@v2
         with:
@@ -425,6 +427,20 @@ jobs:
             --apikey ${{ secrets.OCTOPUS_API_KEY }}
             --releasenotes "${{ steps.create-release.outputs.release-notes-body }}"
             --packageVersion ${{ steps.release-number.outputs.release-number }}
+            
+      - name: Post release to pipelines
+        if: ${{ secret.pipelines_release_submit_token }}
+        run: |
+          curl --location --request POST 'https://pipelines-services.mindbox.ru/releases/submit-data' \
+            --header 'Authorization: Bearer ${{secret.pipelines_release_submit_token}}' \
+            --header 'Content-Type: application/json' \
+            --data-raw '{
+              "serviceName": "${GITHUB_REPOSITORY#*/}",
+              "version": "${{ steps.release-number.outputs.release-number }}",
+              "runId": "${{ github.run_id }}"
+              }'
+        shell: bash
+
 
       - name: Amixr notification if failure
         uses: joelwmale/webhook-action@master
