@@ -137,7 +137,7 @@ jobs:
               "version": "вфывф",
               "runId": "${{ github.run_id }}"
               }'
-              --fail-with-body
+              --fail
           fi
         shell: bash
       - name: Checkout the repository
