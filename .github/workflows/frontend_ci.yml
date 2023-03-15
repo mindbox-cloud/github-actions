@@ -128,12 +128,12 @@ jobs:
     steps:
       - name: Test
         run: |
-          if [ "${{ secrets.MY_KEY }}" != '' ]; then
+          if [ "${{ secrets.pipelines_release_submit_token }}" != "" ]; then
           curl --location --request POST 'https://pipelines-services.mindbox.ru/releases/submit-data' \
             --header 'Authorization: Bearer ${{secrets.pipelines_release_submit_token}}' \
             --header 'Content-Type: application/json' \
             --data-raw '{
-              "serviceName": "${GITHUB_REPOSITORY#*/}",
+              "serviceName": "${{ github.event.repository.name }}",
               "version": "dasda",
               "runId": "${{ github.run_id }}"
               }'
@@ -432,12 +432,12 @@ jobs:
             
       - name: Post release to pipelines
         run: |
-          if [ "${{ secrets.MY_KEY }}" != '' ]; then
+          if [ "${{ secrets.pipelines_release_submit_token }}" != "" ]; then
           curl --location --request POST 'https://pipelines-services.mindbox.ru/releases/submit-data' \
             --header 'Authorization: Bearer ${{secrets.pipelines_release_submit_token}}' \
             --header 'Content-Type: application/json' \
             --data-raw '{
-              "serviceName": "${GITHUB_REPOSITORY#*/}",
+              "serviceName": "${{ github.event.repository.name }}",
               "version": "${{ steps.release-number.outputs.release-number }}",
               "runId": "${{ github.run_id }}"
               }'
