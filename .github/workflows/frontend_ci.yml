@@ -126,19 +126,6 @@ jobs:
     runs-on: [self-hosted, frontend]
     timeout-minutes: 15
     steps:
-      - name: Post release to pipelines
-        run: |
-          if [ "${{ secrets.pipelines_release_submit_token }}" != "" ]; then
-          curl --fail --location --request POST 'https://pipelines-services.mindbox.ru/releases/submit-datal' \
-            --header 'Authorization: Bearer ${{secrets.pipelines_release_submit_token}}' \
-            --header 'Content-Type: application/json' \
-            --data-raw '{
-              "serviceName": "${{ github.event.repository.name }}",
-              "version": "вфывф",
-              "runId": "${{ github.run_id }}"
-              }'
-          fi
-        shell: bash
       - name: Checkout the repository
         uses: actions/checkout@v2
         with:
