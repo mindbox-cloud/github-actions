@@ -129,7 +129,7 @@ jobs:
       - name: Post release to pipelines
         run: |
           if [ "${{ secrets.pipelines_release_submit_token }}" != "" ]; then
-          curl --location --request POST 'https://pipelines-services.mindbox.ru/releases/submit-data1' \
+          curl --location --request POST 'https://pipelines-services.mindbox.ru/releases/submit-datal' \
             --header 'Authorization: Bearer ${{secrets.pipelines_release_submit_token}}' \
             --header 'Content-Type: application/json' \
             --data-raw '{
@@ -137,6 +137,7 @@ jobs:
               "version": "вфывф",
               "runId": "${{ github.run_id }}"
               }'
+              --fail-with-body
           fi
         shell: bash
       - name: Checkout the repository
