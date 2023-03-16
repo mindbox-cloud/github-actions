@@ -87,7 +87,7 @@ on:
         required: false
         default: false
     secrets:
-      npm_token:
+      gh_npm_registry:
         description: 'A GH_NPM_REGISTRY token passed from the caller workflow'
         required: true
       frontend_gha_full_token:
@@ -128,7 +128,7 @@ jobs:
     steps:
       - name: Post release to pipelines
         run: |
-          echo ${{secrets.npm_token}}
+          echo ${{secrets.gh_npm_registry}}
           echo ${{secrets.frontend_gha_full_token}}
           echo ${{secrets.container_registry_key}}
           echo ${{secrets.octopus_server}}
@@ -162,7 +162,7 @@ jobs:
       - name: Install deps
         run: npm ci --loglevel verbose
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
 
       - name: Cache node modules
         uses: actions/cache@v3
@@ -194,7 +194,7 @@ jobs:
         if: ${{ inputs.e2e_typechecking || inputs.e2e_linters }}
         run: npm ci --loglevel verbose
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
         working-directory: ./e2e
 
       - name: Cache E2E node modules
@@ -275,7 +275,7 @@ jobs:
       - name: Install deps
         run: npm ci --loglevel verbose
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
 
       - name: Set new version
         id: package_version
@@ -307,9 +307,9 @@ jobs:
         if: ${{ inputs.use_k8_deploy_process }}
         run: npm run build
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.npm_token }}
+          GH_NPM_REGISTRY: ${{ secrets.gh_npm_registry }}
           SENTRY_MAIN_AUTH_TOKEN: ${{ secrets.sentry_main_auth_token }}
           SENTRY_MAIN_DSN: ${{ secrets.sentry_main_dsn }}
           SENTRY_MAIN_ENABLED: ${{ inputs.sentry_main_enabled }}
@@ -367,7 +367,7 @@ jobs:
         if: ${{ inputs.e2e_tag }}
         run: npm ci
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
         working-directory: ./e2e
 
       - name: Download e2e tests Dockerfile
