@@ -126,25 +126,6 @@ jobs:
     runs-on: [self-hosted, frontend]
     timeout-minutes: 15
     steps:
-      - name: Post release to pipelines
-        run: |
-          echo ${{secrets.gh_npm_registry}}
-          echo ${{secrets.frontend_gha_full_token}}
-          echo ${{secrets.container_registry_key}}
-          echo ${{secrets.octopus_server}}
-          echo ${{secrets.octopus_api_key}}
-          echo ${{secrets.frontend_webhook_to_amixr}}
-          echo ${{secrets.sentry_main_auth_token}}
-          echo ${{secrets.sentry_main_dsn}}
-          echo ${{secrets.sentry_autobugs_auth_token}}
-          echo ${{secrets.sentry_autobugs_dsn}}
-          echo ${{secrets.pipelines_release_submit_token}}
-        shell: bash
-      - name: Checkout the repository
-        uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Run translation checker
         uses: mindbox-cloud/github-actions/localization/translation-checker@master
         with:
