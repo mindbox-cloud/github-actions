@@ -126,6 +126,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Run translation checker
         uses: mindbox-cloud/github-actions/localization/translation-checker@master
         with:
