@@ -56,7 +56,7 @@ runs:
         registry: ${{ steps.login-ecr.outputs.registry }}
       shell: bash
       run: |
-        docker tag ${{ inputs.localTag }} ${{ env.registry }}/${{ inputs.repositoryName }}:${{ inputs.targetTag }}
+        docker tag local/${{ inputs.repositoryName }}:${{ inputs.localTag }} ${{ env.registry }}/${{ inputs.repositoryName }}:${{ inputs.targetTag }}
     
     - name: Docker push
       env:
