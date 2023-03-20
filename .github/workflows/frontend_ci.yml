@@ -296,7 +296,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_NPM_REGISTRY: ${{ secrets.gh_npm_registry }}
-          SENTRY_MAIN_AUTH_TOKEN: ${{ secrets.sentry_main_auth_token }}
+          SENTRY_MAIN_AUTH_TOKEN: ${{ secrets.sentry_errors_auth_token }}
           SENTRY_MAIN_DSN: ${{ secrets.sentry_main_dsn }}
           SENTRY_MAIN_ENABLED: ${{ inputs.sentry_main_enabled }}
           SENTRY_MAIN_ORG: ${{ env.sentry_main_org }}
