@@ -220,7 +220,7 @@ jobs:
       - name: Set variables
         id: set_variables
         run: |
-          echodasd "repository_name=$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}')" >> $GITHUB_OUTPUT
+          echo "repository_name=$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}')" >> $GITHUB_OUTPUT
 
       - name: Checkout the repository
         uses: actions/checkout@v2
