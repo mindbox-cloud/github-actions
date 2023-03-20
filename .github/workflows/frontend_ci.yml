@@ -87,7 +87,7 @@ on:
         required: false
         default: false
     secrets:
-      npm_token:
+      gh_npm_registry:
         description: 'A GH_NPM_REGISTRY token passed from the caller workflow'
         required: true
       frontend_gha_full_token:
@@ -102,10 +102,10 @@ on:
       octopus_api_key:
         description: 'A OCTOPUS_API_KEY token passed from the caller workflow'
         required: true
-      failure_notify_url:
+      frontend_webhook_to_amixr:
         description: 'A url where to send a crash notification'
         required: false
-      sentry_main_auth_token:
+      sentry_errors_auth_token:
         description: 'Sentry errors mindbox auth token'
         required: false
       sentry_main_dsn:
@@ -117,10 +117,13 @@ on:
       sentry_autobugs_dsn:
         description: 'Sentry autobugs mindbox dsn'
         required: false
+      pipelines_release_submit_token:
+        description: 'Pipeline metrics auth token'
+        required: false
 
 jobs:
   checking:
-    runs-on: [self-hosted, frontend]
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - name: Checkout the repository
@@ -145,7 +148,7 @@ jobs:
       - name: Install deps
         run: npm ci --loglevel verbose
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
 
       - name: Cache node modules
         uses: actions/cache@v3
@@ -177,7 +180,7 @@ jobs:
         if: ${{ inputs.e2e_typechecking || inputs.e2e_linters }}
         run: npm ci --loglevel verbose
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
         working-directory: ./e2e
 
       - name: Cache E2E node modules
@@ -200,7 +203,7 @@ jobs:
   release:
     needs: checking
     concurrency: release
-    runs-on: [self-hosted, frontend]
+    runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
     timeout-minutes: 20
     env:
@@ -258,7 +261,7 @@ jobs:
       - name: Install deps
         run: npm ci --loglevel verbose
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
 
       - name: Set new version
         id: package_version
@@ -290,10 +293,10 @@ jobs:
         if: ${{ inputs.use_k8_deploy_process }}
         run: npm run build
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.npm_token }}
-          SENTRY_MAIN_AUTH_TOKEN: ${{ secrets.sentry_main_auth_token }}
+          GH_NPM_REGISTRY: ${{ secrets.gh_npm_registry }}
+          SENTRY_MAIN_AUTH_TOKEN: ${{ secrets.sentry_errors_auth_token }}
           SENTRY_MAIN_DSN: ${{ secrets.sentry_main_dsn }}
           SENTRY_MAIN_ENABLED: ${{ inputs.sentry_main_enabled }}
           SENTRY_MAIN_ORG: ${{ env.sentry_main_org }}
@@ -350,7 +353,7 @@ jobs:
         if: ${{ inputs.e2e_tag }}
         run: npm ci
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
         working-directory: ./e2e
 
       - name: Download e2e tests Dockerfile
@@ -376,6 +379,20 @@ jobs:
         if: ${{ inputs.e2e_tag }}
         run: |
           docker push ${{ env.registry }}/${{ env.e2e-image }}:${{ env.e2e-tag }}
+
+      - name: Post release to pipelines
+        run: |
+          if [ "${{ secrets.pipelines_release_submit_token }}" != "" ]; then
+          curl --fail --location --request POST 'https://pipelines-services.mindbox.ru/releases/submit-data' \
+            --header 'Authorization: Bearer ${{secrets.pipelines_release_submit_token}}' \
+            --header 'Content-Type: application/json' \
+            --data-raw '{
+              "serviceName": "${{ github.event.repository.name }}",
+              "version": "${{ steps.release-number.outputs.release-number }}",
+              "runId": "${{ github.run_id }}"
+              }'
+          fi
+        shell: bash
 
       - name: Create Release
         id: create-release
@@ -418,5 +435,5 @@ jobs:
         uses: joelwmale/webhook-action@master
         if: ${{ failure() }}
         with:
-          url: ${{ secrets.failure_notify_url }}
+          url: ${{ secrets.frontend_webhook_to_amixr }}
           body: '{"title": "Build ${{ github.repository }} *failed*", "state": "alerting", "message": "Check logs at\nhttps://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\nAutor: ${{ github.actor }}"}'
