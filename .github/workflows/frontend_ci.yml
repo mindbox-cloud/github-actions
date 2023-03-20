@@ -203,7 +203,7 @@ jobs:
   release:
     needs: checking
     concurrency: release
-    runs-on: [self-hosted, frontend]
+    runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
     timeout-minutes: 20
     env:
