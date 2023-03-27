@@ -127,7 +127,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -137,7 +137,7 @@ jobs:
           skipInclusionCheck: true
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ inputs.node_version }}
           registry-url: "https://npm.pkg.github.com/mindbox-cloud"
@@ -223,7 +223,7 @@ jobs:
           echo "repository_name=$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}')" >> $GITHUB_OUTPUT
 
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           token: ${{ secrets.FRONTEND_GHA_FULL_TOKEN }}
 
@@ -246,7 +246,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           always-auth: true
           node-version: ${{ inputs.node_version }}

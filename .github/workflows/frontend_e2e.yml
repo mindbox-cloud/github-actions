@@ -100,7 +100,7 @@ jobs:
 
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set variables
         run: |
@@ -129,14 +129,14 @@ jobs:
         id: set_project
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           always-auth: true
           node-version: ${{ inputs.node_version }}
           registry-url: "https://npm.pkg.github.com/mindbox-cloud"
 
       - name: Get node modules from cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ./node_modules
           key: npm-ci-${{ github.sha }}
@@ -151,7 +151,7 @@ jobs:
 
       - name: Checkout frontend-deploy repository
         if: ${{ inputs.use_k8_deploy_process }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: mindbox-cloud/frontend-deploy
           token: ${{ secrets.frontend_gha_full_token }}
@@ -172,7 +172,7 @@ jobs:
         run: |
           find . -type f -name "remoteEntry.js" -exec cp {} ./v2_static/ \;
         working-directory: ./build
-      
+
       - name: Copy Dockerfile to build folder
         if: ${{ inputs.use_k8_deploy_process }}
         run: | 
@@ -249,7 +249,7 @@ jobs:
         run: apt-get update && apt-get -y install jq
 
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set variables
         run: |
@@ -277,7 +277,7 @@ jobs:
         id: set_project
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           always-auth: true
           node-version: ${{ inputs.node_version }}
@@ -320,7 +320,7 @@ jobs:
 
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set variables
         run: |
@@ -347,7 +347,7 @@ jobs:
         id: set_project
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           always-auth: true
           node-version: ${{ inputs.node_version }}
@@ -394,7 +394,7 @@ jobs:
         run: echo "previous steps are failed" && exit 1
 
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set variables
         run: |
@@ -421,7 +421,7 @@ jobs:
         id: set_project
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           always-auth: true
           node-version: ${{ inputs.node_version }}
@@ -462,7 +462,7 @@ jobs:
     needs: [e2e-tests, core-e2e-tests-runner]
     if: ${{ failure() }}
     steps:
-      
+
       - name: Add comment to commit if the job has failed
         if: ${{ failure() }}
         uses: mshick/add-pr-comment@v2
