@@ -85,7 +85,7 @@ jobs:
         run: echo "This PR is opened by ${{ github.event.pull_request.user.login }} ."
 
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -114,14 +114,14 @@ jobs:
         id: set_project
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           always-auth: true
           node-version: ${{ inputs.node_version }}
           registry-url: "https://npm.pkg.github.com/mindbox-cloud"
 
       - name: Get node modules from cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ./node_modules
           key: npm-ci-${{ github.sha }}
@@ -136,7 +136,7 @@ jobs:
 
       - name: Checkout frontend-deploy repository
         if: ${{ inputs.use_k8_deploy_process }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: mindbox-cloud/frontend-deploy
           token: ${{ secrets.frontend_gha_full_token }}
