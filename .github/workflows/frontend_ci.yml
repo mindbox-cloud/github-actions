@@ -327,7 +327,7 @@ jobs:
         if: ${{ inputs.use_k8_deploy_process }}
         run: |
           wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/master/mcf-release/Dockerfile
-          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/master/mcf-release/nginx.conf
+          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/ovchinnikova/ss/nginx-enable-cache/mcf-release/nginx.conf
         working-directory: ./build
 
         # needed for frontend discovery(build initial.js)
