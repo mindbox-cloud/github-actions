@@ -319,6 +319,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ env.project_name }}-stats
+          if-no-files-found: warn
           path: |
             ./stats
 

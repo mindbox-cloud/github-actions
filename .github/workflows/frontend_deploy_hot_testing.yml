@@ -126,6 +126,16 @@ jobs:
           path: ./node_modules
           key: npm-ci-${{ github.sha }}
 
+      - name: Download artifact
+        id: download-artifact
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{secrets.GITHUB_TOKEN}} 
+          workflow: main.yml    
+          path: ./master-stats   
+          name: ${{ env.repository_name }}-stats
+          if_no_artifact_found: warn
+
       - name: Disable Lefthook
         run: echo "LEFTHOOK=0" >> $GITHUB_ENV
 
@@ -153,7 +163,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.project_folder }}-stats
+          name: ${{ env.repository_name }}-stats
           path: |
             ./stats
 
