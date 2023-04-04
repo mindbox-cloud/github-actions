@@ -151,6 +151,12 @@ jobs:
           NPM_TOKEN: ${{ secrets.npm_token }}
           MCF_STATIC_FOLDER: v2_static
 
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.project_folder }}-stats
+          path: |
+            ./stats
+
       # needed for frontend discovery(build initial.js)
       - name: copy remoteEntry to v2_static folder
         if: ${{ inputs.use_k8_deploy_process }}
