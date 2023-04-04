@@ -316,6 +316,12 @@ jobs:
         if: ${{ inputs.use_k8_deploy_process }}
         run: cp ./package.json ./build/
 
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.project_name }}-stats
+          path: |
+            ./stats
+
       - name: Create e2e tests list for k8
         if: ${{ inputs.use_k8_deploy_process }}
         run: |
