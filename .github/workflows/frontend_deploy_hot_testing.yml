@@ -136,6 +136,10 @@ jobs:
           name: ${{ env.repository_name }}-stats
           if_no_artifact_found: warn
 
+      - name: Rename master stats file
+        run: mv ./master-stats/${{ env.project_folder }}-stats.json ./master-stats/${{ env.project_folder }}-master.json
+        continue-on-error: true
+
       - name: Disable Lefthook
         run: echo "LEFTHOOK=0" >> $GITHUB_ENV
 
