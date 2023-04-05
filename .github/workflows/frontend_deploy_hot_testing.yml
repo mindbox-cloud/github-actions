@@ -133,7 +133,7 @@ jobs:
           github_token: ${{secrets.GITHUB_TOKEN}} 
           workflow: main.yml    
           path: ./master-stats   
-          name: ${{ env.project_folder }}-stats
+          name: ${{ env.repository_name }}-stats
           if_no_artifact_found: warn
 
       - name: Rename master stats file
