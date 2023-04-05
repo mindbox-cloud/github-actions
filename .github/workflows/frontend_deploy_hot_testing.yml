@@ -131,9 +131,10 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{secrets.GITHUB_TOKEN}} 
-          workflow: main.yml    
           path: ./master-stats   
           name: ${{ env.repository_name }}-master-stats
+          search_artifacts: true
+          check_artifacts: true
           if_no_artifact_found: warn
 
       - name: Rename master stats file
