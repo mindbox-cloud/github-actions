@@ -316,9 +316,10 @@ jobs:
         if: ${{ inputs.use_k8_deploy_process }}
         run: cp ./package.json ./build/
 
-      - uses: actions/upload-artifact@v3
+      - name: Upload statoscope artifacts
+        uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.project_name }}-stats
+          name: ${{ env.project_name }}-master-stats
           if-no-files-found: warn
           path: |
             ./stats
