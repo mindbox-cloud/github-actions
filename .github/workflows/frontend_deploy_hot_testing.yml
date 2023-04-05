@@ -129,7 +129,7 @@ jobs:
       - name: Download artifact
         id: download-artifact
         uses: dawidd6/action-download-artifact@v2
-        timeout-minutes: 3
+        timeout-minutes: 1
         continue-on-error: true
         with:
           github_token: ${{secrets.GITHUB_TOKEN}} 
