@@ -174,7 +174,7 @@ jobs:
 
       - name: Run tests
         if: ${{ inputs.tests }}
-        run: npm run test
+        run: npm run test -- --maxConcurrency=1 --maxWorkers=1
 
       - name: Install E2E deps
         if: ${{ inputs.e2e_typechecking || inputs.e2e_linters }}
