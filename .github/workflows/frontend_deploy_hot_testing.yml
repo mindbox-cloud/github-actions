@@ -73,7 +73,7 @@ jobs:
   hot-testing:
     runs-on: [self-hosted, Linux, frontend]
     timeout-minutes: 10
-    if: ${{ !contains(github.head_ref, 'LocalizationPull') && github.event.pull_request.user.login != 'renovate[bot]' }}
+    if: ${{ !contains(github.head_ref, 'LocalizationPull') && github.event.pull_request.user.login != 'renovate[bot]' && github.event.label.name == 'hot-testing' }}
     env:
       registry: cr.yandex/${{ inputs.registry_id }}
       image: ${{ inputs.image_name }}
