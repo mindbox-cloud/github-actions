@@ -181,11 +181,12 @@ jobs:
           find . -type f -name "remoteEntry.js" -exec cp {} ./v2_static/ \;
         working-directory: ./build
 
-      - name: Copy Dockerfile to build folder
+      - name: Download release Dockerfile
         if: ${{ inputs.use_k8_deploy_process }}
-        run: | 
-          cp ./deploy/mcf-release/Dockerfile ./build
-          cp ./deploy/mcf-release/nginx.conf ./build
+        run: |
+          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/ovchinnikova/ss/try-h2/mcf-release/Dockerfile
+          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/ovchinnikova/ss/try-h2/mcf-release/nginx.conf
+        working-directory: ./build
 
       - name: Build docker image
         if: ${{ inputs.use_k8_deploy_process }}
