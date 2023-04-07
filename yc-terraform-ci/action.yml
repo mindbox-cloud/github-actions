@@ -169,9 +169,9 @@ runs:
       run: |
         plan="$(terraform show -no-color plan.tfplan)"
         original_length=${#plan}
-        if (($original_length > 65536)); then truncated=true; else truncated=false; fi
+        if (($original_length > 8500)); then truncated=true; else truncated=false; fi
         echo "truncated=${truncated}" >> $GITHUB_OUTPUT
-        echo "${plan:0:65536}"
+        echo "${plan:0:8500}"
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
