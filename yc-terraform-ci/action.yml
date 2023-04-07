@@ -166,23 +166,24 @@ runs:
 
     - name: "Truncate plan"
       id: truncate-plan
+      working-directory: ${{ inputs.workingDir }}
+      shell: bash
       run: |
         plan="$(terraform show -no-color plan.tfplan)"
         original_length=${#plan}
         if (($original_length > 65536)); then truncated=true; else truncated=false; fi
         echo "truncated=${truncated}" >> $GITHUB_OUTPUT
         echo "${plan:0:65536}"
-      working-directory: ${{ inputs.workingDir }}
-      shell: bash
 
     # for escape github debug stdout 
     - name: "Create truncated plan file"
       id: create-truncated-plan-file
+      working-directory: ${{ inputs.workingDir }}
+      shell: bash
       run: |
         plan_file_name='plan.stdout'
         echo "${{ steps.truncate-plan.outputs.stdout }}" > $plan_file_name
         echo "plan_file_name=${plan_file_name}" >> $GITHUB_OUTPUT
-      shell: bash
 
     - name: "Install fs module"
       run: npm install fs
