@@ -180,7 +180,7 @@ runs:
       id: create-truncated-plan-file
       run: |
         plan_file_name='plan.stdout'
-        "${{ steps.truncate-plan.outputs.stdout }}" > $plan_file_name
+        echo "${{ steps.truncate-plan.outputs.stdout }}" > $plan_file_name
         echo "plan_file_name=${plan_file_name}" >> $GITHUB_OUTPUT
       shell: bash
 
