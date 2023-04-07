@@ -171,7 +171,7 @@ runs:
         original_length=${#plan}
         if (($original_length > 65536)); then truncated=true; else truncated=false; fi
         echo "truncated=${truncated}" >> $GITHUB_OUTPUT
-        echo "${plan:0:65000}"
+        echo "${plan:0:65536}"
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
@@ -179,7 +179,7 @@ runs:
       name: "Comment plan"
       env:
         PLAN: "${{ steps.truncate-plan.outputs.stdout }}"
-        SHOW_PLAN: ${{ steps.truncate-plan.outputs.truncated != 'true' }}
+        SHOW_PLAN: "${{ steps.truncate-plan.outputs.truncated != 'true' }}"
         CONDITION: "${{ steps.plan.outputs.planExitCode }}"
       with:
         github-token: ${{ inputs.githubToken }}
