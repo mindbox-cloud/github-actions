@@ -179,7 +179,7 @@ runs:
       name: "Comment plan"
       env:
         PLAN: "${{ steps.truncate-plan.outputs.stdout }}"
-        SHOW_PLAN: ${{ steps.truncate-plan.outputs.truncated != 'true' }}
+        SHOW_PLAN: "${{ steps.truncate-plan.outputs.truncated != 'true' }}"
         CONDITION: "${{ steps.plan.outputs.planExitCode }}"
       with:
         github-token: ${{ inputs.githubToken }}
