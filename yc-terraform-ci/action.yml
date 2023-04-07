@@ -200,7 +200,7 @@ runs:
             let planMessage;
             if (process.env.SHOW_PLAN == "true") {
               const { readFile } = require("fs/promises")
-              const plan = await readFile('${{ inputs.workingDir }}/${{ steps.create-truncated-plan-file.plan_file_name }}')
+              const plan = await readFile('${{ inputs.workingDir }}/${{ steps.create-truncated-plan-file.outputs.plan_file_name }}')
               planMessage = `\`\`\`terraform\n ${plan} \n\`\`\``
             }
             else {
