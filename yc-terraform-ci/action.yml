@@ -171,8 +171,17 @@ runs:
         original_length=${#plan}
         if (($original_length > 65536)); then truncated=true; else truncated=false; fi
         echo "truncated=${truncated}" >> $GITHUB_OUTPUT
-        echo "${plan:0:65536}" > plan.out
+        echo "${plan:0:65536}"
       working-directory: ${{ inputs.workingDir }}
+      shell: bash
+
+    # for escape github debug stdout 
+    - name: "Create truncated plan file"
+      id: create-truncated-plan-file
+      run: |
+        plan_file_name='plan.stdout'
+        "${{ steps.truncate-plan.outputs.stdout }}" > $plan_file_name
+        echo "plan_file_name=${plan_file_name}" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: "Install fs module"
@@ -191,7 +200,7 @@ runs:
             let planMessage;
             if (process.env.SHOW_PLAN == "true") {
               const { readFile } = require("fs/promises")
-              const plan = await readFile('${{ inputs.workingDir }}/plan.out')
+              const plan = await readFile('${{ inputs.workingDir }}/${{ steps.create-truncated-plan-file.plan_file_name }}')
               planMessage = `\`\`\`terraform\n ${plan} \n\`\`\``
             }
             else {
