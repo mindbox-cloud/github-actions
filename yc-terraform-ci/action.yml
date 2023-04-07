@@ -171,7 +171,7 @@ runs:
         original_length=${#plan}
         if (($original_length > 65536)); then truncated=true; else truncated=false; fi
         echo "truncated=${truncated}" >> $GITHUB_OUTPUT
-        echo "${plan:0:65000}"
+        echo "${plan:0:65536}"
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
@@ -184,6 +184,9 @@ runs:
       with:
         github-token: ${{ inputs.githubToken }}
         script: |
+          if (process.env.SHOW_PLAN == "false") {
+            console.log("Plan will not be shown")
+          }
           if (process.env.CONDITION == "2") {
             const planMessage = process.env.SHOW_PLAN == "true"
               ? `\`\`\`terraform\n ${process.env.PLAN} \n\`\`\``
