@@ -177,6 +177,7 @@ runs:
 
     - name: "Install fs module"
       run: npm install fs
+      shell: bash
 
     - uses: actions/github-script@v6
       name: "Comment plan"
