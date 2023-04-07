@@ -186,7 +186,7 @@ runs:
         script: |
           if (process.env.CONDITION == "2") {
             const planMessage = process.env.SHOW_PLAN == "true"
-              ? `\`\`\`terraform\n ${process.env.PLAN.substring(0,64000)} \n\`\`\``
+              ? `\`\`\`terraform\n ${process.env.PLAN} \n\`\`\``
               : "Please, refer to [Github Action logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})";
 
             const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
