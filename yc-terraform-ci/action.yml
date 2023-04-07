@@ -175,9 +175,11 @@ runs:
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
+    - name: "Install fs module"
+      run: npm install fs
+
     - uses: actions/github-script@v6
       name: "Comment plan"
-      working-directory: ${{ inputs.workingDir }}
       env:
         SHOW_PLAN: "${{ steps.truncate-plan.outputs.truncated != 'true' }}"
         CONDITION: "${{ steps.plan.outputs.planExitCode }}"
@@ -188,7 +190,7 @@ runs:
             let planMessage;
             if (process.env.SHOW_PLAN == "true") {
               const { readFile } = require("fs/promises")
-              const plan = await readFile('plan.out')
+              const plan = await readFile('${{ inputs.workingDir }}/plan.out')
               planMessage = `\`\`\`terraform\n ${plan} \n\`\`\``
             }
             else {
