@@ -182,7 +182,7 @@ runs:
       shell: bash
       run: |
         plan_file_name='plan.stdout'
-        echo "${{ steps.truncate-plan.outputs.stdout }}" > $plan_file_name
+        echo '${{ steps.truncate-plan.outputs.stdout }}' > $plan_file_name
         echo "plan_file_name=${plan_file_name}" >> $GITHUB_OUTPUT
 
     - name: "Install fs module"
