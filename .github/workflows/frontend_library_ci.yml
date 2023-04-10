@@ -10,22 +10,22 @@ on:
         type: string
       typechecking:
         description: "True if need to run check-types"
-        default: false
+        default: true
         required: false
         type: boolean
       linters:
         description: "True if need run check-scripts"
-        default: false
+        default: true
         required: false
         type: boolean
       style_linters:
         description: "True if need run check-styles"
-        default: false
+        default: true
         required: false
         type: boolean
       tests:
         description: "True if need run tests"
-        default: false
+        default: true
         required: false
         type: boolean
     secrets:
@@ -81,7 +81,7 @@ jobs:
 
       - name: Run style linters
         if: ${{ inputs.style_linters }}
-        run: npm run check-styles
+        run: npm run check-styles -- --allow-empty-input
 
       - name: Run tests
         if: ${{ inputs.tests }}
