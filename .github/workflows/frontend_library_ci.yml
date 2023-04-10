@@ -1,0 +1,140 @@
+name: CI
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        description: "Node.js version"
+        default: "18.x"
+        required: false
+        type: string
+      typechecking:
+        description: "True if need to run check-types"
+        default: true
+        required: false
+        type: boolean
+      linters:
+        description: "True if need run check-scripts"
+        default: true
+        required: false
+        type: boolean
+      style_linters:
+        description: "True if need run check-styles"
+        default: true
+        required: false
+        type: boolean
+      tests:
+        description: "True if need run tests"
+        default: true
+        required: false
+        type: boolean
+    secrets:
+      gh_npm_registry:
+        description: 'A GH_NPM_REGISTRY token passed from the caller workflow'
+        required: true
+      frontend_gha_full_token:
+        description: 'A FRONTEND_GHA_FULL_TOKEN token passed from the caller workflow'
+        required: true
+
+jobs:
+  checking:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run translation checker
+        uses: mindbox-cloud/github-actions/localization/translation-checker@master
+        with:
+          skipInclusionCheck: true
+
+      - name: Setup Node.JS
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node_version }}
+          registry-url: "https://npm.pkg.github.com/mindbox-cloud"
+
+      - name: Clean cache
+        run: npm cache clean -f
+
+      - name: Install deps
+        run: npm ci --loglevel verbose
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ./node_modules
+          key: npm-ci-${{ github.sha }}
+
+      - name: Run typechecking
+        if: ${{ inputs.typechecking }}
+        run: npm run check-types
+
+      - name: Run linters
+        if: ${{ inputs.linters }}
+        run: npm run check-scripts
+
+      - name: Run style linters
+        if: ${{ inputs.style_linters }}
+        run: npm run check-styles -- --allow-empty-input
+
+      - name: Run tests
+        if: ${{ inputs.tests }}
+        run: npm run test -- --maxConcurrency=1 --maxWorkers=1
+
+  release:
+    needs: checking
+    concurrency: release
+    runs-on: ubuntu-latest
+    if: ${{ (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') && !contains(github.event.head_commit.message, 'skip ci') }}
+    timeout-minutes: 20
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.frontend_gha_full_token }}
+
+      - name: Setup Node.JS
+        uses: actions/setup-node@v3
+        with:
+          always-auth: true
+          node-version: ${{ inputs.node_version }}
+          registry-url: "https://npm.pkg.github.com/mindbox-cloud"
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        id: cache_node_modules
+        with:
+          path: ./node_modules
+          key: npm-ci-${{ github.sha }}
+
+      - name: Install deps
+        if: steps.cache_node_modules.outputs.cache-hit != 'true'
+        run: npm ci --loglevel verbose
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
+
+      - name: Disable Lefthook
+        run: echo "LEFTHOOK=0" >> $GITHUB_ENV
+
+      - name: Disable Husky
+        run: echo "HUSKY=0" >> $GITHUB_ENV
+
+      - name: Build and format npm-package
+        run: npm run build:npm-package
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.gh_npm_registry }}
+
+      - name: Release
+        run: npm run release
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
+          GITHUB_TOKEN: ${{ secrets.frontend_gha_full_token }}
+          NPM_TOKEN: ${{ secrets.gh_npm_registry }}
