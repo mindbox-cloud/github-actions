@@ -108,11 +108,13 @@ jobs:
 
       - name: Cache node modules
         uses: actions/cache@v3
+        id: cache_node_modules
         with:
           path: ./node_modules
           key: npm-ci-${{ github.sha }}
 
       - name: Install deps
+        if: steps.cache_node_modules.outputs.cache-hit != 'true'
         run: npm ci --loglevel verbose
         env:
           NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
