@@ -28,6 +28,11 @@ on:
         default: true
         required: false
         type: boolean
+      build_npm_package:
+        description: "True if need run npm script 'npm run build:npm-package'"
+        default: true
+        required: false
+        type: boolean
     secrets:
       gh_npm_registry:
         description: 'A GH_NPM_REGISTRY token passed from the caller workflow'
