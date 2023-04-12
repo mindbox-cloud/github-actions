@@ -254,12 +254,16 @@ jobs:
 
       - name: Cache node modules
         uses: actions/cache@v3
+        id: cache_node_modules
         with:
           path: ./node_modules
           key: npm-ci-${{ github.sha }}
 
       - name: Install deps
-        run: npm ci --loglevel verbose
+        if: steps.cache_node_modules.outputs.cache-hit != 'true'
+        # Also skip running the "preinstall" script so that the NodeJS/NPM version is not checked
+        # https://mindbox.slack.com/archives/C04K3M61927/p1681285735640879
+        run: npm ci --loglevel verbose --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
 
@@ -359,7 +363,9 @@ jobs:
 
       - name: Install e2e deps
         if: ${{ inputs.e2e_tag }}
-        run: npm ci
+        # Also skip running the "preinstall" script so that the NodeJS/NPM version is not checked
+        # https://mindbox.slack.com/archives/C04K3M61927/p1681285735640879
+        run: npm ci --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
         working-directory: ./e2e
