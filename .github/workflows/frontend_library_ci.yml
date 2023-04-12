@@ -133,6 +133,7 @@ jobs:
         run: echo "HUSKY=0" >> $GITHUB_ENV
 
       - name: Build and format npm-package
+        if: ${{ inputs.build_npm_package }}
         run: npm run build:npm-package
         env:
           NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
