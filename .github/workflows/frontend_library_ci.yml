@@ -115,7 +115,7 @@ jobs:
 
       - name: Install deps
         if: steps.cache_node_modules.outputs.cache-hit != 'true'
-        run: npm ci --loglevel verbose
+        run: npm ci --loglevel verbose --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
 
