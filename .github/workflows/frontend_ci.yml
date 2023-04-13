@@ -137,6 +137,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run translation checker
+        if: ${{ !inputs.template_repo }}
         uses: mindbox-cloud/github-actions/localization/translation-checker@master
         with:
           skipInclusionCheck: true
