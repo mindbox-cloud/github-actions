@@ -119,7 +119,7 @@ jobs:
           key: npm-ci-${{ github.sha }}
 
       - name: Install deps
-        if: steps.cache_node_modules.outputs.cache-hit != 'true'
+        if: ${{ !steps.cache_node_modules.outputs.cache-hit }}
         # Also skip running the "preinstall" script so that the NodeJS/NPM version is not checked
         # https://mindbox.slack.com/archives/C04K3M61927/p1681285735640879
         run: npm ci --loglevel verbose --ignore-scripts

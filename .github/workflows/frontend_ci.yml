@@ -86,6 +86,11 @@ on:
         description: "True if need to use new deployment procedure"
         required: false
         default: false
+      template_repo:
+        type: boolean
+        description: "True if runs on template repository"
+        required: false
+        default: false
     secrets:
       gh_npm_registry:
         description: 'A GH_NPM_REGISTRY token passed from the caller workflow'
@@ -204,7 +209,7 @@ jobs:
     needs: checking
     concurrency: release
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
+    if: ${{ !inputs.template_repo && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') }}
     timeout-minutes: 20
     env:
       registry: cr.yandex/${{ inputs.registry_id }}
@@ -216,7 +221,6 @@ jobs:
       sentry_autobugs_org: mindbox
 
     steps:
-
       - name: Set variables
         id: set_variables
         run: |
@@ -260,7 +264,7 @@ jobs:
           key: npm-ci-${{ github.sha }}
 
       - name: Install deps
-        if: steps.cache_node_modules.outputs.cache-hit != 'true'
+        if: ${{ !steps.cache_node_modules.outputs.cache-hit }}
         # Also skip running the "preinstall" script so that the NodeJS/NPM version is not checked
         # https://mindbox.slack.com/archives/C04K3M61927/p1681285735640879
         run: npm ci --loglevel verbose --ignore-scripts
@@ -287,7 +291,7 @@ jobs:
           echo '${{ secrets.container_registry_key }}' >> iam_key.json | yc config set service-account-key iam_key.json
           rm iam_key.json
 
-# ---------------- start use_k8_deploy_process ---------------------
+      # ---------------- start use_k8_deploy_process ---------------------
 
       - name: Authenticate in yandex registry
         if: ${{ inputs.e2e_tag }} || ${{ inputs.use_k8_deploy_process }}
@@ -359,7 +363,7 @@ jobs:
         run: |
           docker push ${{ env.registry }}/${{ env.project_name }} --all-tags
 
-# ------------------------- use_k8_deploy_process ------------------
+      # ------------------------- use_k8_deploy_process ------------------
 
       - name: Install e2e deps
         if: ${{ inputs.e2e_tag }}
