@@ -87,10 +87,10 @@ on:
         required: false
         default: false
       template_repo:
-        type: boolean
         description: "True if runs on template repository"
-        required: false
         default: false
+        required: false
+        type: boolean
     secrets:
       gh_npm_registry:
         description: 'A GH_NPM_REGISTRY token passed from the caller workflow'
