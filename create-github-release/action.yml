@@ -33,30 +33,30 @@ runs:
     - name: generate release number
       if: ${{ inputs.release-number == 'empty' }}
       id: release-number
-      uses: mindbox-moscow/gha-release-number@v1.0.1
+      uses: mindbox-cloud/gha-release-number@master
       with:
         token: ${{ github.token }}
 
     - name: Changelog
-      uses: mindbox-moscow/github-actions/generate-release-changelog@master
+      uses: mindbox-cloud/github-actions/generate-release-changelog@master
       id: changelog
       env:
         REPO: ${{ github.repository }}
 
     - name: clean changelog from quotes
       run: |
-        echo "::set-output name=changelog::$((echo "${{ steps.changelog.outputs.changelog }}") | sed "s/\"//g" | sed "s/'//g" )"
+        echo "changelog=$((echo "${{ steps.changelog.outputs.changelog }}") | sed "s/\"//g" | sed "s/'//g" )" >> $GITHUB_OUTPUT
       id: clean-changelog
       shell: bash
 
     - name: "Create GitHub Release"
       id: create_release
-      uses: actions/create-release@master
+      uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         tag_name: "${{ inputs.release-number != 'empty' && inputs.release-number || steps.release-number.outputs.release-number }}"
-        release_name: "Release ${{ inputs.release-number != 'empty' && inputs.release-number || steps.release-number.outputs.release-number }}"
+        name: "Release ${{ inputs.release-number != 'empty' && inputs.release-number || steps.release-number.outputs.release-number }}"
         body: |
           ${{ steps.clean-changelog.outputs.changelog }}
         draft: false

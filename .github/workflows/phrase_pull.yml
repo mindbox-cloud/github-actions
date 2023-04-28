@@ -31,12 +31,12 @@ jobs:
     timeout-minutes: 10
     env:
       amixrWebhookUrl: ${{ secrets.amixrWebhookUrl }}
-      
+
     steps:
       - uses: actions/checkout@v3
 
       - name: phrase pull
-        uses: mindbox-moscow/github-actions/localization/phrase-pull@master
+        uses: mindbox-cloud/github-actions/localization/phrase-pull@master
         with:
           gitHubToken: ${{ secrets.gitHubToken }}
           phraseAppToken: ${{ secrets.phraseAppToken }}

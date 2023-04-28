@@ -44,7 +44,7 @@ runs:
   using: "composite"
   steps:
     - name: "Setup Terraform"
-      uses: hashicorp/setup-terraform@v1
+      uses: hashicorp/setup-terraform@v2
       with:
           terraform_version: ${{ inputs.terraformVersion }}
           terraform_wrapper: false
@@ -75,7 +75,7 @@ runs:
     - name: "Setup github token for module repo"
       run: |
         git config --local --remove-section http."https://github.com/"
-        git config --global url."https://octopus-mindbox:${OCTOPUS_MINDBOX_GITHUB_TOKEN}@github.com/mindbox-moscow".insteadOf "https://github.com/mindbox-moscow"
+        git config --global url."https://octopus-mindbox:${OCTOPUS_MINDBOX_GITHUB_TOKEN}@github.com/mindbox-cloud".insteadOf "https://github.com/mindbox-cloud"
       env:
         OCTOPUS_MINDBOX_GITHUB_TOKEN: ${{ inputs.mindboxOrgGithubToken }}
       working-directory: ${{ inputs.workingDir }}
@@ -101,7 +101,7 @@ runs:
         set +e
         PLAN="terraform plan ${{ inputs.planAdditionalVars }}  -no-color -out=plan.tfplan -detailed-exitcode"
         $PLAN
-        echo "::set-output name=planExitCode::$?"
+        echo "planExitCode=$?" >> $GITHUB_OUTPUT
         exit 0
       env:
         ARM_CLIENT_ID: ${{ inputs.armClientId }}
@@ -124,7 +124,7 @@ runs:
       shell: bash
 
     - name: "Setup Terraform"
-      uses: hashicorp/setup-terraform@v1
+      uses: hashicorp/setup-terraform@v2
       with:
           terraform_version: ${{ inputs.terraformVersion }}
     
@@ -150,15 +150,31 @@ runs:
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
-    - uses: actions/github-script@0.9.0
+    - name: "Truncate plan"
+      id: truncate-plan
+      run: |
+        plan="$(terraform show -no-color plan.tfplan)"
+        original_length=${#plan}
+        if (($original_length > 65536)); then truncated=true; else truncated=false; fi
+        echo "truncated=${truncated}" >> $GITHUB_OUTPUT
+        echo "${plan:0:65536}"
+      working-directory: ${{ inputs.workingDir }}
+      shell: bash
+
+    - uses: actions/github-script@v6
       name: "Comment plan"
       env:
-        PLAN: "${{ steps.show.outputs.stdout }}"
+        PLAN: "${{ steps.truncate-plan.outputs.stdout }}"
+        SHOW_PLAN: ${{ steps.truncate-plan.outputs.truncated != 'true' }}
         CONDITION: "${{ steps.plan.outputs.planExitCode }}"
       with:
         github-token: ${{ inputs.githubToken }}
         script: |
           if (process.env.CONDITION == "2") {
+            const planMessage = process.env.SHOW_PLAN == "true"
+              ? `\`\`\`terraform\n ${process.env.PLAN} \n\`\`\``
+              : "Please, refer to [Github Action logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})";
+
             const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
             #### Terraform Validation 🤖${{ steps.validate.outputs.stdout }}
@@ -166,14 +182,12 @@ runs:
             
             <details><summary>Show Plan</summary>
             
-            \`\`\`terraform\n
-            ${process.env.PLAN}
-            \`\`\`
+            ${planMessage}
             
             </details>
             
             *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ inputs.workingDir }}\`, Workflow: \`${{ github.workflow }}\`*`;
-            github.issues.createComment({
+            github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,

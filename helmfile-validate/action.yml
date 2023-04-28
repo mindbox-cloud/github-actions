@@ -1,0 +1,24 @@
+name: Helmfile validate
+description: Validates helmfile releases
+inputs:
+  path:
+    description: Path to helmfile.yaml
+    required: false
+    default: helmfile/helmfile.yaml
+  environment:
+    description: Helmfile environment
+    required: false
+    default: default
+
+outputs: {}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Helmfile lint
+      shell: bash
+      run: helmfile -f ${{ inputs.path }} --environment ${{ inputs.environment }} lint --args "--strict --quiet"
+
+    - name: Helmfile template
+      shell: bash
+      run: helmfile -f ${{ inputs.path }} --environment ${{ inputs.environment }} template

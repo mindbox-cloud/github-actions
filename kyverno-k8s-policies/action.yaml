@@ -18,7 +18,7 @@ runs:
     - name: "Clone repo with Kyverno policies"
       uses: actions/checkout@v2
       with:
-        repository: mindbox-moscow/kubernetes-system-layer.git
+        repository: mindbox-cloud/kubernetes-system-layer.git
         token: ${{ inputs.mindboxOrgGithubToken }}
         path: kubernetes-system-layer
         ref: master

@@ -26,7 +26,7 @@ function get_tag_name {
     return 11
   fi
 
-  local latest_tags=($(git tag --points-at "$latest_sha" | grep "$1-[0-9]"))
+  local latest_tags=($(git tag --points-at "$latest_sha" | grep "^$1-[0-9]"))
   if [[ "${#latest_tags[@]}" != 1 ]]; then
     exit 2
   fi
@@ -70,6 +70,6 @@ if [[ $first_time == "no" ]]; then
   fi
 fi
 
-echo "::set-output name=continue::${continue}"
-echo "::set-output name=version::${version}"
-echo "::set-output name=first_time::${first_time}"
+echo "continue=${continue}" >> $GITHUB_OUTPUT
+echo "version=${version}" >> $GITHUB_OUTPUT
+echo "first_time=${first_time}" >> $GITHUB_OUTPUT

@@ -31,7 +31,7 @@ function get_tag_version {
     return 11
   fi
 
-  local latest_tags=($(git tag --points-at "$latest_sha" | grep "$1-[0-9]"))
+  local latest_tags=($(git tag --points-at "$latest_sha" | grep "^$1-[0-9]"))
   if [[ "${#latest_tags[@]}" != 1 ]]; 
   then
     local latest_version="1.1.0"
@@ -127,5 +127,5 @@ else
   fi
 fi
 
-echo "::set-output name=continue::${continue}"
-echo "::set-output name=matrix::${matrix}"
+echo "continue=${continue}" >> $GITHUB_OUTPUT
+echo "matrix=${matrix}" >> $GITHUB_OUTPUT

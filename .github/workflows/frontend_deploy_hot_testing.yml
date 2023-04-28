@@ -5,7 +5,7 @@ on:
     inputs:
       node_version:
         description: "Node.js version"
-        default: "14.x"
+        default: "18.x"
         required: false
         type: string
       registry_id:
@@ -71,7 +71,7 @@ on:
 
 jobs:
   hot-testing:
-    runs-on: [self-hosted, frontend]
+    runs-on: [self-hosted, Linux, frontend]
     timeout-minutes: 10
     if: ${{ !contains(github.head_ref, 'LocalizationPull') && github.event.pull_request.user.login != 'renovate[bot]' }}
     env:
@@ -85,7 +85,7 @@ jobs:
         run: echo "This PR is opened by ${{ github.event.pull_request.user.login }} ."
 
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -103,7 +103,7 @@ jobs:
 
       - name: Set project path
         run: |
-          project_name=$(cat ./package.json | jq .name | sed -s 's/@mindbox-moscow\///g' | sed -s 's/-/_/g' | sed -s 's/"//g')
+          project_name=$(cat ./package.json | jq .name | sed -s 's/@mindbox-cloud\///g' | sed -s 's/-/_/g' | sed -s 's/"//g')
           if [[ $project_name == "frontend_core_v2" ]]; then
             echo "project_folder=core" >> $GITHUB_ENV
             echo "frontend_core_service=hot-testing-service-${{ env.hash_payload }}" >> $GITHUB_ENV
@@ -114,17 +114,34 @@ jobs:
         id: set_project
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           always-auth: true
           node-version: ${{ inputs.node_version }}
-          registry-url: "https://npm.pkg.github.com/mindbox-moscow"
+          registry-url: "https://npm.pkg.github.com/mindbox-cloud"
 
       - name: Get node modules from cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ./node_modules
           key: npm-ci-${{ github.sha }}
+
+      - name: Download artifact
+        id: download-artifact
+        uses: dawidd6/action-download-artifact@v2
+        timeout-minutes: 1
+        continue-on-error: true
+        with:
+          github_token: ${{secrets.GITHUB_TOKEN}} 
+          path: ./master-stats   
+          name: ${{ env.repository_name }}-master-stats
+          search_artifacts: true
+          check_artifacts: true
+          if_no_artifact_found: warn
+
+      - name: Rename master stats file
+        run: mv ./master-stats/${{ env.project_folder }}-stats.json ./master-stats/${{ env.project_folder }}-master.json
+        continue-on-error: true
 
       - name: Disable Lefthook
         run: echo "LEFTHOOK=0" >> $GITHUB_ENV
@@ -136,9 +153,9 @@ jobs:
 
       - name: Checkout frontend-deploy repository
         if: ${{ inputs.use_k8_deploy_process }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
-          repository: mindbox-moscow/frontend-deploy
+          repository: mindbox-cloud/frontend-deploy
           token: ${{ secrets.frontend_gha_full_token }}
           path: ./deploy
 
@@ -151,13 +168,19 @@ jobs:
           NPM_TOKEN: ${{ secrets.npm_token }}
           MCF_STATIC_FOLDER: v2_static
 
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.repository_name }}-stats
+          path: |
+            ./stats
+
       # needed for frontend discovery(build initial.js)
       - name: copy remoteEntry to v2_static folder
         if: ${{ inputs.use_k8_deploy_process }}
         run: |
           find . -type f -name "remoteEntry.js" -exec cp {} ./v2_static/ \;
         working-directory: ./build
-      
+
       - name: Copy Dockerfile to build folder
         if: ${{ inputs.use_k8_deploy_process }}
         run: | 
@@ -217,7 +240,7 @@ jobs:
                 fallback: 'fallback',
                 color: 'good',
                 title: "Repository: ${{ env.repository_name }}",
-              text: "You can check your *Frontend* changes at\nhttps://hot-testing-${{ env.hash_payload }}-staging.mindbox.ru\n\nand check your PR at \nhttps://github.com/mindbox-moscow/${{ env.repository_name }}/commit/${{ github.sha }}"
+              text: "You can check your *Frontend* changes at\nhttps://hot-testing-${{ env.hash_payload }}-staging.mindbox.ru\n\nand check your PR at \nhttps://github.com/mindbox-cloud/${{ env.repository_name }}/commit/${{ github.sha }}"
               }]
             }
         env:
@@ -233,7 +256,7 @@ jobs:
         if: ${{ failure() }}
         uses: mshick/add-pr-comment@v2
         with:
-          message: ":negative_squared_cross_mark: Your **Frontend** deploy failed. Check logs at\nhttps://github.com/mindbox-moscow/${{ env.repository_name }}/actions/runs/${{ github.run_id }}"
+          message: ":negative_squared_cross_mark: Your **Frontend** deploy failed. Check logs at\nhttps://github.com/mindbox-cloud/${{ env.repository_name }}/actions/runs/${{ github.run_id }}"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
 
@@ -248,7 +271,7 @@ jobs:
                 "author_name": "Author: ${{ github.actor }}",
                 color: "#FF0000",
                 title: "Repository: ${{ env.repository_name }}",
-              text: "Your *Frontend* deploy failed. Check logs at\nhttps://github.com/mindbox-moscow/${{ env.repository_name }}/actions/runs/${{ github.run_id }}"
+              text: "Your *Frontend* deploy failed. Check logs at\nhttps://github.com/mindbox-cloud/${{ env.repository_name }}/actions/runs/${{ github.run_id }}"
               }]
             }
         env:

@@ -45,7 +45,7 @@ runs:
   using: "composite"
   steps:
     - name: "Setup Terraform"
-      uses: hashicorp/setup-terraform@v1
+      uses: hashicorp/setup-terraform@v2
       with:
           terraform_version: ${{ inputs.terraformVersion }}
           terraform_wrapper: false
@@ -63,7 +63,7 @@ runs:
           echo "--- RUN STEP: Setup github token for module repo"
 
           git config --local --remove-section http."https://github.com/"
-          git config --global url."https://octopus-mindbox:${OCTOPUS_MINDBOX_GITHUB_TOKEN}@github.com/mindbox-moscow".insteadOf "https://github.com/mindbox-moscow"
+          git config --global url."https://octopus-mindbox:${OCTOPUS_MINDBOX_GITHUB_TOKEN}@github.com/mindbox-cloud".insteadOf "https://github.com/mindbox-cloud"
         fi
       env:
         OCTOPUS_MINDBOX_GITHUB_TOKEN: ${{ inputs.mindboxOrgGithubToken }}
@@ -121,7 +121,7 @@ runs:
         set +e
         PLAN="terraform plan ${{ inputs.planAdditionalVars }} -no-color -out=plan.tfplan -detailed-exitcode"
         $PLAN
-        echo "::set-output name=planExitCode::$?"
+        echo "planExitCode=$?" >> $GITHUB_OUTPUT
         exit 0
       working-directory: ${{ inputs.workingDir }}
       shell: bash
@@ -138,7 +138,7 @@ runs:
       shell: bash
     
     - name: "Setup Terraform"
-      uses: hashicorp/setup-terraform@v1
+      uses: hashicorp/setup-terraform@v2
       with:
           terraform_version: ${{ inputs.terraformVersion }}
 
@@ -164,15 +164,52 @@ runs:
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
-    - uses: actions/github-script@0.9.0
+    - name: "Truncate plan"
+      id: truncate-plan
+      working-directory: ${{ inputs.workingDir }}
+      shell: bash
+      run: |
+        plan="$(terraform show -no-color plan.tfplan)"
+        original_length=${#plan}
+        if (($original_length > 65536)); then truncated=true; else truncated=false; fi
+        echo "truncated=${truncated}" >> $GITHUB_OUTPUT
+        echo "${plan:0:65536}"
+
+    # for escape github debug stdout 
+    - name: "Create truncated plan file"
+      id: create-truncated-plan-file
+      working-directory: ${{ inputs.workingDir }}
+      shell: bash
+      run: |
+        plan_file_name='plan.stdout'
+        cat << EOF > $plan_file_name
+        ${{ steps.truncate-plan.outputs.stdout }}
+        EOF
+        echo "plan_file_name=${plan_file_name}" >> $GITHUB_OUTPUT
+
+    - name: "Install fs module"
+      run: npm install fs
+      shell: bash
+
+    - uses: actions/github-script@v6
       name: "Comment plan"
       env:
-        PLAN: "${{ steps.show.outputs.stdout }}"
+        SHOW_PLAN: "${{ steps.truncate-plan.outputs.truncated != 'true' }}"
         CONDITION: "${{ steps.plan.outputs.planExitCode }}"
       with:
         github-token: ${{ inputs.githubToken }}
         script: |
           if (process.env.CONDITION == "2") {
+            let planMessage;
+            if (process.env.SHOW_PLAN == "true") {
+              const { readFile } = require("fs/promises")
+              const plan = await readFile('${{ inputs.workingDir }}/${{ steps.create-truncated-plan-file.outputs.plan_file_name }}')
+              planMessage = `\`\`\`terraform\n ${plan} \n\`\`\``
+            }
+            else {
+              planMessage = "Please, refer to [Github Action logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+            }
+
             const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
             #### Terraform Validation 🤖${{ steps.validate.outputs.stdout }}
@@ -180,14 +217,12 @@ runs:
             
             <details><summary>Show Plan</summary>
             
-            \`\`\`terraform\n
-            ${process.env.PLAN}
-            \`\`\`
+            ${planMessage}
             
             </details>
 
             *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ inputs.workingDir }}\`, Workflow: \`${{ github.workflow }}\`*`;
-            github.issues.createComment({
+            github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,

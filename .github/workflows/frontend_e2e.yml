@@ -5,7 +5,7 @@ on:
     inputs:
       node_version:
         description: "Node.js version"
-        default: "14.x"
+        default: "18.x"
         required: false
         type: string
       e2e-timeout:
@@ -100,7 +100,7 @@ jobs:
 
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set variables
         run: |
@@ -116,7 +116,7 @@ jobs:
 
       - name: Set project path
         run: |
-          project_name=$(cat ./package.json | jq .name | sed -s 's/@mindbox-moscow\///g' | sed -s 's/-/_/g' | sed -s 's/"//g')
+          project_name=$(cat ./package.json | jq .name | sed -s 's/@mindbox-cloud\///g' | sed -s 's/-/_/g' | sed -s 's/"//g')
           if [[ $project_name == "frontend_core_v2" ]]; then
             echo "project_folder=core" >> $GITHUB_ENV
             echo "project_name=core" >> $GITHUB_ENV
@@ -129,14 +129,14 @@ jobs:
         id: set_project
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           always-auth: true
           node-version: ${{ inputs.node_version }}
-          registry-url: "https://npm.pkg.github.com/mindbox-moscow"
+          registry-url: "https://npm.pkg.github.com/mindbox-cloud"
 
       - name: Get node modules from cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ./node_modules
           key: npm-ci-${{ github.sha }}
@@ -151,9 +151,9 @@ jobs:
 
       - name: Checkout frontend-deploy repository
         if: ${{ inputs.use_k8_deploy_process }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
-          repository: mindbox-moscow/frontend-deploy
+          repository: mindbox-cloud/frontend-deploy
           token: ${{ secrets.frontend_gha_full_token }}
           path: ./deploy
 
@@ -172,7 +172,7 @@ jobs:
         run: |
           find . -type f -name "remoteEntry.js" -exec cp {} ./v2_static/ \;
         working-directory: ./build
-      
+
       - name: Copy Dockerfile to build folder
         if: ${{ inputs.use_k8_deploy_process }}
         run: | 
@@ -249,7 +249,7 @@ jobs:
         run: apt-get update && apt-get -y install jq
 
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set variables
         run: |
@@ -266,7 +266,7 @@ jobs:
 
       - name: Set project path
         run: |
-          project_name=$(cat ./package.json | jq .name | sed -s 's/@mindbox-moscow\///g' | sed -s 's/-/_/g' | sed -s 's/"//g')
+          project_name=$(cat ./package.json | jq .name | sed -s 's/@mindbox-cloud\///g' | sed -s 's/-/_/g' | sed -s 's/"//g')
           if [[ $project_name == "frontend_core_v2" ]]; then
             echo "project_folder=core" >> $GITHUB_ENV
             echo "project_name=core" >> $GITHUB_ENV
@@ -277,11 +277,11 @@ jobs:
         id: set_project
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           always-auth: true
           node-version: ${{ inputs.node_version }}
-          registry-url: "https://npm.pkg.github.com/mindbox-moscow"
+          registry-url: "https://npm.pkg.github.com/mindbox-cloud"
 
       - name: Run E2E tests on not core project (v5).
         uses: cypress-io/github-action@v5
@@ -320,7 +320,7 @@ jobs:
 
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set variables
         run: |
@@ -336,7 +336,7 @@ jobs:
 
       - name: Set project path
         run: |
-          project_name=$(cat ./package.json | jq .name | sed -s 's/@mindbox-moscow\///g' | sed -s 's/-/_/g' | sed -s 's/"//g')
+          project_name=$(cat ./package.json | jq .name | sed -s 's/@mindbox-cloud\///g' | sed -s 's/-/_/g' | sed -s 's/"//g')
           if [[ $project_name == "frontend_core_v2" ]]; then
             echo "project_folder=core" >> $GITHUB_ENV
             echo "project_name=core" >> $GITHUB_ENV
@@ -347,11 +347,11 @@ jobs:
         id: set_project
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           always-auth: true
           node-version: ${{ inputs.node_version }}
-          registry-url: "https://npm.pkg.github.com/mindbox-moscow"
+          registry-url: "https://npm.pkg.github.com/mindbox-cloud"
 
       - name: Install YC
         run: |
@@ -365,7 +365,7 @@ jobs:
           echo '${{ secrets.container_registry_key }}' >> iam_key.json | yc config set service-account-key iam_key.json
           rm iam_key.json
           project_matrix=$(curl -s -H "Authorization: Bearer $(yc iam create-token)" $URL?repositoryName=${{ inputs.registry_id }}/frontend-e2e | jq -r ".images[].tags[]?" | sed 's/-latest//g' | jq -R . | jq -s -c .)
-          echo "::set-output name=matrix::$project_matrix"
+          echo "matrix=$project_matrix" >> $GITHUB_OUTPUT
         env:
           URL: "https://container-registry.api.cloud.yandex.net/container-registry/v1/images"
 
@@ -394,7 +394,7 @@ jobs:
         run: echo "previous steps are failed" && exit 1
 
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set variables
         run: |
@@ -410,7 +410,7 @@ jobs:
 
       - name: Set project path
         run: |
-          project_name=$(cat ./package.json | jq .name | sed -s 's/@mindbox-moscow\///g' | sed -s 's/-/_/g' | sed -s 's/"//g')
+          project_name=$(cat ./package.json | jq .name | sed -s 's/@mindbox-cloud\///g' | sed -s 's/-/_/g' | sed -s 's/"//g')
           if [[ $project_name == "frontend_core_v2" ]]; then
             echo "project_folder=core" >> $GITHUB_ENV
             echo "project_name=core" >> $GITHUB_ENV
@@ -421,11 +421,11 @@ jobs:
         id: set_project
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           always-auth: true
           node-version: ${{ inputs.node_version }}
-          registry-url: "https://npm.pkg.github.com/mindbox-moscow"
+          registry-url: "https://npm.pkg.github.com/mindbox-cloud"
 
       - name: Authenticate in yandex registry
         run: echo '${{ secrets.container_registry_key }}' | docker login -u json_key --password-stdin cr.yandex
@@ -462,7 +462,7 @@ jobs:
     needs: [e2e-tests, core-e2e-tests-runner]
     if: ${{ failure() }}
     steps:
-      
+
       - name: Add comment to commit if the job has failed
         if: ${{ failure() }}
         uses: mshick/add-pr-comment@v2
@@ -473,7 +473,7 @@ jobs:
   clean-up-e2e-tests:
     needs: [ e2e-tests, core-e2e-tests-runner ]
     if: ${{ always() && ( needs.e2e-tests.result == 'success' || needs.core-e2e-tests-runner.result == 'success' ) }}
-    uses: mindbox-moscow/github-actions/.github/workflows/frontend_cleanup_testing.yml@master
+    uses: mindbox-cloud/github-actions/.github/workflows/frontend_cleanup_testing.yml@master
     with:
       hot_testing: false
       hot_testing_k8: false

@@ -32,20 +32,21 @@ on:
         required: false
 jobs:
   phrase-sync:
-    runs-on: [self-hosted, Linux, frontend]
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
       amixrWebhookUrl: ${{ secrets.amixrWebhookUrl }}
     steps:
       - uses: actions/checkout@v3
+      - run: sudo chown -R root:root $GITHUB_WORKSPACE
 
       - name: phrase push
-        uses: mindbox-moscow/github-actions/localization/phrase-push@master
+        uses: mindbox-cloud/github-actions/localization/phrase-push@master
         with:
           phraseAppToken: ${{ secrets.phraseAppToken }}
 
       - name: phrase pull
-        uses: mindbox-moscow/github-actions/localization/phrase-pull@master
+        uses: mindbox-cloud/github-actions/localization/phrase-pull@master
         with:
           gitHubToken: ${{ secrets.gitHubToken }}
           commitEmail: ${{ inputs.commitEmail }}

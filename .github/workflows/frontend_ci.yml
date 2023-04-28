@@ -5,7 +5,7 @@ on:
     inputs:
       node_version:
         description: "Node.js version"
-        default: "14.x"
+        default: "18.x"
         required: false
         type: string
       typechecking:
@@ -86,8 +86,13 @@ on:
         description: "True if need to use new deployment procedure"
         required: false
         default: false
+      template_repo:
+        description: "True if runs on template repository"
+        default: false
+        required: false
+        type: boolean
     secrets:
-      npm_token:
+      gh_npm_registry:
         description: 'A GH_NPM_REGISTRY token passed from the caller workflow'
         required: true
       frontend_gha_full_token:
@@ -102,10 +107,10 @@ on:
       octopus_api_key:
         description: 'A OCTOPUS_API_KEY token passed from the caller workflow'
         required: true
-      failure_notify_url:
+      frontend_webhook_to_amixr:
         description: 'A url where to send a crash notification'
         required: false
-      sentry_main_auth_token:
+      sentry_errors_auth_token:
         description: 'Sentry errors mindbox auth token'
         required: false
       sentry_main_dsn:
@@ -117,27 +122,31 @@ on:
       sentry_autobugs_dsn:
         description: 'Sentry autobugs mindbox dsn'
         required: false
+      pipelines_release_submit_token:
+        description: 'Pipeline metrics auth token'
+        required: false
 
 jobs:
   checking:
-    runs-on: [self-hosted, frontend]
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run translation checker
-        uses: mindbox-moscow/github-actions/localization/translation-checker@master
+        if: ${{ !inputs.template_repo }}
+        uses: mindbox-cloud/github-actions/localization/translation-checker@master
         with:
           skipInclusionCheck: true
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ inputs.node_version }}
-          registry-url: "https://npm.pkg.github.com/mindbox-moscow"
+          registry-url: "https://npm.pkg.github.com/mindbox-cloud"
 
       - name: Clean cache
         run: npm cache clean -f
@@ -145,7 +154,7 @@ jobs:
       - name: Install deps
         run: npm ci --loglevel verbose
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
 
       - name: Cache node modules
         uses: actions/cache@v3
@@ -167,19 +176,19 @@ jobs:
 
       - name: Run style linters
         if: ${{ inputs.style_linters }}
-        run: npm run check-styles
+        run: npm run check-styles -- --allow-empty-input
 
       - name: Run tests
         if: ${{ inputs.tests }}
-        run: npm run test
+        run: npm run test -- --maxConcurrency=1 --maxWorkers=1
 
       - name: Install E2E deps
         if: ${{ inputs.e2e_typechecking || inputs.e2e_linters }}
         run: npm ci --loglevel verbose
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
         working-directory: ./e2e
-        
+
       - name: Cache E2E node modules
         if: ${{ inputs.e2e_typechecking || inputs.e2e_linters }}
         uses: actions/cache@v3
@@ -200,8 +209,8 @@ jobs:
   release:
     needs: checking
     concurrency: release
-    runs-on: [self-hosted, frontend]
-    if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    if: ${{ !inputs.template_repo && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') }}
     timeout-minutes: 20
     env:
       registry: cr.yandex/${{ inputs.registry_id }}
@@ -213,14 +222,13 @@ jobs:
       sentry_autobugs_org: mindbox
 
     steps:
-
       - name: Set variables
         id: set_variables
         run: |
-          echo "##[set-output name=repository_name;]$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}')"
+          echo "repository_name=$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}')" >> $GITHUB_OUTPUT
 
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           token: ${{ secrets.FRONTEND_GHA_FULL_TOKEN }}
 
@@ -238,27 +246,31 @@ jobs:
 
       - name: Generate release number
         id: release-number
-        uses: mindbox-moscow/gha-release-number@v1.0.1
+        uses: mindbox-cloud/gha-release-number@v1.0.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           always-auth: true
           node-version: ${{ inputs.node_version }}
-          registry-url: "https://npm.pkg.github.com/mindbox-moscow"
-          
+          registry-url: "https://npm.pkg.github.com/mindbox-cloud"
+
       - name: Cache node modules
         uses: actions/cache@v3
+        id: cache_node_modules
         with:
           path: ./node_modules
           key: npm-ci-${{ github.sha }}
 
       - name: Install deps
-        run: npm ci --loglevel verbose
+        if: ${{ !steps.cache_node_modules.outputs.cache-hit }}
+        # Also skip running the "preinstall" script so that the NodeJS/NPM version is not checked
+        # https://mindbox.slack.com/archives/C04K3M61927/p1681285735640879
+        run: npm ci --loglevel verbose --ignore-scripts
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
 
       - name: Set new version
         id: package_version
@@ -280,7 +292,7 @@ jobs:
           echo '${{ secrets.container_registry_key }}' >> iam_key.json | yc config set service-account-key iam_key.json
           rm iam_key.json
 
-# ---------------- start use_k8_deploy_process ---------------------
+      # ---------------- start use_k8_deploy_process ---------------------
 
       - name: Authenticate in yandex registry
         if: ${{ inputs.e2e_tag }} || ${{ inputs.use_k8_deploy_process }}
@@ -290,10 +302,10 @@ jobs:
         if: ${{ inputs.use_k8_deploy_process }}
         run: npm run build
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.npm_token }}
-          SENTRY_MAIN_AUTH_TOKEN: ${{ secrets.sentry_main_auth_token }}
+          GH_NPM_REGISTRY: ${{ secrets.gh_npm_registry }}
+          SENTRY_MAIN_AUTH_TOKEN: ${{ secrets.sentry_errors_auth_token }}
           SENTRY_MAIN_DSN: ${{ secrets.sentry_main_dsn }}
           SENTRY_MAIN_ENABLED: ${{ inputs.sentry_main_enabled }}
           SENTRY_MAIN_ORG: ${{ env.sentry_main_org }}
@@ -313,6 +325,14 @@ jobs:
         if: ${{ inputs.use_k8_deploy_process }}
         run: cp ./package.json ./build/
 
+      - name: Upload statoscope artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.project_name }}-master-stats
+          if-no-files-found: warn
+          path: |
+            ./stats
+
       - name: Create e2e tests list for k8
         if: ${{ inputs.use_k8_deploy_process }}
         run: |
@@ -323,8 +343,8 @@ jobs:
       - name: Download release Dockerfile
         if: ${{ inputs.use_k8_deploy_process }}
         run: |
-          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-moscow/frontend-deploy/master/mcf-release/Dockerfile
-          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-moscow/frontend-deploy/master/mcf-release/nginx.conf
+          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/master/mcf-release/Dockerfile
+          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/master/mcf-release/nginx.conf
         working-directory: ./build
 
         # needed for frontend discovery(build initial.js)
@@ -344,28 +364,22 @@ jobs:
         run: |
           docker push ${{ env.registry }}/${{ env.project_name }} --all-tags
 
-# ------------------------- use_k8_deploy_process ------------------
+      # ------------------------- use_k8_deploy_process ------------------
 
       - name: Install e2e deps
         if: ${{ inputs.e2e_tag }}
-        run: npm ci
+        # Also skip running the "preinstall" script so that the NodeJS/NPM version is not checked
+        # https://mindbox.slack.com/archives/C04K3M61927/p1681285735640879
+        run: npm ci --ignore-scripts
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
         working-directory: ./e2e
 
       - name: Download e2e tests Dockerfile
         if: ${{ inputs.e2e_tag }}
         run: |
-          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-moscow/frontend-cypress/master/docker/Dockerfile
+          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-cypress/master/docker/Dockerfile
         working-directory: ./e2e
-
-      - name: Remove old e2e image
-        if: ${{ inputs.e2e_tag }}
-        run: |
-          imageId=$(curl -H "Authorization: Bearer $(yc iam create-token)" $URL?repositoryName=${{ inputs.registry_id }}/frontend-e2e | jq -r '.images[] | select(.tags[]? == "${{ env.e2e-tag }}") | .id')
-          curl -X DELETE -H "Authorization: Bearer $(yc iam create-token)" $URL/$imageId
-        env:
-          URL: "https://container-registry.api.cloud.yandex.net/container-registry/v1/images"
 
       - name: Build e2e docker images
         if: ${{ inputs.e2e_tag }}
@@ -377,9 +391,23 @@ jobs:
         run: |
           docker push ${{ env.registry }}/${{ env.e2e-image }}:${{ env.e2e-tag }}
 
+      - name: Post release to pipelines
+        run: |
+          if [ "${{ secrets.pipelines_release_submit_token }}" != "" ]; then
+          curl --fail --location --request POST 'https://pipelines-services.mindbox.ru/releases/submit-data' \
+            --header 'Authorization: Bearer ${{secrets.pipelines_release_submit_token}}' \
+            --header 'Content-Type: application/json' \
+            --data-raw '{
+              "serviceName": "${{ github.event.repository.name }}",
+              "version": "${{ steps.release-number.outputs.release-number }}",
+              "runId": "${{ github.run_id }}"
+              }'
+          fi
+        shell: bash
+
       - name: Create Release
         id: create-release
-        uses: mindbox-moscow/github-actions/create-github-release@master
+        uses: mindbox-cloud/github-actions/create-github-release@master
         with:
           release-number: ${{ steps.release-number.outputs.release-number }}
           checkout: false
@@ -418,5 +446,5 @@ jobs:
         uses: joelwmale/webhook-action@master
         if: ${{ failure() }}
         with:
-          url: ${{ secrets.failure_notify_url }}
+          url: ${{ secrets.frontend_webhook_to_amixr }}
           body: '{"title": "Build ${{ github.repository }} *failed*", "state": "alerting", "message": "Check logs at\nhttps://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\nAutor: ${{ github.actor }}"}'
