@@ -37,6 +37,3 @@ changelog=$lastcommit_hyperlink$'<br/>'$changelog
 echo $changelog
 
 echo "changelog=$changelog" >> $GITHUB_OUTPUT
-
-
-
