@@ -106,7 +106,7 @@ jobs:
           project_name=$(cat ./package.json | jq .name | sed -s 's/@mindbox-cloud\///g' | sed -s 's/-/_/g' | sed -s 's/"//g')
           if [[ $project_name == "frontend_core_v2" ]]; then
             echo "project_folder=core" >> $GITHUB_ENV
-            echo "frontend_core_service=hot-testing-service-${{ env.hash_payload }}" >> $GITHUB_ENV
+            echo "frontend_core_service=hot-testing-${{ env.hash_payload }}" >> $GITHUB_ENV
           else
             echo "project_folder=$project_name" >> $GITHUB_ENV
             echo "frontend_core_service=core-service-staging" >> $GITHUB_ENV

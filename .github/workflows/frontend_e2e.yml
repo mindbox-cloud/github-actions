@@ -120,7 +120,7 @@ jobs:
           if [[ $project_name == "frontend_core_v2" ]]; then
             echo "project_folder=core" >> $GITHUB_ENV
             echo "project_name=core" >> $GITHUB_ENV
-            echo "frontend_core_service=e2e-testing-service-${{ env.hash_payload }}" >> $GITHUB_ENV
+            echo "frontend_core_service=e2e-testing-${{ env.hash_payload }}" >> $GITHUB_ENV
           else
             echo "project_folder=$project_name" >> $GITHUB_ENV
             echo "project_name=$project_name" >> $GITHUB_ENV
@@ -353,7 +353,7 @@ jobs:
           echo '${{ secrets.container_registry_key }}' >> iam_key.json | yc config set service-account-key iam_key.json
           rm iam_key.json
           project_matrix=$(curl -s -H "Authorization: Bearer $(yc iam create-token)" $URL?repositoryName=${{ inputs.registry_id }}/frontend-e2e | jq -r ".images[].tags[]?" | sed 's/-latest//g' | jq -R . | jq -s -c .)
-          echo "matrix=$project_matrix" >> $env:GITHUB_OUTPUT
+          echo "matrix=$project_matrix" >> $GITHUB_OUTPUT
         env:
           URL: "https://container-registry.api.cloud.yandex.net/container-registry/v1/images"
 
