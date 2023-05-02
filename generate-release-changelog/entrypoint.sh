@@ -17,18 +17,18 @@ fi
 echo "last commit: $lastcommit"
 echo $changelog
 
-#changelog="${changelog//'%'/'%25'}"
-#changelog="${changelog//$'\n'/'%0A' - }"
-#changelog=" - ${changelog//$'\r'/'%0D'}"
+changelog="${changelog//'%'/'%25'}"
+changelog="${changelog//$'\n'/'%0A' - }"
+changelog=" - ${changelog//$'\r'/'%0D'}"
 
 lastcommit_url="$repo_url/commits/$lastcommit"
 lastcommit_hyperlink="[View latest commits in Github]($lastcommit_url)"
 
 changelog=$lastcommit_hyperlink$'<br/>'$changelog
 
-#echo "changelog=$changelog" >> $GITHUB_OUTPUT
+echo "changelog=$changelog" >> $GITHUB_OUTPUT
 
-delimiter=$(cat /proc/sys/kernel/random/uuid)
-echo "result<<${delimiter}" >> "${GITHUB_OUTPUT}"
-echo "${changelog}" >> "${GITHUB_OUTPUT}"
-echo "${delimiter}" >> "${GITHUB_OUTPUT}"
+#delimiter=$(cat /proc/sys/kernel/random/uuid)
+#echo "result<<${delimiter}" >> "${GITHUB_OUTPUT}"
+#echo "${changelog}" >> "${GITHUB_OUTPUT}"
+#echo "${delimiter}" >> "${GITHUB_OUTPUT}"
