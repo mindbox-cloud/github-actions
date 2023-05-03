@@ -87,7 +87,7 @@ env:
 
 jobs:
   prepare-site:
-    runs-on: [self-hosted, frontend]
+    runs-on: ubuntu-latest
     if: ${{ !contains(github.head_ref, 'LocalizationPull') }}
     env:
       retries: ${{ inputs.retries }}
@@ -292,7 +292,7 @@ jobs:
           retention-days: 1
 
   core-e2e-tests-matrix:
-    runs-on: [self-hosted, frontend]
+    runs-on: ubuntu-latest
     needs: prepare-site
     if: ${{ !contains(github.head_ref, 'LocalizationPull') && inputs.core_project }}
     env:
@@ -446,7 +446,7 @@ jobs:
           retention-days: 1
 
   post-e2e-tests:
-    runs-on: [self-hosted, frontend]
+    runs-on: ubuntu-latest
     needs: [e2e-tests, core-e2e-tests-runner]
     if: ${{ failure() }}
     steps:
@@ -462,9 +462,7 @@ jobs:
     if: ${{ always() && ( needs.e2e-tests.result == 'success' || needs.core-e2e-tests-runner.result == 'success' ) }}
     uses: mindbox-cloud/github-actions/.github/workflows/frontend_cleanup_testing.yml@master
     with:
-      hot_testing: false
       hot_testing_k8: false
-      e2e_testing: true
       e2e_testing_k8: true
     secrets:
       frontend_gha_full_token: ${{ secrets.frontend_gha_full_token }}
