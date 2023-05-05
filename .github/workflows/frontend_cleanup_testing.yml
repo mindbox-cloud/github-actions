@@ -40,7 +40,7 @@ on:
 jobs:
   cleanup:
     timeout-minutes: 10
-    runs-on: [self-hosted, frontend]
+    runs-on: ubuntu-latest
 
     steps:
 
