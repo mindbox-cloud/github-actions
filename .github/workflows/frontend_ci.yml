@@ -205,6 +205,14 @@ jobs:
         if: ${{ inputs.e2e_linters }}
         run: npm run e2e:check-scripts
         working-directory: ./e2e
+  autoapprove:
+    needs: checking
+    runs-on: ubuntu-latest
+    if: ${{ always() && !cancelled() && contains(github.head_ref, 'LocalizationPull') }}
+    steps:
+      - uses: hmarr/auto-approve-action@v3
+        with:
+          github-token: ${{ secrets.FRONTEND_GHA_FULL_TOKEN }}
 
   release:
     needs: checking
