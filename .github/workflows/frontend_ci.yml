@@ -212,7 +212,7 @@ jobs:
     steps:
       - uses: hmarr/auto-approve-action@v3
         with:
-          github-token: ${{ secrets.FRONTEND_GHA_FULL_TOKEN }}
+          github-token: ${{ secrets.FRONTED_APPROVING_KEY }}
 
   release:
     needs: checking
