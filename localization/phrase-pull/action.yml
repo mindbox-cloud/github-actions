@@ -24,6 +24,10 @@ inputs:
     description: Email for user to commit localization
     required: false
     default: 'action-ci@mindbox.ru'
+  mergeMethod:
+    description: Method to merge. Possible values is squash or merge
+    required: false
+    default: merge
 runs:
   using: 'docker'
   image: 'docker://mindboxmoscow/phrase-integration-gha'
@@ -36,3 +40,4 @@ runs:
     autoMerge: ${{ inputs.autoMerge }}
     allowCyrillicSymbolsInCSharpComments: ${{ inputs.allowCyrillicSymbolsInCSharpComments }}
     commitEmail: ${{ inputs.commitEmail }}
+    mergeMethod: ${{ inputs.mergeMethod }}
