@@ -20,6 +20,11 @@ on:
         description: Email of token's user
         required: false
         default: 'action-ci@mindbox.ru'
+      mergeMethod:
+        type: string
+        description: Method to merge. Possible values is squash or merge
+        required: false
+        default: merge
     secrets:
       phraseAppToken:
         description: 'Token to access PhraseApp'
@@ -50,6 +55,7 @@ jobs:
         with:
           gitHubToken: ${{ secrets.gitHubToken }}
           commitEmail: ${{ inputs.commitEmail }}
+          mergeMethod: ${{ inputs.mergeMethod }}
           phraseAppToken: ${{ secrets.phraseAppToken }}
           baseBranch: ${{ inputs.baseBranch }}
           autoMerge: ${{ inputs.autoMerge }}
