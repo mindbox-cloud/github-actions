@@ -17,7 +17,7 @@ runs:
   steps:
     - name: Helmfile lint
       shell: bash
-      run: helmfile -f ${{ inputs.path }} --environment ${{ inputs.environment }} lint --quiet
+      run: helmfile -f ${{ inputs.path }} --environment ${{ inputs.environment }} lint
 
     - name: Helmfile template
       shell: bash
