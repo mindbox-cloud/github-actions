@@ -15,3 +15,7 @@ jobs:
       - name: Get settings
         run: |
           cat /etc/docker/daemon.json
+
+      - name: Get info
+        run: |
+          docker info
