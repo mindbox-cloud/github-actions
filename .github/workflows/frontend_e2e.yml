@@ -102,6 +102,11 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v3
 
+      - name: Change Dockerd param
+        run: |
+          sudo sed -i 's/ }/, \"max-concurrent-uploads\": 2 }/' /etc/docker/daemon.json
+          sudo systemctl restart docker
+
       - name: Set variables
         run: |
           echo "ref_name=$(echo $GITHUB_HEAD_REF | tr '[A-Z]' '[a-z]')" >> $GITHUB_ENV
