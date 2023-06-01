@@ -9,8 +9,8 @@ jobs:
     steps:
       - name: Change param
         run: |
-          sed -i 's/ }/, \"max-concurrent-uploads\": 2 }/' /etc/docker/daemon.json
-          systemctl restart docker
+          sudo sed -i 's/ }/, \"max-concurrent-uploads\": 2 }/' /etc/docker/daemon.json
+          sudo systemctl restart docker
 
       - name: Get settings
         run: |
