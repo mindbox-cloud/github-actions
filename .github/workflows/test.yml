@@ -1,0 +1,17 @@
+
+name: Test Dockerd
+
+on: push
+
+jobs:
+  dockerd-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Change param
+        run: |
+          sed -i 's/ }/, \"max-concurrent-uploads\": 2 }/' /etc/docker/daemon.json
+          systemctl restart docker
+
+      - name: Get settings
+        run: |
+          cat /etc/docker/daemon.json
