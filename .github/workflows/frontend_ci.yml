@@ -91,39 +91,44 @@ on:
         default: false
         required: false
         type: boolean
+      retry_push_to_registry:
+        description: "True if needs retry push"
+        default: false
+        required: false
+        type: boolean
     secrets:
       gh_npm_registry:
-        description: 'A GH_NPM_REGISTRY token passed from the caller workflow'
+        description: "A GH_NPM_REGISTRY token passed from the caller workflow"
         required: true
       frontend_gha_full_token:
-        description: 'A FRONTEND_GHA_FULL_TOKEN token passed from the caller workflow'
+        description: "A FRONTEND_GHA_FULL_TOKEN token passed from the caller workflow"
         required: true
       container_registry_key:
-        description: 'A CONTAINER_REGISTRY_KEY token passed from the caller workflow'
+        description: "A CONTAINER_REGISTRY_KEY token passed from the caller workflow"
         required: true
       octopus_server:
-        description: 'A OCTOPUS_SERVER token passed from the caller workflow'
+        description: "A OCTOPUS_SERVER token passed from the caller workflow"
         required: true
       octopus_api_key:
-        description: 'A OCTOPUS_API_KEY token passed from the caller workflow'
+        description: "A OCTOPUS_API_KEY token passed from the caller workflow"
         required: true
       frontend_webhook_to_amixr:
-        description: 'A url where to send a crash notification'
+        description: "A url where to send a crash notification"
         required: false
       sentry_errors_auth_token:
-        description: 'Sentry errors mindbox auth token'
+        description: "Sentry errors mindbox auth token"
         required: false
       sentry_main_dsn:
-        description: 'Sentry errors mindbox dsn'
+        description: "Sentry errors mindbox dsn"
         required: false
       sentry_autobugs_auth_token:
-        description: 'Sentry autobugs mindbox auth token'
+        description: "Sentry autobugs mindbox auth token"
         required: false
       sentry_autobugs_dsn:
-        description: 'Sentry autobugs mindbox dsn'
+        description: "Sentry autobugs mindbox dsn"
         required: false
       pipelines_release_submit_token:
-        description: 'Pipeline metrics auth token'
+        description: "Pipeline metrics auth token"
         required: false
 
 jobs:
@@ -367,8 +372,18 @@ jobs:
         run: docker build . -t ${{ env.registry }}/${{ env.project_name }}:${{ steps.release-number.outputs.release-number }} -t ${{ env.registry }}/${{ env.project_name }}:latest
         working-directory: ./build
 
+      - name: Push release docker image to registry with retry
+        if: ${{ inputs.use_k8_deploy_process && inputs.retry_push_to_registry }}
+        run: |
+          docker push ${{ env.registry }}/${{ env.project_name }} --all-tags
+        with:
+          timeout_seconds: 600
+          retry_wait_seconds: 1
+          max_attempts: 3
+          command: docker push ${{ env.registry }}/${{ env.project_name }} --all-tags
+
       - name: Push release docker image to registry
-        if: ${{ inputs.use_k8_deploy_process }}
+        if: ${{ inputs.use_k8_deploy_process && !inputs.retry_push_to_registry }}
         run: |
           docker push ${{ env.registry }}/${{ env.project_name }} --all-tags
 
@@ -394,8 +409,18 @@ jobs:
         run: docker build . -t ${{ env.registry }}/${{ env.e2e-image }}:${{ env.e2e-tag }}
         working-directory: ./e2e
 
+      - name: Push e2e docker image to registry with retry
+        if: ${{ inputs.e2e_tag && inputs.retry_push_to_registry }}
+        run: |
+          docker push ${{ env.registry }}/${{ env.e2e-image }}:${{ env.e2e-tag }}
+        with:
+          timeout_seconds: 600
+          retry_wait_seconds: 1
+          max_attempts: 3
+          command: docker push ${{ env.registry }}/${{ env.e2e-image }}:${{ env.e2e-tag }}
+
       - name: Push e2e docker image to registry
-        if: ${{ inputs.e2e_tag }}
+        if: ${{ inputs.e2e_tag && !inputs.retry_push_to_registry }}
         run: |
           docker push ${{ env.registry }}/${{ env.e2e-image }}:${{ env.e2e-tag }}
 
@@ -432,8 +457,8 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           file_pattern: package.json
-          commit_message: 'chore: upd release version ${{ steps.release-number.outputs.release-number }} [ci skip]'
-          commit_options: '--no-verify'
+          commit_message: "chore: upd release version ${{ steps.release-number.outputs.release-number }} [ci skip]"
+          commit_options: "--no-verify"
 
       - name: Create Octopus k8 Release
         if: ${{ inputs.use_k8_deploy_process }}
