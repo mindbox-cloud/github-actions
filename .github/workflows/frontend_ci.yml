@@ -374,12 +374,12 @@ jobs:
 
       - name: Push release docker image to registry with retry
         if: ${{ inputs.use_k8_deploy_process && inputs.retry_push_to_registry }}
-        run: |
-          docker push ${{ env.registry }}/${{ env.project_name }} --all-tags
+        uses: nick-fields/retry@v2
         with:
           timeout_seconds: 600
           retry_wait_seconds: 1
           max_attempts: 3
+          shell: bash
           command: docker push ${{ env.registry }}/${{ env.project_name }} --all-tags
 
       - name: Push release docker image to registry
@@ -411,12 +411,12 @@ jobs:
 
       - name: Push e2e docker image to registry with retry
         if: ${{ inputs.e2e_tag && inputs.retry_push_to_registry }}
-        run: |
-          docker push ${{ env.registry }}/${{ env.e2e-image }}:${{ env.e2e-tag }}
+        uses: nick-fields/retry@v2
         with:
           timeout_seconds: 600
           retry_wait_seconds: 1
           max_attempts: 3
+          shell: bash
           command: docker push ${{ env.registry }}/${{ env.e2e-image }}:${{ env.e2e-tag }}
 
       - name: Push e2e docker image to registry
