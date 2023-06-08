@@ -16,7 +16,7 @@ runs:
   using: "composite"
   steps:
     - name: "Clone repo with Kyverno policies"
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: mindbox-cloud/kubernetes-system-layer.git
         token: ${{ inputs.mindboxOrgGithubToken }}

@@ -1,3 +1,5 @@
 notify-bump-packages/NotifyBumpPackages/obj/
 notify-bump-packages/NotifyBumpPackagesTest/bin/
 notify-bump-packages/NotifyBumpPackagesTest/obj/
+.vscode
+.idea
