@@ -224,7 +224,7 @@ jobs:
     concurrency: release
     runs-on: ubuntu-latest
     if: ${{ !inputs.template_repo && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') }}
-    timeout-minutes: 20
+    timeout-minutes: 25
     env:
       registry: cr.yandex/${{ inputs.registry_id }}
       e2e-image: ${{ inputs.e2e_image }}
@@ -376,7 +376,7 @@ jobs:
         if: ${{ inputs.use_k8_deploy_process && inputs.retry_push_to_registry }}
         uses: nick-fields/retry@v2
         with:
-          timeout_seconds: 600
+          timeout_seconds: 90
           retry_wait_seconds: 1
           max_attempts: 3
           shell: bash
@@ -413,7 +413,7 @@ jobs:
         if: ${{ inputs.e2e_tag && inputs.retry_push_to_registry }}
         uses: nick-fields/retry@v2
         with:
-          timeout_seconds: 600
+          timeout_seconds: 90
           retry_wait_seconds: 1
           max_attempts: 3
           shell: bash
