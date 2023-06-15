@@ -377,7 +377,6 @@ jobs:
         uses: nick-fields/retry@v2
         with:
           timeout_seconds: 90
-          retry_wait_seconds: 1
           max_attempts: 3
           shell: bash
           command: docker push ${{ env.registry }}/${{ env.project_name }} --all-tags
@@ -413,8 +412,7 @@ jobs:
         if: ${{ inputs.e2e_tag && inputs.retry_push_to_registry }}
         uses: nick-fields/retry@v2
         with:
-          timeout_seconds: 90
-          retry_wait_seconds: 1
+          timeout_seconds: 120
           max_attempts: 3
           shell: bash
           command: docker push ${{ env.registry }}/${{ env.e2e-image }}:${{ env.e2e-tag }}
