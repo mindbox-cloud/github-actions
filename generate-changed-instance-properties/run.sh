@@ -22,7 +22,7 @@ function get_tag_name {
   get_tag_name_output=""
   local latest_sha=$(git rev-list -n 1 "$1-latest" 2>/dev/null)
   if [[ -z "$latest_sha" ]]; then
-    get_tag_name_output="1.2.0"
+    get_tag_name_output="1.1.0"
     return 11
   fi
 
