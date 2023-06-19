@@ -93,7 +93,7 @@ on:
         type: boolean
       retry_push_to_registry:
         description: "True if needs retry push"
-        default: false
+        default: true
         required: false
         type: boolean
     secrets:
