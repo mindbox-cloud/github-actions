@@ -91,11 +91,6 @@ on:
         default: false
         required: false
         type: boolean
-      retry_push_to_registry:
-        description: "True if needs retry push"
-        default: true
-        required: false
-        type: boolean
     secrets:
       gh_npm_registry:
         description: "A GH_NPM_REGISTRY token passed from the caller workflow"
@@ -373,7 +368,7 @@ jobs:
         working-directory: ./build
 
       - name: Push release docker image to registry with retry
-        if: ${{ inputs.use_k8_deploy_process && inputs.retry_push_to_registry }}
+        if: ${{ inputs.use_k8_deploy_process }}
         uses: nick-fields/retry@v2
         with:
           timeout_seconds: 90
@@ -381,11 +376,6 @@ jobs:
           max_attempts: 3
           shell: bash
           command: docker push ${{ env.registry }}/${{ env.project_name }} --all-tags
-
-      - name: Push release docker image to registry
-        if: ${{ inputs.use_k8_deploy_process && !inputs.retry_push_to_registry }}
-        run: |
-          docker push ${{ env.registry }}/${{ env.project_name }} --all-tags
 
       # ------------------------- use_k8_deploy_process ------------------
 
@@ -410,7 +400,7 @@ jobs:
         working-directory: ./e2e
 
       - name: Push e2e docker image to registry with retry
-        if: ${{ inputs.e2e_tag && inputs.retry_push_to_registry }}
+        if: ${{ inputs.e2e_tag }}
         uses: nick-fields/retry@v2
         with:
           timeout_seconds: 90
@@ -418,11 +408,6 @@ jobs:
           max_attempts: 3
           shell: bash
           command: docker push ${{ env.registry }}/${{ env.e2e-image }}:${{ env.e2e-tag }}
-
-      - name: Push e2e docker image to registry
-        if: ${{ inputs.e2e_tag && !inputs.retry_push_to_registry }}
-        run: |
-          docker push ${{ env.registry }}/${{ env.e2e-image }}:${{ env.e2e-tag }}
 
       - name: Post release to pipelines
         run: |
