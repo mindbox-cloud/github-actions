@@ -1,0 +1,39 @@
+vaultAgentConfig:
+  injectorRole: cdp-role
+  secrets:
+    - path: shared/Nexus
+    - path: shared/Security:RSAKeyValue
+    - path: shared/Notifications:Values:ru-RU
+    - path: shared/Notifications:Values:en-US
+    - path: shared/NotificationsTemp:Values:ru-RU
+    - path: shared/NotificationsTemp:Values:en-US
+    - path: cdp/shared/AnonymousService
+    - path: cdp/shared/BeeFree
+    - path: cdp/shared/Caprica
+    - path: cdp/shared/Tracker
+    - path: cdp/shared/ImageProcessors:WebPushImageProcessor
+    - path: cdp/shared/Media:Albato
+    - path: cdp/shared/Sentry
+    - path: cdp/shared/StorageProviders:EmailImagesYandexStorage
+    - path: cdp/shared/StorageProviders:MobPushImagesYandexStorage
+    - path: cdp/shared/StorageProviders:WebPushImagesYandexStorage
+    - path: cdp/shared/StorageProviders:ViberImagesYandexStorage
+    - path: cdp/shared/StorageProviders:SegmentationsCalculationsDataYandexStorage
+    - path: cdp/shared/StorageProviders:ExportDataYandexStorage
+    - path: cdp/shared/StorageProviders:TempDataYandexStorage
+    - path: cdp/shared/StorageProviders:ReportResourcesYandexStorage
+    - path: cdp/shared/StorageProviders:ImportDataMeshYandexStorage
+    - path: cdp/shared/StorageProviders:ReportResourcesAzureStorage
+    - path: cdp/shared/StorageProviders:ImagesAzureStorage
+    - path: cdp/shared/StorageProviders:SegmentationsCalculationsDataAzureStorage
+    - path: cdp/shared/StorageProviders:ExportDataAzureStorage
+    - path: cdp/shared/StorageProviders:ImportDataMeshAzureStorage
+    - path: cdp/tenants/project-name-placeholder/Communications:Campaigns
+    - path: cdp/tenants/project-name-placeholder/Communications:Messaging
+    - path: cdp/tenants/project-name-placeholder/CookieAuthentication
+    - path: cdp/tenants/project-name-placeholder/Hashes
+    - path: cdp/tenants/project-name-placeholder/Hashes
+      name: Hashes:Entries
+    - path: cdp/shared/SomeFakeKey25
+    - path: cdp-database/creds/db-owner-project-name-placeholder
+      name: DatabaseCredentials
