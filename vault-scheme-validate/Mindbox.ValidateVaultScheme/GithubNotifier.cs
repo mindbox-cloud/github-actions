@@ -55,7 +55,7 @@ public static class GithubNotifier
             if (result.HasBreakingChanges)
             {
                 commentBodyBuilder.AppendLine("This PR contains breaking changes");
-                if (commandLineArguments.AllowBreakingChanges)
+                if (commandLineArguments.AllowBreakingChanges!.Value)
                 {
                     commentBodyBuilder.AppendLine("This check **DOES NOT** stop PR from being merged");
                 }

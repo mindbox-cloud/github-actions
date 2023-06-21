@@ -2,6 +2,7 @@
 using Mindbox.ValidateVaultScheme;
 
 var commandLineArgs = Parser.Default.ParseArguments<CommandLineArguments>(args).Value;
+commandLineArgs.AllowBreakingChanges ??= false;
 
 var argumentsCopy = commandLineArgs with { Token = null! };
 Console.WriteLine($"Running with params {argumentsCopy}");
@@ -28,7 +29,7 @@ Console.WriteLine($"Files compared. Breaking changes: {result.HasBreakingChanges
 await GithubNotifier.SendResultAsync(commandLineArgs, result);
 Console.WriteLine("GitHub comment sent");
 
-var exitCode = result.HasBreakingChanges && !commandLineArgs.AllowBreakingChanges
+var exitCode = result.HasBreakingChanges && !commandLineArgs.AllowBreakingChanges.Value
     ? 1
     : 0;
 

@@ -39,10 +39,11 @@ public record CommandLineArguments
         HelpText = "Source path to template file (yaml.gotmpl)")]
     public string FileSourcePath { get; set; } = null!;
 
+    /// <summary>
+    ///     If we use bool, --allow-breaking-changes false evaluates to true (parameter is set, value is irrelevant)
+    /// </summary>
     [Option("allow-breaking-changes",
         Required = true,
         HelpText = "Fail process (exit code 1) if any keys were deleted from new version of the file.")]
-    public bool AllowBreakingChanges { get; set; }
-    
-    
+    public bool? AllowBreakingChanges { get; set; }
 }
