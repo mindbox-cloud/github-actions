@@ -2,7 +2,7 @@ using CommandLine;
 
 namespace Mindbox.ValidateVaultScheme;
 
-public class CommandLineArguments
+public record CommandLineArguments
 {
     [Option("token",
         Required = true,

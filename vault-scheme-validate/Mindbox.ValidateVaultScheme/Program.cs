@@ -3,6 +3,9 @@ using Mindbox.ValidateVaultScheme;
 
 var commandLineArgs = Parser.Default.ParseArguments<CommandLineArguments>(args).Value;
 
+var argumentsCopy = commandLineArgs with { Token = null! };
+Console.WriteLine($"Running with params {argumentsCopy}");
+
 // var token = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
 // var commandLineArgs = new CommandLineArguments
 // {
@@ -20,7 +23,7 @@ var result = FileComparer.Compare(
     commandLineArgs.OldFileLocalPath, 
     commandLineArgs.NewFileLocalPath,
     commandLineArgs.FileSourcePath);
-Console.WriteLine("Files compared");
+Console.WriteLine($"Files compared. Breaking changes: {result.HasBreakingChanges}");
     
 await GithubNotifier.SendResultAsync(commandLineArgs, result);
 Console.WriteLine("GitHub comment sent");
