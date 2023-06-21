@@ -12,6 +12,28 @@ public static class GithubNotifier
         var issue = commandLineArguments.PullRequestId;
         var url = $"https://api.github.com/repos/{org}/{repo}/issues/{issue}/comments";
 
+        var commentBody = CreateCommentBody(commandLineArguments, result);
+        
+        var payload = new
+        {
+            body = commentBody
+        };
+
+        var serializedPayload = JsonSerializer.Serialize(payload);
+
+        var httpContent = new StringContent(serializedPayload, Encoding.UTF8, "application/json");
+
+        var client = new HttpClient();
+        client.DefaultRequestHeaders.Add("User-Agent", "My-App-Name");
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {commandLineArguments.Token}");
+
+        var response = await client.PostAsync(url, httpContent);
+
+        response.EnsureSuccessStatusCode();
+    }
+
+    public static string CreateCommentBody(CommandLineArguments commandLineArguments,CompareResult result)
+    {
         var commentBodyBuilder = new StringBuilder();
         
         if (!result.HasChanges)
@@ -44,22 +66,7 @@ public static class GithubNotifier
                 }
             }
         }
-        
-        var payload = new
-        {
-            body = commentBodyBuilder.ToString()
-        };
 
-        var serializedPayload = JsonSerializer.Serialize(payload);
-
-        var httpContent = new StringContent(serializedPayload, Encoding.UTF8, "application/json");
-
-        var client = new HttpClient();
-        client.DefaultRequestHeaders.Add("User-Agent", "My-App-Name");
-        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {commandLineArguments.Token}");
-
-        var response = await client.PostAsync(url, httpContent);
-
-        response.EnsureSuccessStatusCode();
+        return commentBodyBuilder.ToString();
     }
 }

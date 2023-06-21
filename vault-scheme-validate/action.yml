@@ -1,0 +1,59 @@
+name: 'ValidateVaultScheme'
+description: 'Compare vault secrets file. Intended for pull request usage (compare base branch version vs PR branch version)'
+branding:
+  icon: alert-triangle
+  color: blue
+inputs:
+  token:
+    description:
+      'Github token.'
+    required: true
+  organization:
+    description:
+      'Organization name (e.g. mindbox-cloud).'
+    required: true
+  repository:
+    description:
+      'Repository name (e.g. nexus).'
+    required: true
+  pull_request_id:
+    description:
+      'Pull request id'
+    required: true
+  oldfile_local_path:
+    description:
+      'Local path to old rendered file (yaml). If file does not exist, we treat secrets as created.'
+    required: true
+  newfile_local_path:
+    description:
+      'Local path to new rendered file (yaml). If file does not exist, we treat secrets as deleted.'
+    required: true
+  file_source_path:
+    description:
+      'Source path to template file (yaml.gotmpl)'
+    required: true
+  allow_breaking_changes:
+    description:
+      'true/false. Fail process (exit code 1) if any keys were deleted from new version of the file.'
+    required: true
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - '--token'
+    - ${{ inputs.token }}
+    - '--organization'
+    - ${{ inputs.organization }}
+    - '--repository'
+    - ${{ inputs.repository }}
+    - '--pull-request-id'
+    - ${{ inputs.pull_request_id }}
+    - '--oldfile-local-path'
+    - ${{ inputs.oldfile_local_path }}
+    - '--newfile-local-path'
+    - ${{ inputs.newfile_local_path }}
+    - '--file-source-path'
+    - ${{ inputs.file_source_path }}
+    - '--allow-breaking-changes'
+    - ${{ inputs.allow_breaking_changes }}
