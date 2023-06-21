@@ -29,4 +29,6 @@ var exitCode = result.HasBreakingChanges && !commandLineArgs.AllowBreakingChange
     ? 1
     : 0;
 
-Environment.ExitCode = exitCode;
+Console.WriteLine($"Exiting with code {exitCode}");
+
+Environment.Exit(exitCode);
