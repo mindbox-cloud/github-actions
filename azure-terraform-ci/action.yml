@@ -161,19 +161,40 @@ runs:
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
+    # for escape github debug stdout 
+    - name: "Create truncated plan file"
+      id: create-truncated-plan-file
+      working-directory: ${{ inputs.workingDir }}
+      shell: bash
+      run: |
+        plan_file_name='plan.stdout'
+        cat << EOF > $plan_file_name
+        ${{ steps.truncate-plan.outputs.stdout }}
+        EOF
+        echo "plan_file_name=${plan_file_name}" >> $GITHUB_OUTPUT
+
+    - name: "Install fs module"
+      run: npm install fs
+      shell: bash
+
     - uses: actions/github-script@v6
       name: "Comment plan"
       env:
-        PLAN: "${{ steps.truncate-plan.outputs.stdout }}"
-        SHOW_PLAN: ${{ steps.truncate-plan.outputs.truncated != 'true' }}
+        SHOW_PLAN: "${{ steps.truncate-plan.outputs.truncated != 'true' }}"
         CONDITION: "${{ steps.plan.outputs.planExitCode }}"
       with:
         github-token: ${{ inputs.githubToken }}
         script: |
           if (process.env.CONDITION == "2") {
-            const planMessage = process.env.SHOW_PLAN == "true"
-              ? `\`\`\`terraform\n ${process.env.PLAN} \n\`\`\``
-              : "Please, refer to [Github Action logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})";
+            let planMessage;
+            if (process.env.SHOW_PLAN == "true") {
+              const { readFile } = require("fs/promises")
+              const plan = await readFile('${{ inputs.workingDir }}/${{ steps.create-truncated-plan-file.outputs.plan_file_name }}')
+              planMessage = `\`\`\`terraform\n ${plan} \n\`\`\``
+            }
+            else {
+              planMessage = "Please, refer to [Github Action logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+            }
 
             const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
@@ -185,7 +206,7 @@ runs:
             ${planMessage}
             
             </details>
-            
+
             *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ inputs.workingDir }}\`, Workflow: \`${{ github.workflow }}\`*`;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
