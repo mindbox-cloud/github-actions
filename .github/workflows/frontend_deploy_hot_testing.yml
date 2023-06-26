@@ -178,10 +178,11 @@ jobs:
       
       # needed for frontend hot testing deploy to get MKF_NAMESPACE
       - name: get mcf namespace from module-config to GITHUB_ENV
-        run: |
-          mcf_namespace=$(cat ./module-config.json | jq .namespace 
-          echo "mcf_namespace=$mcf_namespace" >> $GITHUB_ENV
         working-directory: ./build
+        run: |
+          mcf_namespace=$(cat ./module-config.json | jq .namespace) 
+          echo "mcf_namespace=$mcf_namespace" >> $GITHUB_ENV
+        id: set_mcf_namespace
 
 
       - name: Copy Dockerfile to build folder
