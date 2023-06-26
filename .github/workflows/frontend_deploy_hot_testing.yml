@@ -175,6 +175,14 @@ jobs:
         run: |
           find . -type f -name "remoteEntry.js" -exec cp {} ./v2_static/ \;
         working-directory: ./build
+      
+      # needed for frontend hot testing deploy to get MKF_NAMESPACE
+      - name: get mcf namespace from module-config to GITHUB_ENV
+        run: |
+          mcf_namespace=$(cat ./module-config.json | jq .namespace 
+          echo "mcf_namespace=$mcf_namespace" >> $GITHUB_ENV
+        working-directory: ./build
+
 
       - name: Copy Dockerfile to build folder
         run: |
@@ -199,6 +207,7 @@ jobs:
           sed -i "s~PROJECT_FOLDER~$PROJECT_FOLDER~g" ./deploy-k8.yml
           sed -i "s~TARGET_PORT~$TARGET_PORT~g" ./deploy-k8.yml
           sed -i "s~FRONTEND_CORE_SERVICE_NAME~$FRONTEND_CORE_SERVICE_NAME~g" ./deploy-k8.yml
+          sed -i "s~MKF_NAMESPACE~$MKF_NAMESPACE~g" ./deploy-k8.yml
         env:
           DOCKER_IMAGE: ${{ env.registry }}/${{ env.image }}-k8/${{ env.ref_name }}:${{ github.sha }}
           HASH_PAYLOAD: ${{ env.hash_payload }}
@@ -207,6 +216,7 @@ jobs:
           PROJECT_FOLDER: ${{ env.project_folder }}
           TARGET_PORT: ${{ inputs.target_port }}
           FRONTEND_CORE_SERVICE_NAME: ${{ env.frontend_core_service }}
+          MKF_NAMESPACE: ${{ env.mcf_namespace }}
 
       - name: Deploy to cluster
         uses: wahyd4/kubectl-helm-action@master
