@@ -1,0 +1,50 @@
+name: 'Ensure version bump'
+description: "Checks for abstractions changes and fails build if major version isn't changed along"
+inputs:
+  abstractionsPath:
+    description: 'Path to directory with abstractions package'
+    required: true
+  buildPropsPath:
+    description: 'Path to Directory.Build.props'
+    required: false
+    default: "Directory.Build.props"
+runs:
+  using: "composite"
+  steps:
+    - name: Detect Changes in ${{ inputs.abstractionsPath }}
+      id: dir_changes
+      run: |
+        if git diff --name-only HEAD^ HEAD | grep -q "${{ inputs.abstractionsPath }}"
+        then
+          echo "::set-output name=changed::true"
+        else
+          echo "::set-output name=changed::false"
+        fi
+
+    - name: Get XML Element Value
+      id: xml
+      uses: mavrosxristoforos/get-xml-info@1.0
+      with:
+        xml-file: '${{ inputs.buildPropsPath }}'
+        xpath: '/Project/PropertyGroup/VersionMajor'
+
+    - name: Detect Changes MajorVersion
+      id: xml_changes
+      run: |
+        if git diff HEAD^ HEAD -- "${{ inputs.buildPropsPath }}" | grep -q "${{ steps.xml.outputs.info }}"
+        then
+        echo "::set-output name=changed::true"
+        else
+        echo "::set-output name=changed::false"
+        fi
+
+    - name: If ${{ inputs.abstractionsPath }} changed, check MajorVersion
+      if: steps.dir_changes.outputs.changed == 'true'
+      run: |
+        if [[ "${{ steps.xml_changes.outputs.changed }}" == "false" ]]
+        then
+          echo "Error: ${{ inputs.abstractionsPath }} was changed but MajorVersion was not" >&2
+          exit 1
+        else
+          echo "Both ${{ inputs.abstractionsPath }} and MajorVersion were changed"
+        fi    
