@@ -20,6 +20,7 @@ runs:
         else
           echo "::set-output name=changed::false"
         fi
+      shell: bash
 
     - name: Get XML Element Value
       id: xml
@@ -37,6 +38,7 @@ runs:
         else
         echo "::set-output name=changed::false"
         fi
+      shell: bash  
 
     - name: If ${{ inputs.abstractionsPath }} changed, check MajorVersion
       if: steps.dir_changes.outputs.changed == 'true'
@@ -47,4 +49,5 @@ runs:
           exit 1
         else
           echo "Both ${{ inputs.abstractionsPath }} and MajorVersion were changed"
-        fi    
+        fi  
+      shell: bash  
