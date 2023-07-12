@@ -155,6 +155,7 @@ jobs:
           repository: mindbox-cloud/frontend-deploy
           token: ${{ secrets.frontend_gha_full_token }}
           path: ./deploy
+          ref: nikitin/remove-slash
 
       - name: Build and format npm-package for new deploy
         run: npm run build
