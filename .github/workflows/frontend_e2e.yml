@@ -434,7 +434,6 @@ jobs:
             -e CYPRESS_username=${{ secrets.cypress_login }} \
             -e CYPRESS_password=${{ secrets.cypress_pass }} \
             -e CYPRESS_grepTags="@smoke" \
-            -e CYPRESS_grepFilterSpecs=true \
             -e CYPRESS_grepOmitFiltered=true \
             -v $(pwd)/cypress/${{ matrix.project }}/videos:/e2e/cypress/videos \
             -v $(pwd)/cypress/${{ matrix.project }}/screenshots:/e2e/cypress/screenshots \
