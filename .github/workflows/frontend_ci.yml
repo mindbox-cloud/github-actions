@@ -357,7 +357,7 @@ jobs:
         if: ${{ inputs.use_k8_deploy_process }}
         uses: nick-fields/retry@v2
         with:
-          timeout_seconds: 90
+          timeout_seconds: 60
           retry_wait_seconds: 1
           max_attempts: 3
           shell: bash
@@ -389,7 +389,7 @@ jobs:
         if: ${{ inputs.e2e_tag }}
         uses: nick-fields/retry@v2
         with:
-          timeout_seconds: 90
+          timeout_seconds: 180
           retry_wait_seconds: 1
           max_attempts: 3
           shell: bash
