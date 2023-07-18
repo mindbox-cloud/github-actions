@@ -170,12 +170,12 @@ runs:
       shell: bash
       run: |
         plan="$(terraform show -no-color plan.tfplan)"
-        colorized_plan=$(echo "$plan" | sed -r 's/^([[:blank:]]*)([-+~])/\2\1/g')
-        colorized_plan=$(echo "$colorized_plan" | sed -r 's/^~/!/g')
+        plan=$(echo "$plan" | sed -r 's/^([[:blank:]]*)([-+~])/\2\1/g')
+        plan=$(echo "$plan" | sed -r 's/^~/!/g')
         original_length=${#plan}
         if (($original_length > 65536)); then truncated=true; else truncated=false; fi
         echo "truncated=${truncated}" >> $GITHUB_OUTPUT
-        echo "${colorized_plan:0:65536}"
+        echo "${plan:0:65536}"
 
     # for escape github debug stdout 
     - name: "Create truncated plan file"
@@ -184,6 +184,7 @@ runs:
       shell: bash
       run: |
         plan_file_name='plan.stdout'
+        echo "${{ steps.truncate-plan.outputs.stdout }}"
         cat << EOF > $plan_file_name
         ${{ steps.truncate-plan.outputs.stdout }}
         EOF
