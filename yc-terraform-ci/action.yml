@@ -175,7 +175,10 @@ runs:
         original_length=${#plan}
         if (($original_length > 65536)); then truncated=true; else truncated=false; fi
         echo "truncated=${truncated}" >> $GITHUB_OUTPUT
-        echo "stdout=${plan:0:65536}" >> $GITHUB_OUTPUT
+        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+        echo "stdout<<$EOF" >> $GITHUB_OUTPUT
+        echo "${plan:0:65536}" >> $GITHUB_OUTPUT
+        echo "$EOF" >> $GITHUB_OUTPUT
 
     # for escape github debug stdout 
     - name: "Create truncated plan file"
