@@ -40,6 +40,10 @@ inputs:
     description: 'Legacy ci step for Replace secrets in IAM key file'
     required: false
     default: '0' # 0 == false, 1 == true
+  logLevel:
+    description: 'if you want log level debug'
+    required: false
+    default: 'INFO'
 outputs: {}
 runs:
   using: "composite"
@@ -119,6 +123,7 @@ runs:
       id: plan
       run: |
         set +e
+        export TF_LOG="${{ inputs.logLevel }}"
         PLAN="terraform plan ${{ inputs.planAdditionalVars }} -no-color -out=plan.tfplan -detailed-exitcode"
         $PLAN
         echo "planExitCode=$?" >> $GITHUB_OUTPUT
