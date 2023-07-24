@@ -86,7 +86,7 @@ runs:
 
     - name: "Terraform Validate"
       id: validate
-      run: terraform validate -no-color
+      run: terraform validate -no-color -json
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
