@@ -76,8 +76,10 @@ runs:
 
     - name: "Terraform Init"
       id: init
-      run: terraform init
-        -backend-config="access_key=${{ inputs.tfBackendAccessKey }}"
+      run: |
+        export TF_LOG="${{ inputs.logLevel }}"
+        terraform init \
+        -backend-config="access_key=${{ inputs.tfBackendAccessKey }}" \
         -backend-config="secret_key=${{ inputs.tfBackendSecretKey }}"
       working-directory: ${{ inputs.workingDir }}
       shell: bash
@@ -123,7 +125,6 @@ runs:
       id: plan
       run: |
         set +e
-        export TF_LOG="${{ inputs.logLevel }}"
         PLAN="terraform plan ${{ inputs.planAdditionalVars }} -no-color -out=plan.tfplan -detailed-exitcode"
         $PLAN
         echo "planExitCode=$?" >> $GITHUB_OUTPUT
