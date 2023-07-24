@@ -43,7 +43,7 @@ inputs:
   logLevel:
     description: 'if you want log level debug'
     required: false
-    default: 'INFO'
+    default: 'TRACE'
 outputs: {}
 runs:
   using: "composite"
