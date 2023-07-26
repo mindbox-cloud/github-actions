@@ -72,6 +72,9 @@ on:
 jobs:
   hot-testing:
     runs-on: ubuntu-latest
+    concurrency:
+       group: ${{ github.workflow }}-${{ github.event.pull_request.number }}-prepare-hot-testing
+       cancel-in-progress: true
     timeout-minutes: 10
     if: ${{ !contains(github.head_ref, 'LocalizationPull') && github.event.pull_request.user.login != 'renovate[bot]' }}
     env:
