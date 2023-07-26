@@ -119,6 +119,7 @@ jobs:
       - name: Setup Node.JS
         uses: actions/setup-node@v3
         with:
+          cache: 'npm'
           always-auth: true
           node-version: ${{ inputs.node_version }}
           registry-url: "https://npm.pkg.github.com/mindbox-cloud"
