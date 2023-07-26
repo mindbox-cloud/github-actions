@@ -125,6 +125,9 @@ jobs:
   checking:
     runs-on: ubuntu-latest
     timeout-minutes: ${{ inputs.checking_timeout_minutes }}
+    concurrency:
+       group: ${{ github.workflow }}-${{ github.event.pull_request.number }}-ci
+       cancel-in-progress: true
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v3
@@ -140,22 +143,14 @@ jobs:
       - name: Setup Node.JS
         uses: actions/setup-node@v3
         with:
+          cache: 'npm'
           node-version: ${{ inputs.node_version }}
           registry-url: "https://npm.pkg.github.com/mindbox-cloud"
-
-      - name: Clean cache
-        run: npm cache clean -f
 
       - name: Install deps
         run: npm ci --loglevel verbose
         env:
           NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
-
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules
-          key: npm-ci-${{ github.sha }}
 
       - name: Run graphql-codegen
         if: ${{ inputs.graphql_codegen }}
@@ -254,16 +249,10 @@ jobs:
       - name: Setup Node.JS
         uses: actions/setup-node@v3
         with:
+          cache: 'npm'
           always-auth: true
           node-version: ${{ inputs.node_version }}
           registry-url: "https://npm.pkg.github.com/mindbox-cloud"
-
-      - name: Cache node modules
-        uses: actions/cache@v3
-        id: cache_node_modules
-        with:
-          path: ./node_modules
-          key: npm-ci-${{ github.sha }}
 
       - name: Install deps
         if: ${{ !steps.cache_node_modules.outputs.cache-hit }}
