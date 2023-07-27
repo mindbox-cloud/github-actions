@@ -159,6 +159,14 @@ jobs:
           token: ${{ secrets.frontend_gha_full_token }}
           path: ./deploy
 
+      - name: Select core deploy.yml
+        if: ${{ env.repository_name == 'frontend-core-v2' }}
+        run: mv ./deploy/e2e/kubernetes/deploy-k8-core.yml ./deploy/e2e/kubernetes/deploy-k8.yml
+
+      - name: Select micro deploy.yml
+        if: ${{ env.repository_name != 'frontend-core-v2' }}
+        run: mv ./deploy/e2e/kubernetes/deploy-k8-micro.yml ./deploy/e2e/kubernetes/deploy-k8.yml
+
       - name: Build and format npm-package for new deploy
 
         run: npm run build
