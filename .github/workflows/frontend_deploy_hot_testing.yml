@@ -61,7 +61,7 @@ on:
         required: true
       slack_webhook_url:
         description: "A FRONTEND_PIPELINE_SLACK_WEBHOOK_URL token passed from the caller workflow"
-        required: true
+        required: false
       bucket_access_id:
         description: "A NEW_FRONTEND_STAGING_TEMPLATE_BUCKET_KEY_ID token passed from the caller workflow"
         required: true
@@ -227,23 +227,6 @@ jobs:
         with:
           args: kubectl apply -f ./deploy/hot-testing/kubernetes/deploy-k8.yml
 
-      - name: Slack notification if the job has completed
-        uses: 8398a7/action-slack@v2
-        with:
-          status: custom
-          payload: |
-            {
-              attachments: [{
-                "author_name": "Author: ${{ github.actor }}",
-                fallback: 'fallback',
-                color: 'good',
-                title: "Repository: ${{ env.repository_name }}",
-              text: "You can check your *Frontend* changes at\nhttps://hot-testing-${{ env.hash_payload }}-staging.mindbox.ru\n\nand check your PR at \nhttps://github.com/mindbox-cloud/${{ env.repository_name }}/commit/${{ github.sha }}"
-              }]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.slack_webhook_url }}
-
       - name: Add comment to commit if the job has completed
         uses: mshick/add-pr-comment@v2
         with:
@@ -256,20 +239,3 @@ jobs:
         with:
           message: ":negative_squared_cross_mark: Your **Frontend** deploy failed. Check logs at\nhttps://github.com/mindbox-cloud/${{ env.repository_name }}/actions/runs/${{ github.run_id }}"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Slack notification if the job has failed
-        if: ${{ failure() }}
-        uses: 8398a7/action-slack@v2
-        with:
-          status: custom
-          payload: |
-            {
-              attachments: [{
-                "author_name": "Author: ${{ github.actor }}",
-                color: "#FF0000",
-                title: "Repository: ${{ env.repository_name }}",
-              text: "Your *Frontend* deploy failed. Check logs at\nhttps://github.com/mindbox-cloud/${{ env.repository_name }}/actions/runs/${{ github.run_id }}"
-              }]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.slack_webhook_url }}
