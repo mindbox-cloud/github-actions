@@ -131,6 +131,24 @@ jobs:
           args: kubectl delete -f ./hot_build/e2e/kubernetes/deploy.yml
         continue-on-error: true
 
+# ---------------------- setup files ----------------------
+      - name: Select core e2e/deploy.yml
+        if: ${{ env.repository_name == 'frontend-core-v2' }}
+        run: mv ./hot_build/e2e/kubernetes/deploy-k8-core.yml ./deploy/e2e/kubernetes/deploy-k8.yml
+
+      - name: Select micro e2e/deploy.yml
+        if: ${{ env.repository_name != 'frontend-core-v2' }}
+        run: mv ./hot_build/e2e/kubernetes/deploy-k8-micro.yml ./deploy/e2e/kubernetes/deploy-k8.yml
+
+      - name: Select core ht/deploy.yml
+        if: ${{ env.repository_name == 'frontend-core-v2' }}
+        run: mv ./hot_build/hot-testing/kubernetes/deploy-k8-core.yml ./deploy/e2e/kubernetes/deploy-k8.yml
+
+      - name: Select micro ht/deploy.yml
+        if: ${{ env.repository_name != 'frontend-core-v2' }}
+        run: mv ./hot_build/hot-testing/kubernetes/deploy-k8-micro.yml ./deploy/e2e/kubernetes/deploy-k8.yml
+
+
 # ---------------------- hot_testing_k8 -------------------
 
       - name: Set variables in hot-testing deployment.yml
