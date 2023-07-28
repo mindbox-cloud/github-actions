@@ -20,6 +20,30 @@ jobs:
 
       - name: phrase push
         uses: mindbox-cloud/github-actions/localization/phrase-push@master
+        continue-on-error: true
+        id: phrasePushStep1
+        with:
+          phraseAppToken: ${{ secrets.phraseAppToken }}
+
+      - name: wait if failed
+        if: ${{ steps.phrasePushStep1.outcome == 'failure' }}
+        run: sleep 60
+
+      - name: phrase push
+        uses: mindbox-cloud/github-actions/localization/phrase-push@master
+        if: ${{ steps.phrasePushStep1.outcome == 'failure' }}
+        continue-on-error: true
+        id: phrasePushStep2
+        with:
+          phraseAppToken: ${{ secrets.phraseAppToken }}
+
+      - name: wait if failed both
+        if: ${{ steps.phrasePushStep1.outcome == 'failure' && steps.phrasePushStep2.outcome == 'failure' }}
+        run: sleep 120
+
+      - name: phrase push
+        uses: mindbox-cloud/github-actions/localization/phrase-push@master
+        if: ${{ steps.phrasePushStep1.outcome == 'failure' && steps.phrasePushStep2.outcome == 'failure' }}
         with:
           phraseAppToken: ${{ secrets.phraseAppToken }}
 
