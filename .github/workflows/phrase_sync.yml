@@ -47,10 +47,75 @@ jobs:
 
       - name: phrase push
         uses: mindbox-cloud/github-actions/localization/phrase-push@master
+        id: phrasePushStep1
+        with:
+          phraseAppToken: ${{ secrets.phraseAppToken }}
+      
+      - name: wait if failed
+        if: ${{ steps.phrasePushStep1.outcome == 'failure' }}
+        uses: m3y/random-wait-action@v1
+        with:
+          max-wait-time: 60
+      
+      - name: phrase push #2
+        uses: mindbox-cloud/github-actions/localization/phrase-push@master
+        if: ${{ steps.phrasePush1.outcome == 'failure' }}
+        id: phrasePushStep2
+        with:
+          phraseAppToken: ${{ secrets.phraseAppToken }}
+     
+      - name: wait if failed
+        if: ${{ steps.phrasePushStep1.outcome == 'failure' && steps.phrasePushStep2.outcome == 'failure' }}
+        uses: m3y/random-wait-action@v1
+        with:
+          max-wait-time: 120
+
+      - name: phrase push #3
+        uses: mindbox-cloud/github-actions/localization/phrase-push@master
+        if: ${{ steps.phrasePushStep1.outcome == 'failure' && steps.phrasePushStep2.outcome == 'failure' }}
         with:
           phraseAppToken: ${{ secrets.phraseAppToken }}
 
       - name: phrase pull
+        uses: mindbox-cloud/github-actions/localization/phrase-pull@master
+        id: phrasePullStep1
+        with:
+          gitHubToken: ${{ secrets.gitHubToken }}
+          commitEmail: ${{ inputs.commitEmail }}
+          mergeMethod: ${{ inputs.mergeMethod }}
+          phraseAppToken: ${{ secrets.phraseAppToken }}
+          baseBranch: ${{ inputs.baseBranch }}
+          autoMerge: ${{ inputs.autoMerge }}
+          allowCyrillicSymbolsInCSharpComments: ${{ inputs.allowCyrillicSymbolsInCSharpComments }}
+
+      - name: wait if failed
+        if: ${{ steps.phrasePullStep1.outcome == 'failure' }}
+        uses: m3y/random-wait-action@v1
+        with:
+          max-wait-time: 60
+      
+      - name: phrase pull #2
+        if: ${{ steps.phrasePullStep1.outcome == 'failure' }}
+        id: phrasePullStep2
+        uses: mindbox-cloud/github-actions/localization/phrase-pull@master
+        with:
+          gitHubToken: ${{ secrets.gitHubToken }}
+          commitEmail: ${{ inputs.commitEmail }}
+          mergeMethod: ${{ inputs.mergeMethod }}
+          phraseAppToken: ${{ secrets.phraseAppToken }}
+          baseBranch: ${{ inputs.baseBranch }}
+          autoMerge: ${{ inputs.autoMerge }}
+          allowCyrillicSymbolsInCSharpComments: ${{ inputs.allowCyrillicSymbolsInCSharpComments }}
+
+     
+      - name: wait if failed
+        if: ${{ steps.phrasePullStep1.outcome == 'failure' && steps.phrasePullStep2.outcome == 'failure' }}
+        uses: m3y/random-wait-action@v1
+        with:
+          max-wait-time: 120
+
+      - name: phrase pull #3
+        if: ${{ steps.phrasePullStep1.outcome == 'failure' && steps.phrasePullStep2.outcome == 'failure' }}
         uses: mindbox-cloud/github-actions/localization/phrase-pull@master
         with:
           gitHubToken: ${{ secrets.gitHubToken }}
