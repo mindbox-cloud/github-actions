@@ -47,6 +47,7 @@ jobs:
 
       - name: phrase push
         uses: mindbox-cloud/github-actions/localization/phrase-push@master
+        continue-on-error: true
         id: phrasePushStep1
         with:
           phraseAppToken: ${{ secrets.phraseAppToken }}
@@ -59,6 +60,7 @@ jobs:
       
       - name: phrase push #2
         uses: mindbox-cloud/github-actions/localization/phrase-push@master
+        continue-on-error: true
         if: ${{ steps.phrasePush1.outcome == 'failure' }}
         id: phrasePushStep2
         with:
@@ -77,6 +79,7 @@ jobs:
           phraseAppToken: ${{ secrets.phraseAppToken }}
 
       - name: phrase pull
+        continue-on-error: true
         uses: mindbox-cloud/github-actions/localization/phrase-pull@master
         id: phrasePullStep1
         with:
@@ -95,6 +98,7 @@ jobs:
           max-wait-time: 60
       
       - name: phrase pull #2
+        continue-on-error: true
         if: ${{ steps.phrasePullStep1.outcome == 'failure' }}
         id: phrasePullStep2
         uses: mindbox-cloud/github-actions/localization/phrase-pull@master
