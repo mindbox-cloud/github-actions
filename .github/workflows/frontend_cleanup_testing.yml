@@ -92,7 +92,7 @@ jobs:
         working-directory: ./hot_build/hot-testing
         continue-on-error: true
 
-      - name: Cleanup cluster from hot-testing
+      - name: Cleanup cluster from hot testing
         if: ${{ inputs.hot_testing }}
         uses: wahyd4/kubectl-helm-action@master
         env:
@@ -112,7 +112,7 @@ jobs:
         working-directory: ./hot_build/e2e
         continue-on-error: true
 
-      - name: Set variables in hot-testing deployment.yml
+      - name: Set variables in e2e testing deployment.yml
         if: ${{ inputs.e2e_testing }}
         run: sed -i "s~HASH_PAYLOAD~$HASH_PAYLOAD~g" ./kubernetes/deploy.yml
         env:
@@ -120,7 +120,7 @@ jobs:
         working-directory: ./hot_build/e2e
         continue-on-error: true
 
-      - name: Cleanup cluster from hot-testing
+      - name: Cleanup cluster from e2e testing
         if: ${{ inputs.e2e_testing }}
         uses: wahyd4/kubectl-helm-action@master
         env:
@@ -142,11 +142,11 @@ jobs:
 
       - name: Select core ht/deploy.yml
         if: ${{ env.repository_name == 'frontend-core-v2' }}
-        run: mv ./hot_build/hot-testing/kubernetes/deploy-k8-core.yml ./hot_build/e2e/kubernetes/deploy-k8.yml
+        run: mv ./hot_build/hot-testing/kubernetes/deploy-k8-core.yml ./hot_build/hot-testing/kubernetes/deploy-k8.yml
 
       - name: Select micro ht/deploy.yml
         if: ${{ env.repository_name != 'frontend-core-v2' }}
-        run: mv ./hot_build/hot-testing/kubernetes/deploy-k8-micro.yml ./hot_build/e2e/kubernetes/deploy-k8.yml
+        run: mv ./hot_build/hot-testing/kubernetes/deploy-k8-micro.yml ./hot_build/hot-testing/kubernetes/deploy-k8.yml
 
 
 # ---------------------- hot_testing_k8 -------------------
