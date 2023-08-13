@@ -3,9 +3,8 @@ description: 'Composite Terraform GitHub Actions'
 inputs:
   tfInstall:
     description: ''
-    type: boolean
     required: false
-    default: true
+    default: 'true'
   terraformVersion:
     description: ''
     required: true
@@ -55,7 +54,7 @@ runs:
   steps:
     - name: "Setup Terraform"
       uses: hashicorp/setup-terraform@v2
-      if: ${{ inputs.tfInstall }}
+      if: ${{ inputs.tfInstall == 'true' }}
       with:
           terraform_version: ${{ inputs.terraformVersion }}
           terraform_wrapper: false
