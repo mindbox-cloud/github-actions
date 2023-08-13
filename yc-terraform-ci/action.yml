@@ -55,7 +55,7 @@ runs:
   steps:
     - name: "Setup Terraform"
       uses: hashicorp/setup-terraform@v2
-      if: ${{ inputs.tfInstall }} == true
+      if: ${{ inputs.tfInstall }}
       with:
           terraform_version: ${{ inputs.terraformVersion }}
           terraform_wrapper: false
