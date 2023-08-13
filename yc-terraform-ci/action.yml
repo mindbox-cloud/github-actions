@@ -3,8 +3,9 @@ description: 'Composite Terraform GitHub Actions'
 inputs:
   tfInstall:
     description: ''
+    type: boolean
     required: false
-    default: 'true'
+    default: true
   terraformVersion:
     description: ''
     required: true
