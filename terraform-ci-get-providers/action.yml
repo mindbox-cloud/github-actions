@@ -64,6 +64,7 @@ runs:
         mv .terraform/providers .terraform/local-providers
         tar -cvzf tf-providers.tgz .terraform/local-providers
       working-directory: ${{ inputs.workingDir }}
+      shell: bash
 
     - name: "Upload Terraform Providers Artifact"
       uses: actions/upload-artifact@v3
