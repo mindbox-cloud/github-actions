@@ -84,7 +84,7 @@ runs:
         tar -xvf tf-providers.tgz
         echo "provider_installation {
           filesystem_mirror {
-            path = ".terraform/local-providers"
+            path = \".terraform/local-providers\"
           }
         }" > .terraformrc
         cat .terraformrc
