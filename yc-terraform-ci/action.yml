@@ -56,8 +56,8 @@ runs:
       uses: hashicorp/setup-terraform@v2
       if: ${{ inputs.tfInstall == 'true' }}
       with:
-          terraform_version: ${{ inputs.terraformVersion }}
-          terraform_wrapper: false
+        terraform_version: ${{ inputs.terraformVersion }}
+        terraform_wrapper: false
 
     - name: "Terraform Format"
       id: fmt
