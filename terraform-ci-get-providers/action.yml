@@ -5,9 +5,6 @@ inputs:
     description: ''
     required: false
     default: 'true'
-  terraformVersion:
-    description: ''
-    required: true
   mindboxOrgGithubToken:
     description: 'Used to download organization wide resources, like terraform-modules repo'
     required: false
@@ -29,13 +26,6 @@ outputs: {}
 runs:
   using: "composite"
   steps:
-    - name: "Setup Terraform"
-      uses: hashicorp/setup-terraform@v2
-      if: ${{ inputs.tfInstall == 'true' }}
-      with:
-        terraform_version: ${{ inputs.terraformVersion }}
-        terraform_wrapper: false
-
     - name: "Setup github token for module repo"
       run: |
         if [[ ${{ inputs.isLegacyProject }} -ne "3" ]] ; then
