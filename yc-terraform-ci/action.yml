@@ -10,7 +10,7 @@ inputs:
   tfConfig:
     description: ''
     required: false
-    default: ''
+    default: '.terraformrc'
   terraformVersion:
     description: ''
     required: true
@@ -80,7 +80,13 @@ runs:
 
     - name: "Extract Local Providers"
       if: ${{ inputs.tfUseLocalSetup == 'true' }}
-      run: tar -xvf tf-providers.tgz
+      run: |
+        tar -xvf tf-providers.tgz
+        echo "provider_installation {
+          filesystem_mirror {
+            path = ".terraform/local-providers"
+          }
+        }" > .terraformrc
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
