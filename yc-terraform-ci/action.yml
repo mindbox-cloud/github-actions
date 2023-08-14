@@ -1,10 +1,10 @@
 name: 'Composite Terraform'
 description: 'Composite Terraform GitHub Actions'
 inputs:
-  tfInstall:
+  tfUseLocalSetup:
     description: ''
     required: false
-    default: 'true'
+    default: 'false'
   terraformVersion:
     description: ''
     required: true
@@ -54,10 +54,31 @@ runs:
   steps:
     - name: "Setup Terraform"
       uses: hashicorp/setup-terraform@v2
-      if: ${{ inputs.tfInstall == 'true' }}
+      if: ${{ inputs.tfUseLocalSetup == 'false' }}
       with:
         terraform_version: ${{ inputs.terraformVersion }}
         terraform_wrapper: false
+
+    - name: "Setup Node & NPM"
+      uses: actions/setup-node@v3
+      if: ${{ inputs.tfUseLocalSetup == 'true' }}
+      with:
+        node-version: 18
+
+    - name: "Download Providers Artifact"
+      uses: actions/download-artifact@v3
+      if: ${{ inputs.tfUseLocalSetup == 'true' }}
+      with:
+        name: tf-providers
+        path: terraform/yandex/staging/
+
+    - name: "Extract Local Providers"
+      if: ${{ inputs.tfUseLocalSetup == 'true' }}
+      run: |
+        tar -xvf tf-providers.tgz
+        export TF_CLI_CONFIG_FILE=.terraformrc
+      working-directory: ${{ inputs.workingDir }}
+      shell: bash
 
     - name: "Terraform Format"
       id: fmt
