@@ -1,0 +1,64 @@
+name: 'Composite Terraform Get Providers'
+description: 'Composite Terraform GitHub Actions To Store Providers as Artifact'
+inputs:
+  tfInstall:
+    description: ''
+    required: false
+    default: 'true'
+  mindboxOrgGithubToken:
+    description: 'Used to download organization wide resources, like terraform-modules repo'
+    required: false
+    default: ''
+  workingDir:
+    description: ''
+    required: true
+  tfBackendAccessKey:
+    description: ''
+    required: true
+  tfBackendSecretKey:
+    description: ''
+    required: true
+  isLegacyProject:
+    description: 'Legacy ci step for Replace secrets in IAM key file'
+    required: false
+    default: '0' # 0 == false, 1 == true
+outputs: {}
+runs:
+  using: "composite"
+  steps:
+    - name: "Setup github token for module repo"
+      run: |
+        if [[ ${{ inputs.isLegacyProject }} -ne "3" ]] ; then
+          echo "--- RUN STEP: Setup github token for module repo"
+
+          git config --local --remove-section http."https://github.com/"
+          git config --global url."https://octopus-mindbox:${OCTOPUS_MINDBOX_GITHUB_TOKEN}@github.com/mindbox-cloud".insteadOf "https://github.com/mindbox-cloud"
+        fi
+      env:
+        OCTOPUS_MINDBOX_GITHUB_TOKEN: ${{ inputs.mindboxOrgGithubToken }}
+      working-directory: ${{ inputs.workingDir }}
+      shell: bash
+
+    - name: "Terraform Init"
+      id: init
+      run: |
+        export TF_LOG="${{ inputs.logLevel }}"
+        terraform init \
+        -backend-config="access_key=${{ inputs.tfBackendAccessKey }}" \
+        -backend-config="secret_key=${{ inputs.tfBackendSecretKey }}"
+      working-directory: ${{ inputs.workingDir }}
+      shell: bash
+
+    - name: "Archive Terraform Providers"
+      run: |
+        mv .terraform/providers .terraform/local-providers
+        tar -cvzf tf-providers.tgz .terraform/local-providers
+      working-directory: ${{ inputs.workingDir }}
+      shell: bash
+
+    - name: "Upload Terraform Providers Artifact"
+      uses: actions/upload-artifact@v3
+      with:
+        name: tf-providers
+        path: ${{ inputs.workingDir }}/tf-providers.tgz
+        retention-days: 1

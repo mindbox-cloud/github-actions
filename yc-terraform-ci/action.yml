@@ -1,6 +1,16 @@
 name: 'Composite Terraform'
 description: 'Composite Terraform GitHub Actions'
+env:
+  
 inputs:
+  tfUseLocalSetup:
+    description: ''
+    required: false
+    default: 'false'
+  tfConfig:
+    description: ''
+    required: false
+    default: '.terraformrc'
   terraformVersion:
     description: ''
     required: true
@@ -50,9 +60,35 @@ runs:
   steps:
     - name: "Setup Terraform"
       uses: hashicorp/setup-terraform@v2
+      if: ${{ inputs.tfUseLocalSetup == 'false' }}
       with:
-          terraform_version: ${{ inputs.terraformVersion }}
-          terraform_wrapper: false
+        terraform_version: ${{ inputs.terraformVersion }}
+        terraform_wrapper: false
+
+    - name: "Setup Node & NPM"
+      uses: actions/setup-node@v3
+      if: ${{ inputs.tfUseLocalSetup == 'true' }}
+      with:
+        node-version: 18
+
+    - name: "Download Providers Artifact"
+      uses: actions/download-artifact@v3
+      if: ${{ inputs.tfUseLocalSetup == 'true' }}
+      with:
+        name: tf-providers
+        path: ${{ inputs.workingDir }}/
+
+    - name: "Extract Local Providers"
+      if: ${{ inputs.tfUseLocalSetup == 'true' }}
+      run: |
+        tar -xvf tf-providers.tgz
+        echo "provider_installation {
+          filesystem_mirror {
+            path = \".terraform/local-providers\"
+          }
+        }" > .terraformrc
+      working-directory: ${{ inputs.workingDir }}
+      shell: bash
 
     - name: "Terraform Format"
       id: fmt
@@ -81,6 +117,8 @@ runs:
         terraform init \
         -backend-config="access_key=${{ inputs.tfBackendAccessKey }}" \
         -backend-config="secret_key=${{ inputs.tfBackendSecretKey }}"
+      env:
+        TF_CLI_CONFIG_FILE: ${{ inputs.tfConfig }}
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
@@ -142,11 +180,6 @@ runs:
         fi
       working-directory: ${{ inputs.workingDir }}
       shell: bash
-    
-    - name: "Setup Terraform"
-      uses: hashicorp/setup-terraform@v2
-      with:
-          terraform_version: ${{ inputs.terraformVersion }}
 
     - name: "Terraform Show"
       id: show
