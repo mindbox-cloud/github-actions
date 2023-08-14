@@ -76,7 +76,7 @@ runs:
       if: ${{ inputs.tfUseLocalSetup == 'true' }}
       with:
         name: tf-providers
-        path: terraform/yandex/staging/
+        path: ${{ inputs.workingDir }}/
 
     - name: "Extract Local Providers"
       if: ${{ inputs.tfUseLocalSetup == 'true' }}
@@ -87,7 +87,6 @@ runs:
             path = \".terraform/local-providers\"
           }
         }" > .terraformrc
-        cat .terraformrc
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
