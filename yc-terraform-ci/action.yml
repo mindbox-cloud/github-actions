@@ -87,6 +87,7 @@ runs:
             path = ".terraform/local-providers"
           }
         }" > .terraformrc
+        cat .terraformrc
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
