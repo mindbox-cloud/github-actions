@@ -1,10 +1,16 @@
 name: 'Composite Terraform'
 description: 'Composite Terraform GitHub Actions'
+env:
+  
 inputs:
   tfUseLocalSetup:
     description: ''
     required: false
     default: 'false'
+  tfConfig:
+    description: ''
+    required: false
+    default: ''
   terraformVersion:
     description: ''
     required: true
@@ -74,9 +80,7 @@ runs:
 
     - name: "Extract Local Providers"
       if: ${{ inputs.tfUseLocalSetup == 'true' }}
-      run: |
-        tar -xvf tf-providers.tgz
-        export TF_CLI_CONFIG_FILE=.terraformrc
+      run: tar -xvf tf-providers.tgz
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
@@ -107,6 +111,8 @@ runs:
         terraform init \
         -backend-config="access_key=${{ inputs.tfBackendAccessKey }}" \
         -backend-config="secret_key=${{ inputs.tfBackendSecretKey }}"
+      env:
+        TF_CLI_CONFIG_FILE: ${{ inputs.tfConfig }}
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
