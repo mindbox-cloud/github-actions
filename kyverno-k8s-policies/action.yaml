@@ -27,4 +27,4 @@ runs:
       uses: gbaeke/kyverno-cli@v1
       with:
         command: |
-          kyverno apply kubernetes-system-layer/charts/kyverno-extend/templates --resource=${{ inputs.validatedResource }} --v ${{ inputs.verboseLevel }}
+          kyverno apply kubernetes-system-layer/charts/kyverno-ci-policies/templates --resource=${{ inputs.validatedResource }} --v ${{ inputs.verboseLevel }}
