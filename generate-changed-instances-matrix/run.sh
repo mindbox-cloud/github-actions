@@ -38,7 +38,7 @@ function get_tag_version {
   else
     local latest_version=$(echo ${latest_tags[0]} | sed "s/$1-//")
   fi
-  if [[ $1 == "haproxy-common-staging" ]]
+  if [[ $1 == "haproxy-common-staging" ]]; then
     local latest_version="1.1.40"
   fi
   get_tag_version_output="$(increment_version $latest_version)"
