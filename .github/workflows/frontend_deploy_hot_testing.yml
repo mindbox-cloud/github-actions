@@ -196,7 +196,7 @@ jobs:
         run: |
           wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/ovchinnikova/temp-remove-brotli/mcf-release/Dockerfile
           wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/ovchinnikova/temp-remove-brotli/mcf-release/nginx.conf
-          working-directory: ./build
+        working-directory: ./build
           
 
       - name: Build docker image
