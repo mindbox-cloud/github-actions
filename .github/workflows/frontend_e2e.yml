@@ -222,6 +222,10 @@ jobs:
           KUBE_CONFIG_DATA: ${{ secrets.kube_dev_config_k8 }}
         with:
           args: kubectl apply -f ./deploy/e2e/kubernetes/deploy-k8.yml
+      
+      - name: Wait if is core project
+        if: ${{ env.repository_name == 'frontend-core-v2' }}
+        run: sleep 30
 
   e2e-tests:
     runs-on: [self-hosted, frontend]
