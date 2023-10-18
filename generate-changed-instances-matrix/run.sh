@@ -40,7 +40,7 @@ function get_tag_version {
   fi
 
   if [[ $1 == "dtln-kube-cdp-lrt-stable-01-a" ]]; then
-    local latest_version="1.1.72"
+    local latest_version="1.1.73"
   fi
   get_tag_version_output="$(increment_version $latest_version)"
 
