@@ -39,7 +39,7 @@ function get_tag_version {
     local latest_version=$(echo ${latest_tags[0]} | sed "s/$1-//")
   fi
 
-  if [[ $1 == "dtln-kube-cdp-services-stable-01-a" ]]; then
+  if [[ $1 == "dtln-kube-cdp-lrt-stable-01-a" ]]; then
     local latest_version="1.1.76"
   fi
   get_tag_version_output="$(increment_version $latest_version)"
