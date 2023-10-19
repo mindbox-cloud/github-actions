@@ -43,7 +43,7 @@ runs:
       id: init
       run: |
         export TF_LOG="${{ inputs.logLevel }}"
-        terraform init \
+        terraform init -backend=false \
         -backend-config="access_key=${{ inputs.tfBackendAccessKey }}" \
         -backend-config="secret_key=${{ inputs.tfBackendSecretKey }}"
       working-directory: ${{ inputs.workingDir }}
