@@ -12,12 +12,6 @@ inputs:
   workingDir:
     description: ''
     required: true
-  tfBackendAccessKey:
-    description: ''
-    required: true
-  tfBackendSecretKey:
-    description: ''
-    required: true
   isLegacyProject:
     description: 'Legacy ci step for Replace secrets in IAM key file'
     required: false
@@ -44,8 +38,6 @@ runs:
       run: |
         export TF_LOG="${{ inputs.logLevel }}"
         terraform init -backend=false \
-        -backend-config="access_key=${{ inputs.tfBackendAccessKey }}" \
-        -backend-config="secret_key=${{ inputs.tfBackendSecretKey }}"
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
