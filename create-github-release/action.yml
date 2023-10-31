@@ -19,7 +19,7 @@ outputs:
     value: ${{ inputs.release-number != 'empty' && inputs.release-number || steps.release-number.outputs.release-number }}
   release-notes-body: 
     description: "Body for Release Notes"
-    value:  '[View release in GitHub](${{ steps.create_release.outputs.html_url }}) <br /> ${{ steps.clean-changelog.outputs.changelog }}'
+    value:  '[View release in GitHub](${{ steps.create_release.outputs.html_url }}) <br /> ${{ steps.clean-changelog.outputs.changelog }} <br/><br/>${{ steps.first-built-on.outputs.first-built-on }}'
   release-url:
     description: "GitHub Release URL"
     value: ${{ steps.create_release.outputs.html_url }}
@@ -47,6 +47,13 @@ runs:
       run: |
         echo "changelog=$((echo "${{ steps.changelog.outputs.changelog }}") | sed "s/\"//g" | sed "s/'//g" )" >> $GITHUB_OUTPUT
       id: clean-changelog
+      shell: bash
+
+    - name: generate first built on
+      run: |
+        datetime=$(date '+%Y-%m-%d %H:%M:%S')
+        echo "first-built-on=<p>First built on ${datetime} </p>" >> $GITHUB_OUTPUT
+      id: first-built-on
       shell: bash
 
     - name: "Create GitHub Release"
