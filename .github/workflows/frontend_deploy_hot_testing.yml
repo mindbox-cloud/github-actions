@@ -119,42 +119,6 @@ jobs:
           fi
         id: set_project
 
-      - name: Setup Node.JS
-        uses: actions/setup-node@v3
-        with:
-          always-auth: true
-          node-version: ${{ inputs.node_version }}
-          registry-url: "https://npm.pkg.github.com/mindbox-cloud"
-
-      - name: Get node modules from cache
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules
-          key: npm-ci-${{ github.sha }}
-
-      - name: Download artifact
-        id: download-artifact
-        uses: dawidd6/action-download-artifact@v2
-        timeout-minutes: 1
-        continue-on-error: true
-        with:
-          github_token: ${{secrets.GITHUB_TOKEN}}
-          path: ./master-stats
-          name: ${{ env.repository_name }}-master-stats
-          search_artifacts: true
-          check_artifacts: true
-          if_no_artifact_found: warn
-
-      - name: Rename master stats file
-        run: mv ./master-stats/${{ env.project_folder }}-stats.json ./master-stats/${{ env.project_folder }}-master.json
-        continue-on-error: true
-
-      - name: Disable Lefthook
-        run: echo "LEFTHOOK=0" >> $GITHUB_ENV
-
-      - name: Authenticate in yandex registry
-        run: echo '${{ secrets.container_registry_key }}' | docker login -u json_key --password-stdin cr.yandex
-
       - name: Checkout frontend-deploy repository
         uses: actions/checkout@v3
         with:
@@ -169,47 +133,6 @@ jobs:
       - name: Select micro deploy.yml
         if: ${{ env.repository_name != 'frontend-core-v2' }}
         run: mv ./deploy/hot-testing/kubernetes/deploy-k8-micro.yml ./deploy/hot-testing/kubernetes/deploy-k8.yml
-
-      - name: Build and format npm-package for new deploy
-        run: npm run build
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.npm_token }}
-          MCF_STATIC_FOLDER: v2_static
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ${{ env.repository_name }}-stats
-          path: |
-            ./stats
-
-      # needed for frontend discovery(build initial.js)
-      - name: copy remoteEntry to v2_static folder
-        run: |
-          find . -type f -name "remoteEntry.js" -exec cp {} ./v2_static/ \;
-        working-directory: ./build
-      
-      # needed for frontend hot testing deploy to get MKF_NAMESPACE
-      - name: get mcf namespace from module-config to GITHUB_ENV
-        run: |
-          mcf_namespace=$(cat ./module-config.json | jq -r .namespace) 
-          echo "mcf_namespace=$mcf_namespace" >> $GITHUB_ENV
-        id: set_mcf_namespace
-
-
-      - name: Copy Dockerfile to build folder
-        run: |
-          cp ./deploy/mcf-release/Dockerfile ./build
-          cp ./deploy/mcf-release/nginx.conf ./build
-
-      - name: Build docker image
-        working-directory: ./build
-        run: |
-          docker build . -t ${{ env.registry }}/${{ env.image }}-k8/${{ env.ref_name }}:${{ github.sha }}
-
-      - name: Push docker image
-        run: docker push ${{ env.registry }}/${{ env.image }}-k8/${{ env.ref_name }}:${{ github.sha }}
 
       - name: Set variables in deployment.yaml
         working-directory: ./deploy/hot-testing/kubernetes
