@@ -27,6 +27,7 @@ on:
         required: false
 jobs:
   phrase-pull:
+    if: false
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
