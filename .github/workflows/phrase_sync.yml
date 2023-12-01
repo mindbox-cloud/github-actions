@@ -39,6 +39,7 @@ jobs:
   phrase-sync:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    if: false
     env:
       amixrWebhookUrl: ${{ secrets.amixrWebhookUrl }}
     steps:
@@ -82,6 +83,7 @@ jobs:
         continue-on-error: true
         uses: mindbox-cloud/github-actions/localization/phrase-pull@master
         id: phrasePullStep1
+        
         with:
           gitHubToken: ${{ secrets.gitHubToken }}
           commitEmail: ${{ inputs.commitEmail }}

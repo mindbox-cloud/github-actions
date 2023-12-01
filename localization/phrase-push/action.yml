@@ -7,9 +7,8 @@ inputs:
     required: true
 
 runs:
-  using: 'docker'
-  image: 'docker://mindboxmoscow/phrase-integration-gha'
-  args:
-   - push
-  env:
-    phraseAppToken: ${{ inputs.phraseAppToken }}
+  using: 'composite'
+  steps:
+    - run: "echo Hello" # intentionally, phrase isn't working rn
+      if: false
+      shell: bash
