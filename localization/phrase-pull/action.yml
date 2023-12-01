@@ -31,6 +31,6 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - run: "echo Hello"
+    - run: "echo Hello" # intentionally, phrase isn't working rn
       if: false
       shell: bash
