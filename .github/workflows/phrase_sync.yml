@@ -39,24 +39,22 @@ jobs:
   phrase-sync:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    if: false
     env:
       amixrWebhookUrl: ${{ secrets.amixrWebhookUrl }}
     steps:
       - uses: actions/checkout@v3
-        if: false
       - run: sudo chown -R root:root $GITHUB_WORKSPACE
-        if: false
 
       - name: phrase push
         uses: mindbox-cloud/github-actions/localization/phrase-push@master
-        if: false
         continue-on-error: true
         id: phrasePushStep1
         with:
           phraseAppToken: ${{ secrets.phraseAppToken }}
       
       - name: wait if failed
-        if: ${{ false && steps.phrasePushStep1.outcome == 'failure' }}
+        if: ${{ steps.phrasePushStep1.outcome == 'failure' }}
         uses: m3y/random-wait-action@v1
         with:
           max-wait-time: 60
@@ -64,7 +62,7 @@ jobs:
       - name: phrase push #2
         uses: mindbox-cloud/github-actions/localization/phrase-push@master
         continue-on-error: true
-        if: ${{ false && steps.phrasePush1.outcome == 'failure' }}
+        if: ${{ steps.phrasePush1.outcome == 'failure' }}
         id: phrasePushStep2
         with:
           phraseAppToken: ${{ secrets.phraseAppToken }}
@@ -77,7 +75,7 @@ jobs:
 
       - name: phrase push #3
         uses: mindbox-cloud/github-actions/localization/phrase-push@master
-        if: ${{ false && steps.phrasePushStep1.outcome == 'failure' && steps.phrasePushStep2.outcome == 'failure' }}
+        if: ${{ steps.phrasePushStep1.outcome == 'failure' && steps.phrasePushStep2.outcome == 'failure' }}
         with:
           phraseAppToken: ${{ secrets.phraseAppToken }}
 
@@ -85,7 +83,7 @@ jobs:
         continue-on-error: true
         uses: mindbox-cloud/github-actions/localization/phrase-pull@master
         id: phrasePullStep1
-        if: false
+        
         with:
           gitHubToken: ${{ secrets.gitHubToken }}
           commitEmail: ${{ inputs.commitEmail }}
@@ -96,14 +94,14 @@ jobs:
           allowCyrillicSymbolsInCSharpComments: ${{ inputs.allowCyrillicSymbolsInCSharpComments }}
 
       - name: wait if failed
-        if: ${{ false && steps.phrasePullStep1.outcome == 'failure' }}
+        if: ${{ steps.phrasePullStep1.outcome == 'failure' }}
         uses: m3y/random-wait-action@v1
         with:
           max-wait-time: 60
       
       - name: phrase pull #2
         continue-on-error: true
-        if: ${{ false && steps.phrasePullStep1.outcome == 'failure' }}
+        if: ${{ steps.phrasePullStep1.outcome == 'failure' }}
         id: phrasePullStep2
         uses: mindbox-cloud/github-actions/localization/phrase-pull@master
         with:
@@ -117,13 +115,13 @@ jobs:
 
      
       - name: wait if failed
-        if: ${{ false && steps.phrasePullStep1.outcome == 'failure' && steps.phrasePullStep2.outcome == 'failure' }}
+        if: ${{ steps.phrasePullStep1.outcome == 'failure' && steps.phrasePullStep2.outcome == 'failure' }}
         uses: m3y/random-wait-action@v1
         with:
           max-wait-time: 120
 
       - name: phrase pull #3
-        if: ${{ false && steps.phrasePullStep1.outcome == 'failure' && steps.phrasePullStep2.outcome == 'failure' }}
+        if: ${{ steps.phrasePullStep1.outcome == 'failure' && steps.phrasePullStep2.outcome == 'failure' }}
         uses: mindbox-cloud/github-actions/localization/phrase-pull@master
         with:
           gitHubToken: ${{ secrets.gitHubToken }}
