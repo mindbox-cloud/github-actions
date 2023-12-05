@@ -161,6 +161,13 @@ jobs:
         if: ${{ inputs.graphql_codegen }}
         run: npm run graphql-codegen
 
+      - name: Upload test results artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifact-${{ env.project_name }}
+          path: ./src
+          retention-days: 1
+
       - name: Run typechecking
         if: ${{ inputs.typechecking }}
         run: npm run check-types
