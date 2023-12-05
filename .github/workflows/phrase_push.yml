@@ -10,7 +10,6 @@ on:
         required: false
 jobs:
   phrase-push:
-    if: false
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:

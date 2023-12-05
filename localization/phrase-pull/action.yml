@@ -29,8 +29,15 @@ inputs:
     required: false
     default: merge
 runs:
-  using: 'composite'
-  steps:
-    - run: "echo Hello" # intentionally, phrase isn't working rn
-      if: false
-      shell: bash
+  using: 'docker'
+  image: 'docker://mindboxmoscow/phrase-integration-gha'
+  args:
+   - pull
+  env:
+    gitHubToken: ${{ inputs.gitHubToken }}
+    phraseAppToken: ${{ inputs.phraseAppToken }}
+    baseBranch: ${{ inputs.baseBranch }}
+    autoMerge: ${{ inputs.autoMerge }}
+    allowCyrillicSymbolsInCSharpComments: ${{ inputs.allowCyrillicSymbolsInCSharpComments }}
+    commitEmail: ${{ inputs.commitEmail }}
+    mergeMethod: ${{ inputs.mergeMethod }}
