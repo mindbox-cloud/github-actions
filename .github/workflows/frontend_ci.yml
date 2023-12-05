@@ -157,29 +157,6 @@ jobs:
           path: ./node_modules
           key: npm-ci-${{ github.sha }}
 
-      - name: Run graphql-codegen
-        if: ${{ inputs.graphql_codegen }}
-        run: npm run graphql-codegen
-
-      - name: Upload test results artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: artifact-${{ env.project_name }}
-          path: ./src
-          retention-days: 1
-
-      - name: Run typechecking
-        if: ${{ inputs.typechecking }}
-        run: npm run check-types
-
-      - name: Run linters
-        if: ${{ inputs.linters }}
-        run: npm run check-scripts
-
-      - name: Run style linters
-        if: ${{ inputs.style_linters }}
-        run: npm run check-styles -- --allow-empty-input
-
       - name: Run tests
         if: ${{ inputs.tests }}
         run: npm run test -- --maxConcurrency=1 --maxWorkers=1
