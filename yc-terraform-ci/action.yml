@@ -124,7 +124,7 @@ runs:
 
     - name: "Terraform Validate"
       id: validate
-      run: terraform validate -no-color
+      run: terraform validate
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
@@ -163,7 +163,7 @@ runs:
       id: plan
       run: |
         set +e
-        PLAN="terraform plan ${{ inputs.planAdditionalVars }} -no-color -out=plan.tfplan -detailed-exitcode"
+        PLAN="terraform plan ${{ inputs.planAdditionalVars }} -out=plan.tfplan -detailed-exitcode"
         $PLAN
         echo "planExitCode=$?" >> $GITHUB_OUTPUT
         exit 0
@@ -185,7 +185,7 @@ runs:
       id: show
       run: |
         if [[ ${{ steps.plan.outputs.planExitCode }} -ne 0 ]]; then
-          terraform show -no-color plan.tfplan
+          terraform show plan.tfplan
         fi
       working-directory: ${{ inputs.workingDir }}
       shell: bash
@@ -194,7 +194,7 @@ runs:
       id: kafkaCheck
       run: |
         if [[ ${{ steps.plan.outputs.planExitCode }} -ne 0 ]]; then
-          if test "$(terraform show -no-color plan.tfplan | grep -oP '# module\.kafka.*[broker|zookeeper]\[\K(".*")(?=\]\..*updated in\-place)' | sort -u | wc -l)" -gt 1; then
+          if test "$(terraform show plan.tfplan | grep -oP '# module\.kafka.*[broker|zookeeper]\[\K(".*")(?=\]\..*updated in\-place)' | sort -u | wc -l)" -gt 1; then
             RED='\033[0;31m'
             echo -e "${RED} You must update kafka brokers and zookeepers one by one only!"
             exit 1
@@ -208,7 +208,7 @@ runs:
       working-directory: ${{ inputs.workingDir }}
       shell: bash
       run: |
-        plan="$(terraform show -no-color plan.tfplan)"
+        plan="$(terraform show plan.tfplan)"
         plan=$(echo "$plan" | sed -r 's/^([[:blank:]]*)([-+~])/\2\1/g')
         plan=$(echo "$plan" | sed -r 's/^~/!/g')
         original_length=${#plan}
