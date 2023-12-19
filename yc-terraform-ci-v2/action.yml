@@ -1,16 +1,6 @@
 name: 'Composite Terraform'
 description: 'Composite Terraform GitHub Actions'
-env:
-  
 inputs:
-  tfUseLocalSetup:
-    description: ''
-    required: false
-    default: 'false'
-  tfConfig:
-    description: ''
-    required: false
-    default: '.terraformrc'
   terraformVersion:
     description: ''
     required: true
@@ -50,45 +40,15 @@ inputs:
     description: 'Legacy ci step for Replace secrets in IAM key file'
     required: false
     default: '0' # 0 == false, 1 == true
-  logLevel:
-    description: 'if you want log level debug'
-    required: false
-    default: 'ERROR'
 outputs: {}
 runs:
   using: "composite"
   steps:
     - name: "Setup Terraform"
       uses: hashicorp/setup-terraform@v2
-      if: ${{ inputs.tfUseLocalSetup == 'false' }}
       with:
-        terraform_version: ${{ inputs.terraformVersion }}
-        terraform_wrapper: false
-
-    - name: "Setup Node & NPM"
-      uses: actions/setup-node@v3
-      if: ${{ inputs.tfUseLocalSetup == 'true' }}
-      with:
-        node-version: 18
-
-    - name: "Download Providers Artifact"
-      uses: actions/download-artifact@v3
-      if: ${{ inputs.tfUseLocalSetup == 'true' }}
-      with:
-        name: tf-providers
-        path: ${{ inputs.workingDir }}/
-
-    - name: "Extract Local Providers"
-      if: ${{ inputs.tfUseLocalSetup == 'true' }}
-      run: |
-        tar -xvf tf-providers.tgz
-        echo "provider_installation {
-          filesystem_mirror {
-            path = \".terraform/local-providers\"
-          }
-        }" > .terraformrc
-      working-directory: ${{ inputs.workingDir }}
-      shell: bash
+          terraform_version: ${{ inputs.terraformVersion }}
+          terraform_wrapper: false
 
     - name: "Terraform Format"
       id: fmt
@@ -99,7 +59,7 @@ runs:
 
     - name: "Setup github token for module repo"
       run: |
-        if [[ ${{ inputs.isLegacyProject }} -ne "3" ]] ; then
+        if [[ ${{ inputs.isLegacyProject }} -ne "1" ]] && [[ ${{ inputs.isLegacyProject }} -ne "3" ]] ; then
           echo "--- RUN STEP: Setup github token for module repo"
 
           git config --local --remove-section http."https://github.com/"
@@ -112,19 +72,15 @@ runs:
 
     - name: "Terraform Init"
       id: init
-      run: |
-        export TF_LOG="${{ inputs.logLevel }}"
-        terraform init \
-        -backend-config="access_key=${{ inputs.tfBackendAccessKey }}" \
+      run: terraform init
+        -backend-config="access_key=${{ inputs.tfBackendAccessKey }}"
         -backend-config="secret_key=${{ inputs.tfBackendSecretKey }}"
-      env:
-        TF_CLI_CONFIG_FILE: ${{ inputs.tfConfig }}
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
     - name: "Terraform Validate"
       id: validate
-      run: terraform validate -no-color
+      run: terraform validate
       working-directory: ${{ inputs.workingDir }}
       shell: bash
 
@@ -163,7 +119,7 @@ runs:
       id: plan
       run: |
         set +e
-        PLAN="terraform plan ${{ inputs.planAdditionalVars }} -no-color -out=plan.tfplan -detailed-exitcode"
+        PLAN="terraform plan ${{ inputs.planAdditionalVars }} -out=plan.tfplan -detailed-exitcode"
         $PLAN
         echo "planExitCode=$?" >> $GITHUB_OUTPUT
         exit 0
@@ -180,12 +136,17 @@ runs:
         fi
       working-directory: ${{ inputs.workingDir }}
       shell: bash
+    
+    - name: "Setup Terraform"
+      uses: hashicorp/setup-terraform@v2
+      with:
+          terraform_version: ${{ inputs.terraformVersion }}
 
     - name: "Terraform Show"
       id: show
       run: |
         if [[ ${{ steps.plan.outputs.planExitCode }} -ne 0 ]]; then
-          terraform show -no-color plan.tfplan
+          terraform show plan.tfplan
         fi
       working-directory: ${{ inputs.workingDir }}
       shell: bash
@@ -194,7 +155,7 @@ runs:
       id: kafkaCheck
       run: |
         if [[ ${{ steps.plan.outputs.planExitCode }} -ne 0 ]]; then
-          if test "$(terraform show -no-color plan.tfplan | grep -oP '# module\.kafka.*[broker|zookeeper]\[\K(".*")(?=\]\..*updated in\-place)' | sort -u | wc -l)" -gt 1; then
+          if test "$(terraform show plan.tfplan | grep -oP '# module\.kafka.*[broker|zookeeper]\[\K(".*")(?=\]\..*updated in\-place)' | sort -u | wc -l)" -gt 1; then
             RED='\033[0;31m'
             echo -e "${RED} You must update kafka brokers and zookeepers one by one only!"
             exit 1
@@ -208,16 +169,11 @@ runs:
       working-directory: ${{ inputs.workingDir }}
       shell: bash
       run: |
-        plan="$(terraform show -no-color plan.tfplan)"
-        plan=$(echo "$plan" | sed -r 's/^([[:blank:]]*)([-+~])/\2\1/g')
-        plan=$(echo "$plan" | sed -r 's/^~/!/g')
+        plan="$(terraform show plan.tfplan)"
         original_length=${#plan}
         if (($original_length > 65536)); then truncated=true; else truncated=false; fi
         echo "truncated=${truncated}" >> $GITHUB_OUTPUT
-        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-        echo "stdout<<$EOF" >> $GITHUB_OUTPUT
-        echo "${plan:0:65536}" >> $GITHUB_OUTPUT
-        echo "$EOF" >> $GITHUB_OUTPUT
+        echo "${plan:0:65536}"
 
     # for escape github debug stdout 
     - name: "Create truncated plan file"
@@ -248,7 +204,7 @@ runs:
             if (process.env.SHOW_PLAN == "true") {
               const { readFile } = require("fs/promises")
               const plan = await readFile('${{ inputs.workingDir }}/${{ steps.create-truncated-plan-file.outputs.plan_file_name }}')
-              planMessage = `\`\`\`diff\n ${plan} \n\`\`\``
+              planMessage = `\`\`\`terraform\n ${plan} \n\`\`\``
             }
             else {
               planMessage = "Please, refer to [Github Action logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
