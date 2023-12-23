@@ -148,12 +148,6 @@ jobs:
         if: ${{ env.repository_name != 'frontend-core-v2' }}
         run: mv ./deploy/e2e/kubernetes/deploy-k8-micro.yml ./deploy/e2e/kubernetes/deploy-k8.yml
 
-      # needed for frontend discovery(build initial.js)
-      - name: copy remoteEntry to v2_static folder
-        run: |
-          find . -type f -name "remoteEntry.js" -exec cp {} ./v2_static/ \;
-        working-directory: ./build
-
       - name: Set variables in deployment.yaml
         working-directory: ./deploy/e2e/kubernetes
         run: |
