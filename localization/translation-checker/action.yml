@@ -3,16 +3,31 @@ name: 'Check translation'
 description: 'Checks Mindbox i18n files in .NET solution'
 inputs:
   skipInclusionCheck:
-    description: 'Forces checker to skip inclusion check'
+    description: Forces checker to skip inclusion check
     required: false
-    default: false
+    default: 'false'
   allowCyrillicSymbolsInCSharpComments:
-    description: 'Allow cyrillic symbols in CSharp comments'
+    description: Allow cyrillic symbols in CSharp comments
     required: false
-    default: false
+    default: 'false'
+  allowOldFormatTranslationFiles:
+    description: |
+      Allow old format translation files (with unspecified Mindbox/Maestra subdivision).
+      Please do not use this input anywhere except TeamSLA.
+    required: false
+    default: 'false'
+  requireDivisionAgnosticTranslations:
+    description: |
+      Whether the division-agnostic translations are enforced.
+      If set to 'true', any mentions of "Mindbox" or "Maestra" will cause an error.
+      Useful in microservices with multiple subdivisions per environment, such as Billing.
+    required: false
+    default: 'false'
+
 runs:
   using: 'docker'
   image: 'docker://mindboxmoscow/translation-checker-gha'
   env:
     skipInclusionCheck: ${{ inputs.skipInclusionCheck }}
     allowCyrillicSymbolsInCSharpComments: ${{ inputs.allowCyrillicSymbolsInCSharpComments }}
+    allowOldFormatTranslationFiles: ${{ inputs.allowOldFormatTranslationFiles }}
