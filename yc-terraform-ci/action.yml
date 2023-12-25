@@ -208,7 +208,7 @@ runs:
       working-directory: ${{ inputs.workingDir }}
       shell: bash
       run: |
-        plan="$(terraform show plan.tfplan)"
+        plan="$(terraform show -no-color plan.tfplan)"
         plan=$(echo "$plan" | sed -r 's/^([[:blank:]]*)([-+~])/\2\1/g')
         plan=$(echo "$plan" | sed -r 's/^~/!/g')
         original_length=${#plan}
