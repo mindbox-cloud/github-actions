@@ -31,3 +31,4 @@ runs:
     skipInclusionCheck: ${{ inputs.skipInclusionCheck }}
     allowCyrillicSymbolsInCSharpComments: ${{ inputs.allowCyrillicSymbolsInCSharpComments }}
     allowOldFormatTranslationFiles: ${{ inputs.allowOldFormatTranslationFiles }}
+    requireDivisionAgnosticTranslations: ${{ inputs.requireDivisionAgnosticTranslations }}
