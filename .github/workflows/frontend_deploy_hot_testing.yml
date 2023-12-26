@@ -243,7 +243,7 @@ jobs:
 
       - name: Set output
         id: set_output
-        run: echo "hot_testing_url=https://hot-testing-${{ env.hash_payload }}-staging.mindbox.ru" >> $GITHUB_ENV
+        run: echo "hot_testing_url=https://hot-testing-${{ env.hash_payload }}-staging.mindbox.ru" >> $GITHUB_OUTPUT
 
       - name: Add comment to commit if the job has completed
         uses: mshick/add-pr-comment@v2
