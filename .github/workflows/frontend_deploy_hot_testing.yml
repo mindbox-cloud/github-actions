@@ -68,10 +68,16 @@ on:
       bucket_access_key:
         description: "A NEW_FRONTEND_STAGING_TEMPLATE_BUCKET_ACCESS_KEY token passed from the caller workflow"
         required: true
+    outputs:
+      hot_testing_url:
+        description: "Hot-testing url"
+        value: ${{ jobs.hot_testing.outputs.hot_testing_url }}
 
 jobs:
-  hot-testing:
+  hot_testing:
     runs-on: ubuntu-latest
+    outputs:
+      hot_testing_url: ${{ steps.set_output.outputs.hot_testing_url }}
     timeout-minutes: 10
     if: ${{ !contains(github.head_ref, 'LocalizationPull') && github.event.pull_request.user.login != 'renovate[bot]' }}
     env:
@@ -234,6 +240,10 @@ jobs:
           KUBE_CONFIG_DATA: ${{ secrets.kube_dev_config_k8 }}
         with:
           args: kubectl apply -f ./deploy/hot-testing/kubernetes/deploy-k8.yml
+
+      - name: Set output
+        id: set_output
+        run: echo "hot_testing_url=https://hot-testing-${{ env.hash_payload }}-staging.mindbox.ru" >> $GITHUB_OUTPUT
 
       - name: Add comment to commit if the job has completed
         uses: mshick/add-pr-comment@v2
