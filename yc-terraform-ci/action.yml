@@ -270,7 +270,7 @@ runs:
             *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ inputs.workingDir }}\`, Workflow: \`${{ github.workflow }}\`*`;
 
             const issueNumberInput = ${{ inputs.issueNumber }};
-            const issueNumber = const issueNumber = issueNumberInput ? issueNumberInput : context.issue.number;
+            const issueNumber = issueNumberInput ? issueNumberInput : context.issue.number;
             github.rest.issues.createComment({
               issue_number: issueNumber,
               owner: context.repo.owner,
