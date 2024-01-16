@@ -269,7 +269,8 @@ runs:
             </details>
 
             *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ inputs.workingDir }}\`, Workflow: \`${{ github.workflow }}\`*`;
-            const issueNumber = ${{ inputs.issueNumber || context.issue.number }};
+            const issueNumberInput = core.getInput('issueNumber');
+            const issueNumber = issueNumberInput || context.issue.number;
             github.rest.issues.createComment({
               issue_number: issueNumber,
               owner: context.repo.owner,
