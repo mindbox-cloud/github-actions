@@ -54,7 +54,7 @@ inputs:
     description: 'if you want log level debug'
     required: false
     default: 'ERROR'
-   issueNumber:
+  issueNumber:
     description: 'Used for comment webhook with non-standard usage'
     required: false
     default: ''
