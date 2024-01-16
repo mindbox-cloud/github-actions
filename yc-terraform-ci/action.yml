@@ -57,6 +57,7 @@ inputs:
   issueNumber:
     description: 'Used for comment webhook with non-standard usage'
     required: false
+    default: ''
 outputs: {}
 runs:
   using: "composite"
