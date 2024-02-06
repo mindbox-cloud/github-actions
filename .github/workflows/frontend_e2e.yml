@@ -155,6 +155,7 @@ jobs:
       - name: Checkout frontend-deploy repository
         uses: actions/checkout@v3
         with:
+          ref: postolov-dnsrecord-creation
           repository: mindbox-cloud/frontend-deploy
           token: ${{ secrets.frontend_gha_full_token }}
           path: ./deploy
