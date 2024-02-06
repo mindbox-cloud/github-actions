@@ -223,6 +223,23 @@ jobs:
         with:
           args: kubectl apply -f ./deploy/e2e/kubernetes/deploy-k8.yml
 
+      - name: Check dns record creation
+        id: check_dns
+        uses: nick-fields/retry@v3
+        with:
+          timeout_seconds: 15
+          shell: bash
+          max_attempts: 40
+          retry_wait_seconds: 5
+          command: dig -t cname +short e2e-testing-${{ env.hash_payload }}-staging.mindbox.ru. | grep -q "mindbox-cdp.trafficmanager.net." || exit 1
+        continue-on-error: true
+
+      - name: Fail with error message
+        if: ${{ steps.check_dns.outcome == 'failure' }}
+        run: |
+          echo "The DNS CNAME record for 'e2e-testing-${{ env.hash_payload }}-staging.mindbox.ru' was not created as expected."
+          exit 1
+
   e2e-tests:
     runs-on: [self-hosted, frontend]
     container:
