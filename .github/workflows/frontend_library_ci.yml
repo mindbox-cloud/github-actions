@@ -101,7 +101,7 @@ jobs:
     needs: checking
     concurrency: release
     runs-on: ubuntu-latest
-    if: ${{ !inputs.template_repo && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') && !contains(github.event.head_commit.message, 'skip ci') }}
+    if: ${{ !inputs.template_repo && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/rc') && !contains(github.event.head_commit.message, 'skip ci') }}
     timeout-minutes: 20
     steps:
       - name: Checkout the repository
