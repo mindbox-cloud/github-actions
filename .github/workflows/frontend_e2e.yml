@@ -25,7 +25,7 @@ on:
         type: string
       image_name:
         description: "Hot-testing image name"
-        default: "e2e_new_frontend"
+        default: "dev_new_frontend"
         required: false
         type: string
       template_bucket:
