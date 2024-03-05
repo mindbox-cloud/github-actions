@@ -23,11 +23,6 @@ on:
         default: "dev_new_frontend"
         required: false
         type: string
-      core_project:
-        description: "True if project is frontend_core_v2"
-        default: false
-        required: false
-        type: boolean
     secrets:
       npm_token:
         description: "A GH_NPM_REGISTRY token passed from the caller workflow"
@@ -111,7 +106,7 @@ jobs:
           repository: mindbox-cloud/frontend-deploy
           token: ${{ secrets.frontend_gha_full_token }}
           path: ./deploy
-          
+
       - name: Build and format npm-package for new deploy
         run: npm run build
         env:
