@@ -1,0 +1,135 @@
+name: create frontend image
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        description: "Node.js version"
+        default: "18.x"
+        required: false
+        type: string
+      retries:
+        description: "Number of retries"
+        default: 2
+        required: false
+        type: number
+      registry_id:
+        description: "YC registry ID"
+        default: "crpo9tj76o3c7pi8i72n"
+        required: false
+        type: string
+      image_name:
+        description: "Image name for k8s deployment"
+        default: "dev_new_frontend"
+        required: false
+        type: string
+    secrets:
+      npm_token:
+        description: "A GH_NPM_REGISTRY token passed from the caller workflow"
+        required: true
+      frontend_gha_full_token:
+        description: "A FRONTEND_GHA_FULL_TOKEN token passed from the caller workflow"
+        required: true
+      container_registry_key:
+        description: "A CONTAINER_REGISTRY_KEY token passed from the caller workflow"
+        required: true
+
+env:
+  NODE_OPTIONS: --unhandled-rejections=strict
+
+jobs:
+  create-image:
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.head_ref, 'LocalizationPull') }}
+    env:
+      retries: ${{ inputs.retries }}
+      registry: cr.yandex/${{ inputs.registry_id }}
+      image: ${{ inputs.image_name }}
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Change Dockerd param
+        run: |
+          sudo sed -i 's/ }/, \"max-concurrent-uploads\": 2 }/' /etc/docker/daemon.json
+          sudo systemctl restart docker
+
+      - name: Set variables
+        run: |
+          echo "ref_name=$(echo $GITHUB_HEAD_REF | tr '[A-Z]' '[a-z]')" >> $GITHUB_ENV
+          echo "repository_name=$(cat $GITHUB_EVENT_PATH | jq '.repository.name' | sed 's/\"//g')" >> $GITHUB_ENV
+        id: set_variables
+
+      - name: Get branch and repo names hash
+        run: echo "hash_payload=$(echo $BRANCH_AND_REPO | md5sum | sed 's/  -//g')"  >> $GITHUB_ENV
+        id: branch_and_repo_hash
+        env:
+          BRANCH_AND_REPO: "${{ env.repository_name }} ${{ env.ref_name }}"
+
+      - name: Set project path
+        run: |
+          project_name=$(cat ./package.json | jq .name | sed -s 's/@mindbox-cloud\///g' | sed -s 's/-/_/g' | sed -s 's/"//g')
+          if [[ $project_name == "frontend_core_v2" ]]; then
+            echo "project_folder=core" >> $GITHUB_ENV
+            echo "project_name=core" >> $GITHUB_ENV
+            echo "frontend_core_service=e2e-testing-${{ env.hash_payload }}" >> $GITHUB_ENV
+          else
+            echo "project_folder=$project_name" >> $GITHUB_ENV
+            echo "project_name=$project_name" >> $GITHUB_ENV
+            echo "frontend_core_service=core-service-standard" >> $GITHUB_ENV
+          fi
+        id: set_project
+
+      - name: Setup Node.JS
+        uses: actions/setup-node@v3
+        with:
+          always-auth: true
+          node-version: ${{ inputs.node_version }}
+          registry-url: "https://npm.pkg.github.com/mindbox-cloud"
+
+      - name: Get node modules from cache
+        uses: actions/cache@v3
+        with:
+          path: ./node_modules
+          key: npm-ci-${{ github.sha }}
+
+      - name: Disable Lefthook
+        run: echo "LEFTHOOK=0" >> $GITHUB_ENV
+
+      - name: Authenticate in yandex registry
+        run: echo '${{ secrets.container_registry_key }}' | docker login -u json_key --password-stdin cr.yandex
+
+      - name: Checkout frontend-deploy repository
+        uses: actions/checkout@v3
+        with:
+          repository: mindbox-cloud/frontend-deploy
+          token: ${{ secrets.frontend_gha_full_token }}
+          path: ./deploy
+
+      - name: Build and format npm-package for new deploy
+        run: npm run build
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.npm_token }}
+          MCF_STATIC_FOLDER: v2_static
+
+      # needed for frontend discovery(build initial.js)
+      - name: copy remoteEntry to v2_static folder
+        run: |
+          find . -type f -name "remoteEntry.js" -exec cp {} ./v2_static/ \;
+        working-directory: ./build
+
+      - name: Copy Dockerfile to build folder
+        run: |
+          cp ./deploy/mcf-release/Dockerfile ./build
+          cp ./deploy/mcf-release/nginx.conf ./build
+
+      - name: Build docker image
+        working-directory: ./build
+        run: |
+          docker build . -t ${{ env.registry }}/${{ env.image }}-k8/${{ env.ref_name }}:${{ github.sha }}
+
+      - name: Push docker image
+        run: docker push ${{ env.registry }}/${{ env.image }}-k8/${{ env.ref_name }}:${{ github.sha }}
