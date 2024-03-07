@@ -179,7 +179,7 @@ jobs:
           shell: bash
           max_attempts: 40
           retry_wait_seconds: 5
-          command: dig @ns1.yandexcloud.net -t cname +short e2e-testing-${{ env.hash_payload }}-staging.mindbox.ru. | grep -q "dtln-kube-cdp-staging-01-a-services.mindbox.ru." || exit 1
+          command: dig @8.8.8.8 -t cname +short e2e-testing-${{ env.hash_payload }}-staging.mindbox.ru. | grep -q "dtln-kube-cdp-staging-01-a-services.mindbox.ru." || exit 1
         continue-on-error: true
 
       - name: Fail with error message
