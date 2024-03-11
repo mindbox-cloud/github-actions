@@ -87,6 +87,7 @@ env:
 
 jobs:
   prepare-site:
+    timeout-minutes: 20
     runs-on: ubuntu-latest
     if: ${{ !contains(github.head_ref, 'LocalizationPull') }}
     env:

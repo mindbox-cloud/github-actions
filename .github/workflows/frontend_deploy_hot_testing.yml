@@ -78,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       hot_testing_url: ${{ steps.set_output.outputs.hot_testing_url }}
-    timeout-minutes: 10
+    timeout-minutes: 20
     if: ${{ !contains(github.head_ref, 'LocalizationPull') && github.event.pull_request.user.login != 'renovate[bot]' }}
     env:
       registry: cr.yandex/${{ inputs.registry_id }}
