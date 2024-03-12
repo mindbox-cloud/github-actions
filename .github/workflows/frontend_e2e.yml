@@ -82,6 +82,7 @@ env:
 
 jobs:
   prepare-site:
+    timeout-minutes: 20
     runs-on: ubuntu-latest
     if: ${{ !contains(github.head_ref, 'LocalizationPull') }}
     env:
@@ -177,7 +178,7 @@ jobs:
         with:
           timeout_seconds: 15
           shell: bash
-          max_attempts: 40
+          max_attempts: 90
           retry_wait_seconds: 10
           command: dig @8.8.8.8 -t cname +short e2e-testing-${{ env.hash_payload }}-staging.mindbox.ru. | grep -q "dtln-kube-cdp-staging-01-a-services.mindbox.ru." || exit 1
         continue-on-error: true

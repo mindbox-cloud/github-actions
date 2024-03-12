@@ -68,7 +68,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       hot_testing_url: ${{ steps.set_output.outputs.hot_testing_url }}
-    timeout-minutes: 10
+    timeout-minutes: 20
     if: ${{ !contains(github.head_ref, 'LocalizationPull') && github.event.pull_request.user.login != 'renovate[bot]' }}
     env:
       registry: cr.yandex/${{ inputs.registry_id }}
@@ -160,7 +160,7 @@ jobs:
         with:
           timeout_seconds: 15
           shell: bash
-          max_attempts: 40
+          max_attempts: 90
           retry_wait_seconds: 10
           command: dig @8.8.8.8 -t cname +short hot-testing-${{ env.hash_payload }}-staging.mindbox.ru. | grep -q "dtln-kube-cdp-staging-01-a-services.mindbox.ru." || exit 1
         continue-on-error: true
