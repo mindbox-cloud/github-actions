@@ -24,8 +24,8 @@ on:
         required: false
         type: string
       image_name:
-        description: "Hot-testing image name"
-        default: "e2e_new_frontend"
+        description: "e2e image name"
+        default: "dev_new_frontend"
         required: false
         type: string
       template_bucket:
@@ -43,11 +43,6 @@ on:
         default: false
         required: false
         type: boolean
-      use_k8_deploy_process:
-        type: boolean
-        description: "True if need to use new deployment procedure"
-        required: false
-        default: true
       target_port:
         type: number
         description: "The port for k8 services"
@@ -134,25 +129,6 @@ jobs:
           fi
         id: set_project
 
-      - name: Setup Node.JS
-        uses: actions/setup-node@v3
-        with:
-          always-auth: true
-          node-version: ${{ inputs.node_version }}
-          registry-url: "https://npm.pkg.github.com/mindbox-cloud"
-
-      - name: Get node modules from cache
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules
-          key: npm-ci-${{ github.sha }}
-
-      - name: Disable Lefthook
-        run: echo "LEFTHOOK=0" >> $GITHUB_ENV
-
-      - name: Authenticate in yandex registry
-        run: echo '${{ secrets.container_registry_key }}' | docker login -u json_key --password-stdin cr.yandex
-
       - name: Checkout frontend-deploy repository
         uses: actions/checkout@v3
         with:
@@ -167,34 +143,6 @@ jobs:
       - name: Select micro deploy.yml
         if: ${{ env.repository_name != 'frontend-core-v2' }}
         run: mv ./deploy/e2e/kubernetes/deploy-k8-micro.yml ./deploy/e2e/kubernetes/deploy-k8.yml
-
-      - name: Build and format npm-package for new deploy
-
-        run: npm run build
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.npm_token }}
-          MCF_STATIC_FOLDER: v2_static
-
-      # needed for frontend discovery(build initial.js)
-      - name: copy remoteEntry to v2_static folder
-        run: |
-          find . -type f -name "remoteEntry.js" -exec cp {} ./v2_static/ \;
-        working-directory: ./build
-
-      - name: Copy Dockerfile to build folder
-        run: |
-          cp ./deploy/mcf-release/Dockerfile ./build
-          cp ./deploy/mcf-release/nginx.conf ./build
-
-      - name: Build docker image
-        working-directory: ./build
-        run: |
-          docker build . -t ${{ env.registry }}/${{ env.image }}-k8/${{ env.ref_name }}:${{ github.sha }}
-
-      - name: Push docker image
-        run: docker push ${{ env.registry }}/${{ env.image }}-k8/${{ env.ref_name }}:${{ github.sha }}
 
       - name: Set variables in deployment.yaml
         working-directory: ./deploy/e2e/kubernetes
