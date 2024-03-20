@@ -400,8 +400,7 @@ jobs:
       - name: Authenticate in yandex registry
         run: echo '${{ secrets.container_registry_key }}' | docker login -u json_key --password-stdin cr.yandex
 
-      - name: Push release docker image to registry with retry
-        if: ${{ inputs.use_k8_deploy_process }}
+      - name: Pull docker image to registry with retry
         uses: nick-fields/retry@v2
         with:
           timeout_seconds: 300
