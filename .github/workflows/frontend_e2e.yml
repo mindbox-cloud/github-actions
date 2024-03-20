@@ -345,7 +345,7 @@ jobs:
     strategy:
       matrix:
         project: ${{ fromJSON(needs.core-e2e-tests-matrix.outputs.matrix) }}
-      max-parallel: 4
+      max-parallel: 2
     timeout-minutes: ${{ inputs.e2e-timeout }}
     if: ${{ always() && !cancelled() && !contains(github.head_ref, 'LocalizationPull') && inputs.core_project }}
     env:
