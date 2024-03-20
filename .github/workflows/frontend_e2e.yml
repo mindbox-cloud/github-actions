@@ -400,12 +400,20 @@ jobs:
       - name: Authenticate in yandex registry
         run: echo '${{ secrets.container_registry_key }}' | docker login -u json_key --password-stdin cr.yandex
 
+      - name: Pull docker image to registry with retry
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 300
+          retry_wait_seconds: 30
+          max_attempts: 5
+          shell: bash
+          command: docker pull cr.yandex/${{ inputs.registry_id }}/frontend-e2e:${{ matrix.project }}-latest 2>&1
+
       - name: Run E2E tests on core project.
         run: |
           [ -d ./cypress/${{ matrix.project }} ] && mkdir -p ./cypress/${{ matrix.project }}
           mkdir -p ./cypress/${{ matrix.project }}/videos && mkdir -p ./cypress/${{ matrix.project }}/screenshots
           docker run -i \
-            --pull always \
             -e BASE_URL="${{ env.E2E_URL }}" \
             -e RETRIES="${{ env.retries }}" \
             -e CYPRESS_username=${{ secrets.cypress_login }} \
