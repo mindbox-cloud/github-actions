@@ -177,6 +177,10 @@ jobs:
         if: ${{ inputs.tests }}
         run: npm run test -- --maxConcurrency=1 --maxWorkers=1
 
+      - name: Run component tests
+        if: ${{ inputs.tests }}
+        run: npm run component-testing
+
       - name: Install E2E deps
         if: ${{ inputs.e2e_typechecking || inputs.e2e_linters }}
         run: npm ci --loglevel verbose
