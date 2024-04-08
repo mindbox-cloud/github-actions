@@ -43,6 +43,11 @@ on:
         default: false
         required: false
         type: boolean
+      component_tests:
+        description: "True if need run component tests"
+        default: false
+        required: false
+        type: boolean
       e2e_typechecking:
         description: "True if need to run check-types for E2E"
         default: false
@@ -176,6 +181,10 @@ jobs:
       - name: Run tests
         if: ${{ inputs.tests }}
         run: npm run test -- --maxConcurrency=1 --maxWorkers=1
+
+      - name: Run component tests
+        if: ${{ inputs.component_tests }}
+        run: npm run component-testing
 
       - name: Install E2E deps
         if: ${{ inputs.e2e_typechecking || inputs.e2e_linters }}
