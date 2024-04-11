@@ -40,7 +40,6 @@ env:
 jobs:
   create-image:
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.head_ref, 'LocalizationPull') }}
     env:
       retries: ${{ inputs.retries }}
       registry: cr.yandex/${{ inputs.registry_id }}
