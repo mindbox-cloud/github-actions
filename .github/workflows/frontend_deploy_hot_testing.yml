@@ -176,7 +176,7 @@ jobs:
         env:
           KUBE_CONFIG: ${{ env.KUBECONFIG_ENCODED }}
         with:
-          args: apply -f ./kubernetes/deploy.yaml
+          args: apply -f ./deploy/hot-testing/kubernetes/deploy-k8.yml
 
       - name: Check dns record creation
         id: check_dns
