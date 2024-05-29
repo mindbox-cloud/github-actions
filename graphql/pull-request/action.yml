@@ -2,10 +2,10 @@ name: GraphQL Inspector
 description: 'Verify graphql schema can be merged'
 
 inputs:
-  oldSchema:
+  oldSchemaFile:
     description: 'Current schema file to validate against.'
     required: true
-  newSchema:
+  newSchemaFile:
     description: 'New schema file to be validated.'
     required: true
   allowBreakingChanges:
@@ -25,7 +25,7 @@ runs:
       id: new_schema_presence
       uses: andstor/file-existence-action@v3
       with:
-        files: ${{ inputs.newSchema }}
+        files: ${{ inputs.newSchemaFile }}
 
     - name: Fail with missing new schema
       if: steps.new_schema_presence.outputs.files_exists == 'false'
@@ -36,7 +36,7 @@ runs:
       id: old_schema_presence
       uses: andstor/file-existence-action@v3
       with:
-        files: ${{ inputs.oldSchema }}
+        files: ${{ inputs.oldSchemaFile }}
 
     - name: Check old schema is changed in PR
       id: old_schema_touched
@@ -44,7 +44,7 @@ runs:
       uses: tj-actions/changed-files@v44
       with:
         files: |
-          ${{ inputs.oldSchema }}
+          ${{ inputs.oldSchemaFile }}
 
     - name: Fail if old schema was touched
       if: steps.old_schema_touched.outputs.any_changed == 'true'
@@ -56,14 +56,14 @@ runs:
       shell: bash
       run: |
         echo ::group::Old schema
-        cat ${{ inputs.oldSchema }}
+        cat ${{ inputs.oldSchemaFile }}
         echo ::endgroup::
 
     - name: Show new schema
       shell: bash
       run: |
         echo ::group::New schema
-        cat ${{ inputs.newSchema }}
+        cat ${{ inputs.newSchemaFile }}
         echo ::endgroup::
 
     - name: Validate schema
@@ -75,14 +75,14 @@ runs:
         options: |
           -v ${{ github.workspace }}:/workspace
           -v ${{ github.action_path }}/entrypoint.js:/workspace/entrypoint.js
-        run: /workspace/entrypoint.js /workspace/${{ inputs.oldSchema }} /workspace/${{ inputs.newSchema }} ${{ inputs.allowBreakingChanges }} /workspace/${{ inputs.oldSchema }}.report.txt
+        run: /workspace/entrypoint.js /workspace/${{ inputs.oldSchemaFile }} /workspace/${{ inputs.newSchemaFile }} ${{ inputs.allowBreakingChanges }} /workspace/${{ inputs.oldSchemaFile }}.report.txt
 
     - name: Add comment with output to PR
       uses: mshick/add-pr-comment@v2
       if: ${{ !cancelled() && (steps.validation.conclusion == 'success' || steps.validation.conclusion == 'failure') }}
       with:
         message-path: |
-          ${{ inputs.oldSchema }}.report.txt
+          ${{ inputs.oldSchemaFile }}.report.txt
 
     - uses: ravsamhq/notify-slack-action@v2
       if: ${{ !cancelled() && steps.validation.conclusion == 'failure' }}

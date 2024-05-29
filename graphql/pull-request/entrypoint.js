@@ -3,12 +3,12 @@
 const { spawn } = require('child_process');
 const { writeFileSync } = require('fs');
 
-const oldSchema = process.argv[2]
-const newSchema = process.argv[3]
+const oldSchemaFile = process.argv[2]
+const newSchemaFile = process.argv[3]
 const allowBreakingChanges = process.argv[4] === 'true'
 const reportPath = process.argv[5]
 
-runProcess('graphql-inspector', ['diff', oldSchema, newSchema])
+runProcess('graphql-inspector', ['diff', oldSchemaFile, newSchemaFile])
     .then(async ({ code, output }) => {
         const report = resolveReport(output)
         writeFileSync(reportPath, report)
@@ -39,12 +39,12 @@ function runProcess(cmd, args) {
 
 function resolveReport(report) {
     if (report.includes('No changes detected'))
-        return `### ✅ Schema ${newSchema} has no changes`
+        return `### ✅ Schema ${newSchemaFile} has no changes`
 
     if (report.includes('GraphQLError: Syntax Error') || report.includes('Unable to find any GraphQL type definitions for the following pointers'))
-        return `### ❌ Schema ${newSchema} is broken and can't be validated`
+        return `### ❌ Schema ${newSchemaFile} is broken and can't be validated`
 
-    return `### ⚠️ Schema ${newSchema} validation failed:\n\n${formatReport(report)}`;
+    return `### ⚠️ Schema ${newSchemaFile} validation failed:\n\n${formatReport(report)}`;
 }
 
 function formatReport(report) {
