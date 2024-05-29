@@ -1,0 +1,39 @@
+name: GraphQL Inspector
+description: 'Verify graphql schema can be merged'
+
+inputs:
+  oldSchema:
+    description: 'Current schema file to validate against.'
+    required: true
+  newSchema:
+    description: 'New schema file to be validated.'
+    required: true
+
+outputs: {}
+
+runs:
+  using: 'composite'
+  steps:
+
+    - name: Check new schema presence
+      id: new_schema_presence
+      uses: andstor/file-existence-action@v3
+      with:
+        files: ${{ inputs.newSchema }}
+
+    - name: Fail with missing new schema
+      if: steps.new_schema_presence.outputs.files_exists == 'false'
+      shell: bash
+      run: exit 1
+
+    - name: Copy new schema to old schema place
+      shell: bash
+      run: cp -f ${{ inputs.newSchema }} ${{ inputs.oldSchema }}
+
+    - name: Commit new schema
+      uses: EndBug/add-and-commit@v9
+      with:
+        add: ${{ inputs.oldSchema }}
+        message: Commit updated ${{ inputs.oldSchema }}
+        committer_name: GitHub Actions
+        committer_email: actions@github.com

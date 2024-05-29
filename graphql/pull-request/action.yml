@@ -1,0 +1,95 @@
+name: GraphQL Inspector
+description: 'Verify graphql schema can be merged'
+
+inputs:
+  oldSchema:
+    description: 'Current schema file to validate against.'
+    required: true
+  newSchema:
+    description: 'New schema file to be validated.'
+    required: true
+  allowBreakingChanges:
+    description: 'Whether to allow breaking changes in new schema'
+    required: true
+  slackWebhookUrl:
+    description: 'Slack webhook, used for notification'
+    required: true
+
+outputs: {}
+
+runs:
+  using: 'composite'
+  steps:
+
+    - name: Check new schema presence
+      id: new_schema_presence
+      uses: andstor/file-existence-action@v3
+      with:
+        files: ${{ inputs.newSchema }}
+
+    - name: Fail with missing new schema
+      if: steps.new_schema_presence.outputs.files_exists == 'false'
+      shell: bash
+      run: exit 1
+
+    - name: Check old schema presence
+      id: old_schema_presence
+      uses: andstor/file-existence-action@v3
+      with:
+        files: ${{ inputs.oldSchema }}
+
+    - name: Check old schema is changed in PR
+      id: old_schema_touched
+      if: steps.old_schema_presence.outputs.files_exists == 'true'
+      uses: tj-actions/changed-files@v44
+      with:
+        files: |
+          ${{ inputs.oldSchema }}
+
+    - name: Fail if old schema was touched
+      if: steps.old_schema_touched.outputs.any_changed == 'true'
+      shell: bash
+      run: exit 1
+
+    - name: Show old schema
+      if: steps.old_schema_presence.outputs.files_exists == 'true'
+      shell: bash
+      run: |
+        echo ::group::Old schema
+        cat ${{ inputs.oldSchema }}
+        echo ::endgroup::
+
+    - name: Show new schema
+      shell: bash
+      run: |
+        echo ::group::New schema
+        cat ${{ inputs.newSchema }}
+        echo ::endgroup::
+
+    - name: Validate schema
+      id: validation
+      if: steps.old_schema_presence.outputs.files_exists == 'true'
+      uses: addnab/docker-run-action@v3
+      with:
+        image: kamilkisiela/graphql-inspector:latest
+        options: |
+          -v ${{ github.workspace }}:/workspace
+          -v ${{ github.action_path }}/entrypoint.js:/workspace/entrypoint.js
+        run: /workspace/entrypoint.js /workspace/${{ inputs.oldSchema }} /workspace/${{ inputs.newSchema }} ${{ inputs.allowBreakingChanges }} /workspace/${{ inputs.oldSchema }}.report.txt
+
+    - name: Add comment with output to PR
+      uses: mshick/add-pr-comment@v2
+      if: ${{ !cancelled() && (steps.validation.conclusion == 'success' || steps.validation.conclusion == 'failure') }}
+      with:
+        message-path: |
+          ${{ inputs.oldSchema }}.report.txt
+
+    - uses: ravsamhq/notify-slack-action@v2
+      if: ${{ !cancelled() && steps.validation.conclusion == 'failure' }}
+      with:
+        status: ${{ steps.validation.conclusion }}
+        notification_title: '{workflow} has {status_message}'
+        message_format: '{emoji} *{workflow}* GraphQL schema validation {status_message} in <{repo_url}|{repo}@{branch}> on <{commit_url}|{commit_sha}>'
+        footer: 'Repo <{repo_url}|{repo}>'
+      env:
+        SLACK_WEBHOOK_URL: ${{ inputs.slackWebhookUrl }}
