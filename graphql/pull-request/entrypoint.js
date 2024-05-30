@@ -44,7 +44,10 @@ function resolveReport(report) {
     if (report.includes('GraphQLError: Syntax Error') || report.includes('Unable to find any GraphQL type definitions for the following pointers'))
         return `### ❌ Schema ${newSchemaFile} is broken and can't be validated`
 
-    return `### ⚠️ Schema ${newSchemaFile} validation failed:\n\n${formatReport(report)}`;
+    if (report.includes('[error]'))
+        return `### ⚠️ Schema ${newSchemaFile} validation failed:\n\n${formatReport(report)}`;
+
+    return `### ✅ Schema ${newSchemaFile} validation passed:\n\n${formatReport(report)}`;
 }
 
 function formatReport(report) {
