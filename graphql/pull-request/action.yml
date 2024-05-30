@@ -74,7 +74,7 @@ runs:
     - name: Validate schema
       id: validation
       if: ${{ steps.old_schema_presence.outputs.files_exists == 'true' && steps.compare_schemas.outputs.changed == '1' }}
-      uses: addnab/docker-run-action@v3
+      uses: mindbox-cloud/docker-run-action@v1
       with:
         image: kamilkisiela/graphql-inspector:latest
         options: |
