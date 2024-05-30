@@ -66,9 +66,14 @@ runs:
         cat ${{ inputs.newSchemaFile }}
         echo ::endgroup::
 
+    - name: Compare schemas
+      id: compare_schemas
+      shell: bash
+      run: echo "changed=$(cmp -s ${{ inputs.oldSchemaFile }} ${{ inputs.newSchemaFile }} && echo 0 || echo 1)" >> "$GITHUB_OUTPUT"
+
     - name: Validate schema
       id: validation
-      if: steps.old_schema_presence.outputs.files_exists == 'true'
+      if: ${{ steps.old_schema_presence.outputs.files_exists == 'true' && steps.compare_schemas.outputs.changed == '1' }}
       uses: addnab/docker-run-action@v3
       with:
         image: kamilkisiela/graphql-inspector:latest
