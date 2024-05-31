@@ -383,6 +383,9 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
         working-directory: ./e2e
 
+      - name: Authenticate in yandex registry
+        run: echo '${{ secrets.CONTAINER_REGISTRY_KEY }}' | docker login -u json_key --password-stdin cr.yandex
+
       - name: Download e2e tests Dockerfile
         if: ${{ inputs.e2e_tag }}
         run: |
