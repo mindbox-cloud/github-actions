@@ -8,6 +8,12 @@ const newSchemaFile = process.argv[3]
 const allowBreakingChanges = process.argv[4] === 'true'
 const reportPath = process.argv[5]
 
+console.log('Args:', process.argv)
+console.log('Old schema file:', oldSchemaFile)
+console.log('New schema file:', oldSchemaFile)
+console.log('Allow breaking changes:', allowBreakingChanges)
+console.log('Report path:', reportPath)
+
 runProcess('graphql-inspector', ['diff', oldSchemaFile, newSchemaFile])
     .then(async ({ code, output }) => {
         const report = resolveReport(output)
