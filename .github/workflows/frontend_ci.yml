@@ -452,6 +452,7 @@ jobs:
             --server ${{ secrets.OCTOPUS_SERVER }}
             --project "${{ steps.set_variables.outputs.repository_name }}"-k8-deploy
             --version ${{ steps.release-number.outputs.release-number }}
+            --gitRef master
             --channel Default
             --tenant=*
             --apikey ${{ secrets.OCTOPUS_API_KEY }}
