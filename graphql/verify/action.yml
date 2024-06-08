@@ -1,5 +1,5 @@
-name: GraphQL Inspector
-description: 'Verify graphql schema can be merged'
+name: Verify GraphQL Schema
+description: Verify GraphQL Schema
 
 inputs:
   oldSchemaFile:
