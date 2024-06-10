@@ -1,0 +1,24 @@
+name: Download GraphQL Schema
+description: Download GraphQL Schema
+
+inputs:
+  directory:
+    description: 'Directory to execute commands at'
+    required: true
+  startCommand:
+    description: 'Command to start GraphQL host'
+    required: true
+  stopCommand:
+    description: 'Command to stop GraphQL host'
+    required: true
+  hostAddress:
+    description: 'GraphQL host address'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+
+    - name: Download GraphQL schema
+      shell: bash
+      run: ${{ github.action_path }}/download.sh ${{ inputs.directory }} ${{ inputs.startCommand }} ${{ inputs.stopCommand }} ${{ inputs.hostAddress }}
