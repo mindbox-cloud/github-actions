@@ -107,4 +107,4 @@ runs:
         message_format: '{emoji} *{workflow}* GraphQL schema validation broken in <{repo_url}|{repo}@{branch}> on <{commit_url}|{commit_sha}>'
         footer: 'Repo <{repo_url}|{repo}>'
       env:
-        SLACK_WEBHOOK_URL: https://hooks.slack.com/services/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
+        SLACK_WEBHOOK_URL: https://hooks.slack.com/services/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
