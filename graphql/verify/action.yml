@@ -11,9 +11,6 @@ inputs:
   allowBreakingChanges:
     description: 'Whether to allow breaking changes in new schema'
     required: true
-  slackWebhookUrl:
-    description: 'Slack webhook, used for notification'
-    required: true
 
 outputs: {}
 
@@ -78,9 +75,10 @@ runs:
       with:
         image: kamilkisiela/graphql-inspector:latest
         options: |
-          -v ${{ github.workspace }}:/workspace
-          -v ${{ github.action_path }}/entrypoint.js:/workspace/entrypoint.js
-        run: /workspace/entrypoint.js /workspace/${{ inputs.oldSchemaFile }} /workspace/${{ inputs.newSchemaFile }} ${{ inputs.allowBreakingChanges }} /workspace/${{ inputs.oldSchemaFile }}.report.txt
+          -v ${{ github.workspace }}:/w
+          -v ${{ github.action_path }}/entrypoint.js:/w/entrypoint.js
+        run: |
+          /w/entrypoint.js /w/${{ inputs.oldSchemaFile }} /w/${{ inputs.newSchemaFile }} ${{ inputs.allowBreakingChanges }} /w/${{ inputs.oldSchemaFile }}.report.txt /w/${{ inputs.oldSchemaFile }}.log.txt
 
     - name: Add comment with output to PR
       uses: mshick/add-pr-comment@v2
@@ -89,12 +87,24 @@ runs:
         message-path: |
           ${{ inputs.oldSchemaFile }}.report.txt
 
-    - uses: ravsamhq/notify-slack-action@v2
+    - name: Verify log file
+      id: verify_log
       if: ${{ !cancelled() && steps.validation.conclusion == 'failure' }}
+      shell: bash
+      run: |
+        cat ${{ inputs.oldSchemaFile }}.log.txt
+        if [ $(cat ${{ inputs.oldSchemaFile }}.log.txt | wc -c) -gt 2 ]; then
+          echo 'log=error' >> "$GITHUB_OUTPUT";
+        else
+          echo 'log=ok' >> "$GITHUB_OUTPUT";
+        fi
+
+    - uses: ravsamhq/notify-slack-action@v2
+      if: ${{ !cancelled() && steps.validation.conclusion == 'failure' && steps.verify_log.outputs.log == 'error' }}
       with:
         status: ${{ steps.validation.conclusion }}
-        notification_title: '{workflow} has {status_message}'
-        message_format: '{emoji} *{workflow}* GraphQL schema validation {status_message} in <{repo_url}|{repo}@{branch}> on <{commit_url}|{commit_sha}>'
+        notification_title: '{workflow} has broken'
+        message_format: '{emoji} *{workflow}* GraphQL schema validation broken in <{repo_url}|{repo}@{branch}> on <{commit_url}|{commit_sha}>'
         footer: 'Repo <{repo_url}|{repo}>'
       env:
-        SLACK_WEBHOOK_URL: ${{ inputs.slackWebhookUrl }}
+        SLACK_WEBHOOK_URL: https://hooks.slack.com/services/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

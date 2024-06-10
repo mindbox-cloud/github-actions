@@ -7,19 +7,24 @@ const oldSchemaFile = process.argv[2]
 const newSchemaFile = process.argv[3]
 const allowBreakingChanges = process.argv[4] === 'true'
 const reportPath = process.argv[5]
+const logPath = process.argv[6]
 
 console.log('Args:', process.argv)
 console.log('Old schema file:', oldSchemaFile)
 console.log('New schema file:', oldSchemaFile)
 console.log('Allow breaking changes:', allowBreakingChanges)
 console.log('Report path:', reportPath)
+console.log('Log path:', logPath)
 
 runProcess('graphql-inspector', ['diff', oldSchemaFile, newSchemaFile])
     .then(async ({ code, output }) => {
-        const report = resolveReport(output)
+        const [report, log] = resolveReportAndLog(output)
         writeFileSync(reportPath, report)
+        writeFileSync(logPath, log)
         console.log('Report')
         console.log(report)
+        console.log('Log')
+        console.log(log)
 
         // don't care about errors if breaking changes are allowed
         if (allowBreakingChanges)
@@ -43,17 +48,17 @@ function runProcess(cmd, args) {
     });
 }
 
-function resolveReport(report) {
+function resolveReportAndLog(report) {
     if (report.includes('No changes detected'))
-        return `### ✅ Schema ${newSchemaFile} has no changes`
+        return [`### ✅ Schema ${newSchemaFile} has no changes`, '']
 
     if (report.includes('GraphQLError: Syntax Error') || report.includes('Unable to find any GraphQL type definitions for the following pointers'))
-        return `### ❌ Schema ${newSchemaFile} is broken and can't be validated`
+        return [`### ❌ Schema ${newSchemaFile} is broken and can't be validated`, report]
 
     if (report.includes('[error]'))
-        return `### ⚠️ Schema ${newSchemaFile} validation failed:\n\n${formatReport(report)}`;
+        return [`### ⚠️ Schema ${newSchemaFile} validation failed:\n\n${formatReport(report)}`, ''];
 
-    return `### ✅ Schema ${newSchemaFile} validation passed:\n\n${formatReport(report)}`;
+    return [`### ✅ Schema ${newSchemaFile} validation passed:\n\n${formatReport(report)}`, ''];
 }
 
 function formatReport(report) {
@@ -61,6 +66,6 @@ function formatReport(report) {
         .replaceAll('✖', '❌')
         .replaceAll('✔', '✅')
         .replaceAll('[log]', '')
-        .replaceAll('[error]','####')
+        .replaceAll('[error]', '####')
         .trim();
 }
