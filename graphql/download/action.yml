@@ -11,8 +11,11 @@ inputs:
   stopCommand:
     description: 'Command to stop GraphQL host'
     required: true
-  hostAddress:
-    description: 'GraphQL host address'
+  schemaUrl:
+    description: 'GraphQL schema URL'
+    required: true
+  schemaPath:
+    description: 'GraphQL schema path'
     required: true
 
 runs:
@@ -21,4 +24,4 @@ runs:
 
     - name: Download GraphQL schema
       shell: bash
-      run: ${{ github.action_path }}/download.sh ${{ inputs.directory }} ${{ inputs.startCommand }} ${{ inputs.stopCommand }} ${{ inputs.hostAddress }}
+      run: ${{ github.action_path }}/download.sh ${{ inputs.directory }} ${{ inputs.startCommand }} ${{ inputs.stopCommand }} ${{ inputs.schemaUrl }} ${{ inputs.schemaPath }}
