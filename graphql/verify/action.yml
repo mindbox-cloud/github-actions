@@ -11,7 +11,7 @@ inputs:
   allowBreakingChanges:
     description: 'Whether to allow breaking changes in new schema'
     required: true
-  frameworkAlertsWebhook:
+  frameworkAlertsWebhookUrl:
     description: 'Framework alerts Slack webhook'
     required: true
 
@@ -103,7 +103,7 @@ runs:
     - uses: rtCamp/action-slack-notify@v2
       if: ${{ !cancelled() && steps.validation.conclusion == 'failure' && steps.verify_log.outputs.log == 'error' }}
       env:
-        SLACK_WEBHOOK: ${{ inputs.frameworkAlertsWebhook }}
+        SLACK_WEBHOOK: ${{ inputs.frameworkAlertsWebhookUrl }}
         SLACK_USERNAME: GraphQL Validator
         SLACK_COLOR: failure
         SLACK_TITLE: GraphQL schema validation broken
