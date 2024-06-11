@@ -11,8 +11,9 @@ inputs:
   allowBreakingChanges:
     description: 'Whether to allow breaking changes in new schema'
     required: true
-
-outputs: {}
+  frameworkAlertsWebhook:
+    description: 'Framework alerts Slack webhook'
+    required: true
 
 runs:
   using: 'composite'
@@ -99,12 +100,10 @@ runs:
           echo 'log=ok' >> "$GITHUB_OUTPUT";
         fi
 
-    - uses: ravsamhq/notify-slack-action@v2
+    - uses: rtCamp/action-slack-notify@v2
       if: ${{ !cancelled() && steps.validation.conclusion == 'failure' && steps.verify_log.outputs.log == 'error' }}
-      with:
-        status: ${{ steps.validation.conclusion }}
-        notification_title: '{workflow} has {status_message}'
-        message_format: '{emoji} *{workflow}* GraphQL schema validation {status_message} in <{repo_url}|{repo}@{branch}> on <{commit_url}|{commit_sha}>'
-        footer: 'Repo <{repo_url}|{repo}>'
       env:
-        SLACK_WEBHOOK_URL: 'https://hooks.slack.com/services/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'
+        SLACK_WEBHOOK: ${{ inputs.frameworkAlertsWebhook }}
+        SLACK_USERNAME: GraphQL Validator
+        SLACK_COLOR: failure
+        SLACK_TITLE: GraphQL schema validation broken
