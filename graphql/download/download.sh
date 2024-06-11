@@ -7,6 +7,12 @@ stop_command=$3
 schema_url=$4
 schema_path=$5
 
+echo "directory: $directory"
+echo "start_command: $start_command"
+echo "stop_command: $stop_command"
+echo "schema_url: $schema_url"
+echo "schema_path: $schema_path"
+
 cd $directory || exit 1
 echo "start at $(pwd): $start_command"
 eval $start_command

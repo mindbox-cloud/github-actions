@@ -24,4 +24,4 @@ runs:
 
     - name: Download GraphQL schema
       shell: bash
-      run: ${{ github.action_path }}/download.sh ${{ inputs.directory }} ${{ inputs.startCommand }} ${{ inputs.stopCommand }} ${{ inputs.schemaUrl }} ${{ inputs.schemaPath }}
+      run: ${{ github.action_path }}/download.sh '${{ inputs.directory }}' '${{ inputs.startCommand }}' '${{ inputs.stopCommand }}' '${{ inputs.schemaUrl }}' '${{ inputs.schemaPath }}'
