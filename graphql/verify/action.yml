@@ -11,9 +11,6 @@ inputs:
   allowBreakingChanges:
     description: 'Whether to allow breaking changes in new schema'
     required: true
-  frameworkAlertsWebhookUrl:
-    description: 'Framework alerts Slack webhook'
-    required: true
 
 runs:
   using: 'composite'
@@ -79,7 +76,7 @@ runs:
           -v ${{ github.workspace }}:/w
           -v ${{ github.action_path }}/entrypoint.js:/w/entrypoint.js
         run: |
-          /w/entrypoint.js /w/${{ inputs.oldSchemaFile }} /w/${{ inputs.newSchemaFile }} ${{ inputs.allowBreakingChanges }} /w/${{ inputs.oldSchemaFile }}.report.txt /w/${{ inputs.oldSchemaFile }}.log.txt
+          /w/entrypoint.js /w/${{ inputs.oldSchemaFile }} /w/${{ inputs.newSchemaFile }} ${{ inputs.allowBreakingChanges }} /w/${{ inputs.oldSchemaFile }}.report.txt
 
     - name: Add comment with output to PR
       uses: mshick/add-pr-comment@v2
@@ -87,23 +84,3 @@ runs:
       with:
         message-path: |
           ${{ inputs.oldSchemaFile }}.report.txt
-
-    - name: Verify log file
-      id: verify_log
-      if: ${{ !cancelled() && steps.validation.conclusion == 'failure' }}
-      shell: bash
-      run: |
-        cat ${{ inputs.oldSchemaFile }}.log.txt
-        if [ $(cat ${{ inputs.oldSchemaFile }}.log.txt | wc -c) -gt 2 ]; then
-          echo 'log=error' >> "$GITHUB_OUTPUT";
-        else
-          echo 'log=ok' >> "$GITHUB_OUTPUT";
-        fi
-
-    - uses: rtCamp/action-slack-notify@v2
-      if: ${{ !cancelled() && steps.validation.conclusion == 'failure' && steps.verify_log.outputs.log == 'error' }}
-      env:
-        SLACK_WEBHOOK: ${{ inputs.frameworkAlertsWebhookUrl }}
-        SLACK_USERNAME: GraphQL Validator
-        SLACK_COLOR: failure
-        SLACK_TITLE: GraphQL schema validation broken
