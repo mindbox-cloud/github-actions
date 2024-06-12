@@ -2,6 +2,9 @@ name: Verify GraphQL Schema
 description: Verify GraphQL Schema
 
 inputs:
+  referenceSchemaFile:
+    description: 'Current schema file to validate against.'
+    required: true
   oldSchemaFile:
     description: 'Current schema file to validate against.'
     required: true
@@ -53,6 +56,28 @@ runs:
         echo ::group::Old schema
         cat ${{ inputs.oldSchemaFile }}
         echo ::endgroup::
+
+    - name: Checkout reference schema
+      uses: actions/checkout@v4
+      with:
+        path: reference
+        ref: ${{ github.base_ref }}
+        sparse-checkout: ${{ inputs.referenceSchemaFile }}
+        sparse-checkout-cone-mode: false
+
+    - name: Replace old schema with reference schema if they are not equal
+      shell: bash
+      run: |
+        if [ $(cmp -s ${{ inputs.oldSchemaFile }} reference/${{ inputs.referenceSchemaFile }} && echo 0 || echo 1) -eq 1 ]; then
+            echo 'Reference schema "reference/${{ inputs.referenceSchemaFile }}" differs from ${{ inputs.oldSchemaFile }}, sync from reference for verification'
+            echo ::group::Reference schema
+            cat reference/${{ inputs.referenceSchemaFile }}
+            echo ::endgroup::
+            cp reference/${{ inputs.referenceSchemaFile }} ${{ inputs.oldSchemaFile }}
+        else
+            echo 'Reference schema "reference/${{ inputs.referenceSchemaFile }}" equals to ${{ inputs.oldSchemaFile }}, no sync needed'
+        fi
+        rm -rf reference
 
     - name: Show new schema
       shell: bash
