@@ -10,7 +10,7 @@ const reportPath = process.argv[5]
 
 console.log('Args:', process.argv)
 console.log('Old schema file:', oldSchemaFile)
-console.log('New schema file:', oldSchemaFile)
+console.log('New schema file:', newSchemaFile)
 console.log('Allow breaking changes:', allowBreakingChanges)
 console.log('Report path:', reportPath)
 
