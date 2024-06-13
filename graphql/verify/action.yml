@@ -27,31 +27,26 @@ runs:
       shell: bash
       run: exit 1
 
-    - name: Check old schema presence
-      id: old_schema_presence
+    - name: Checkout reference schema
+      uses: actions/checkout@v4
+      with:
+        path: reference_graphql_schema
+        ref: ${{ github.base_ref }}
+        sparse-checkout: ${{ inputs.oldSchemaFile }}
+        sparse-checkout-cone-mode: false
+
+    - name: Check reference schema presence
+      id: reference_schema_presence
       uses: andstor/file-existence-action@v3
       with:
-        files: ${{ inputs.oldSchemaFile }}
+        files: reference_graphql_schema/${{ inputs.oldSchemaFile }}
 
-    - name: Check old schema is changed in PR
-      id: old_schema_touched
-      if: steps.old_schema_presence.outputs.files_exists == 'true'
-      uses: tj-actions/changed-files@v44
-      with:
-        files: |
-          ${{ inputs.oldSchemaFile }}
-
-    - name: Fail if old schema was touched
-      if: steps.old_schema_touched.outputs.any_changed == 'true'
-      shell: bash
-      run: exit 1
-
-    - name: Show old schema
-      if: steps.old_schema_presence.outputs.files_exists == 'true'
+    - name: Show reference schema
+      if: steps.reference_schema_presence.outputs.files_exists == 'true'
       shell: bash
       run: |
-        echo ::group::Old schema
-        cat ${{ inputs.oldSchemaFile }}
+        echo ::group::Reference schema
+        cat reference_graphql_schema/${{ inputs.oldSchemaFile }}
         echo ::endgroup::
 
     - name: Show new schema
@@ -64,19 +59,35 @@ runs:
     - name: Compare schemas
       id: compare_schemas
       shell: bash
-      run: echo "changed=$(cmp -s ${{ inputs.oldSchemaFile }} ${{ inputs.newSchemaFile }} && echo 0 || echo 1)" >> "$GITHUB_OUTPUT"
+      run: echo "changed=$(cmp -s reference_graphql_schema/${{ inputs.oldSchemaFile }} ${{ inputs.newSchemaFile }} && echo 0 || echo 1)" >> "$GITHUB_OUTPUT"
 
     - name: Validate schema
       id: validation
-      if: ${{ steps.old_schema_presence.outputs.files_exists == 'true' && steps.compare_schemas.outputs.changed == '1' }}
+      if: ${{ steps.reference_schema_presence.outputs.files_exists == 'true' && steps.compare_schemas.outputs.changed == '1' }}
       uses: mindbox-cloud/docker-run-action@v1
       with:
         image: kamilkisiela/graphql-inspector:latest
         options: |
-          -v ${{ github.workspace }}:/w
+          -v ${{ github.workspace }}/reference_graphql_schema/${{ inputs.oldSchemaFile }}:/w/${{ inputs.oldSchemaFile }}
+          -v ${{ github.workspace }}/${{ inputs.newSchemaFile }}:/w/${{ inputs.newSchemaFile }}
           -v ${{ github.action_path }}/entrypoint.js:/w/entrypoint.js
         run: |
-          /w/entrypoint.js /w/${{ inputs.oldSchemaFile }} /w/${{ inputs.newSchemaFile }} ${{ inputs.allowBreakingChanges }} /w/${{ inputs.oldSchemaFile }}.report.txt
+          cd /w/ && ./entrypoint.js ${{ inputs.oldSchemaFile }} ${{ inputs.newSchemaFile }} ${{ inputs.allowBreakingChanges }} ${{ inputs.oldSchemaFile }}.report.txt
+
+    - name: Copy new schema to committed schema
+      if: ${{ !cancelled() && (steps.validation.conclusion == 'skipped' || steps.validation.conclusion == 'failure') }}
+      shell: bash
+      run: cp -f ${{ inputs.newSchemaFile }} ${{ inputs.oldSchemaFile }}
+
+    - name: Commit new schema
+      if: ${{ !cancelled() && (steps.validation.conclusion == 'skipped' || steps.validation.conclusion == 'failure') }}
+      uses: EndBug/add-and-commit@v9
+      with:
+        new_branch: ${{ github.head_ref }}
+        add: ${{ inputs.oldSchemaFile }}
+        message: Commit updated ${{ inputs.oldSchemaFile }}
+        committer_name: GitHub Actions
+        committer_email: actions@github.com
 
     - name: Add comment with output to PR
       uses: mshick/add-pr-comment@v2
@@ -84,3 +95,8 @@ runs:
       with:
         message-path: |
           ${{ inputs.oldSchemaFile }}.report.txt
+
+    - name: Remove reference checkout
+      if: ${{ always() }}
+      shell: bash
+      run: rm -rf reference
