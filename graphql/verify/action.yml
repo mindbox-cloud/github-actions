@@ -74,16 +74,22 @@ runs:
         run: |
           cd /w/ && ./entrypoint.js ${{ inputs.oldSchemaFile }} ${{ inputs.newSchemaFile }} ${{ inputs.allowBreakingChanges }} ${{ inputs.oldSchemaFile }}.report.txt
 
+    - uses: actions/checkout@v4
+      if: ${{ !cancelled() && (steps.validation.conclusion == 'skipped' || steps.validation.conclusion == 'failure') }}
+      with:
+        path: updated_graphql_schema
+        ref: ${{ github.head_ref }}
+
     - name: Copy new schema to committed schema
       if: ${{ !cancelled() && (steps.validation.conclusion == 'skipped' || steps.validation.conclusion == 'failure') }}
       shell: bash
-      run: cp -f ${{ inputs.newSchemaFile }} ${{ inputs.oldSchemaFile }}
+      run: cp -f ${{ inputs.newSchemaFile }} updated_graphql_schema/${{ inputs.oldSchemaFile }}
 
     - name: Commit new schema
       if: ${{ !cancelled() && (steps.validation.conclusion == 'skipped' || steps.validation.conclusion == 'failure') }}
       uses: EndBug/add-and-commit@v9
       with:
-        new_branch: ${{ github.head_ref }}
+        cwd: updated_graphql_schema
         add: ${{ inputs.oldSchemaFile }}
         message: Commit updated ${{ inputs.oldSchemaFile }}
         committer_name: GitHub Actions
