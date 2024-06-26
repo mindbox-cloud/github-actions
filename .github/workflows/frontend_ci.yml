@@ -458,3 +458,4 @@ jobs:
             --apikey ${{ secrets.OCTOPUS_API_KEY }}
             --releasenotes "${{ steps.create-release.outputs.release-notes-body }}"
             --packageVersion ${{ steps.release-number.outputs.release-number }}
+            --forcePackageDownload
