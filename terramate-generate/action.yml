@@ -35,9 +35,13 @@ runs:
       with:
         branch: ${{ github.head_ref }}
     
-    - name: "Get commit SHA"
+    - name: "Get commit PR number"
       shell: bash
       run: echo "${{ github.event.number }}"
+
+    - name: "Get commit SHA"
+      shell: bash
+      run: echo "${{ steps.commit.outputs.commit_sha }}"
 
     - name: "Add comment if changes were detected"
       if: steps.commit.outputs.changes_detected == 'true'
