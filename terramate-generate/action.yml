@@ -8,7 +8,7 @@ inputs:
 outputs:
   commit_sha:
     description: "Commit sha of terramate generate output"
-    value:  ${{ steps.commit.outputs.commit_sha }}
+    value:  ${{ steps.commit.outputs.commit_hash }}
   changes_detected:
     description: "Were changes detected?"
     value:  ${{ steps.commit.outputs.changes_detected }}
@@ -41,7 +41,7 @@ runs:
 
     - name: "Get commit SHA"
       shell: bash
-      run: echo "${{ steps.commit.outputs.commit_sha }}"
+      run: echo "${{ steps.commit.outputs.commit_hash }}"
 
     - name: "Add comment if changes were detected"
       if: steps.commit.outputs.changes_detected == 'true'
