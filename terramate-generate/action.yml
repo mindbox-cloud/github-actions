@@ -6,7 +6,7 @@ inputs:
     required: true
 
 outputs:
-  commit_sha:
+  commit_hash:
     description: "Commit sha of terramate generate output"
     value:  ${{ steps.commit.outputs.commit_hash }}
   changes_detected:
