@@ -43,7 +43,7 @@ runs:
       if: steps.commit.outputs.changes_detected == 'true'
       uses: actions/github-script@v5
       with:
-        github-token: ${{secrets.GITHUB_TOKEN}}
+        github-token: ${{inputs.github-token}}
         script: |
           const issue_number = context.payload.pull_request.number;
           const comment = 'Terramate generate output was committed to your branch. Terraform plan checks have been launched on resulting commit hash, you can check their progress in the actions tab.';
