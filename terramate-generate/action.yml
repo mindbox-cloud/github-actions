@@ -1,0 +1,47 @@
+name: "Terramate generate"
+
+outputs:
+  commit_sha:
+    description: "Commit sha of terramate generate output"
+    value:  ${{ steps.commit.outputs.commit_sha }}
+  changes_detected:
+    description: "Were changes detected?"
+    value:  ${{ steps.commit.outputs.changes_detected }}
+runs:
+  using: "composite"
+  steps:
+    - name: "Checkout"
+      uses: actions/checkout@v3
+
+    - name: "Install terramate"
+      uses: terramate-io/terramate-action@v2
+
+    - name: "Check Terramate Formatting"
+      run: terramate fmt
+
+    - name: "Validate Stacks"
+      run: terramate generate
+
+    - name: "Add & Commit"
+      id: commit
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        branch: ${{ github.head_ref }}
+    
+    - name: "Get commit SHA"
+      run: echo "${{ github.event.number }}"
+
+    - name: "Add comment if changes were detected"
+      if: steps.commit.outputs.changes_detected == 'true'
+      uses: actions/github-script@v5
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          const issue_number = context.payload.pull_request.number;
+          const comment = 'Terramate generate output was committed to your branch. Terraform plan checks have been launched on resulting commit hash, you can check their progress in the actions tab.';
+          github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: issue_number,
+            body: comment
+          });
