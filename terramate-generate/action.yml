@@ -1,5 +1,10 @@
 name: "Terramate generate"
 
+inputs:
+  github-token:
+    description: 'Github token'
+    required: true
+
 outputs:
   commit_sha:
     description: "Commit sha of terramate generate output"
@@ -31,6 +36,7 @@ runs:
         branch: ${{ github.head_ref }}
     
     - name: "Get commit SHA"
+      shell: bash
       run: echo "${{ github.event.number }}"
 
     - name: "Add comment if changes were detected"
