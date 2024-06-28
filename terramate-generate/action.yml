@@ -17,9 +17,11 @@ runs:
       uses: terramate-io/terramate-action@v2
 
     - name: "Check Terramate Formatting"
+      shell: bash
       run: terramate fmt
 
     - name: "Validate Stacks"
+      shell: bash
       run: terramate generate
 
     - name: "Add & Commit"
