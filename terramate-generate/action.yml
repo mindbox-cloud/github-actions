@@ -46,7 +46,7 @@ runs:
         if [ "${{ steps.commit.outputs.changes_detected }}" == "true" ]; then
           echo "commit_hash=${{ steps.commit.outputs.commit_hash }}" >> $GITHUB_ENV
         else
-          echo "commit_hash=${{ env.current_commit_hash }}" >> $GITHUB_ENV
+          echo "commit_hash=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
         fi
       shell: bash
     
