@@ -18,11 +18,6 @@ runs:
     - name: "Checkout"
       uses: actions/checkout@v3
 
-    - name: "Get current commit hash"
-      shell: bash
-      id: get_current_commit
-      run: echo "::set-output name=current_commit_hash::$(git rev-parse HEAD)"
-
     - name: "Install terramate"
       uses: terramate-io/terramate-action@v2
 
@@ -44,9 +39,9 @@ runs:
       id: set_commit_hash
       run: |
         if [ "${{ steps.commit.outputs.changes_detected }}" == "true" ]; then
-          echo "commit_hash=${{ steps.commit.outputs.commit_hash }}" >> $GITHUB_ENV
+          echo "commit_hash=${{ steps.commit.outputs.commit_hash }}" >> $GITHUB_OUTPUT
         else
-          echo "commit_hash=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
+          echo "commit_hash=${{ github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
         fi
       shell: bash
     
