@@ -1,9 +1,14 @@
 name: "Terramate generate"
 
+inputs:
+  github-token:
+    description: 'Github token'
+    required: true
+
 outputs:
-  commit_sha:
+  commit_hash:
     description: "Commit sha of terramate generate output"
-    value:  ${{ steps.commit.outputs.commit_sha }}
+    value: ${{ steps.set_commit_hash.outputs.commit_hash }}
   changes_detected:
     description: "Were changes detected?"
     value:  ${{ steps.commit.outputs.changes_detected }}
@@ -17,9 +22,11 @@ runs:
       uses: terramate-io/terramate-action@v2
 
     - name: "Check Terramate Formatting"
+      shell: bash
       run: terramate fmt
 
     - name: "Validate Stacks"
+      shell: bash
       run: terramate generate
 
     - name: "Add & Commit"
@@ -27,15 +34,22 @@ runs:
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         branch: ${{ github.head_ref }}
-    
-    - name: "Get commit SHA"
-      run: echo "${{ github.event.number }}"
 
+    - name: "Set commit hash output"
+      id: set_commit_hash
+      run: |
+        if [ "${{ steps.commit.outputs.changes_detected }}" == "true" ]; then
+          echo "commit_hash=${{ steps.commit.outputs.commit_hash }}" >> $GITHUB_OUTPUT
+        else
+          echo "commit_hash=${{ github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
+        fi
+      shell: bash
+    
     - name: "Add comment if changes were detected"
       if: steps.commit.outputs.changes_detected == 'true'
       uses: actions/github-script@v5
       with:
-        github-token: ${{secrets.GITHUB_TOKEN}}
+        github-token: ${{inputs.github-token}}
         script: |
           const issue_number = context.payload.pull_request.number;
           const comment = 'Terramate generate output was committed to your branch. Terraform plan checks have been launched on resulting commit hash, you can check their progress in the actions tab.';
