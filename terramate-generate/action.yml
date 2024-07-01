@@ -19,6 +19,7 @@ runs:
       uses: actions/checkout@v3
 
     - name: "Get current commit hash"
+      shell: bash
       id: get_current_commit
       run: echo "::set-output name=current_commit_hash::$(git rev-parse HEAD)"
 
