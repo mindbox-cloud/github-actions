@@ -8,7 +8,7 @@ inputs:
 outputs:
   commit_hash:
     description: "Commit sha of terramate generate output"
-    value:  ${{ steps.commit.outputs.commit_hash }}
+    value: ${{ steps.set_commit_hash.outputs.commit_hash }}
   changes_detected:
     description: "Were changes detected?"
     value:  ${{ steps.commit.outputs.changes_detected }}
@@ -17,6 +17,10 @@ runs:
   steps:
     - name: "Checkout"
       uses: actions/checkout@v3
+
+    - name: "Get current commit hash"
+      id: get_current_commit
+      run: echo "::set-output name=current_commit_hash::$(git rev-parse HEAD)"
 
     - name: "Install terramate"
       uses: terramate-io/terramate-action@v2
@@ -34,15 +38,17 @@ runs:
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         branch: ${{ github.head_ref }}
+
+    - name: "Set commit hash output"
+      id: set_commit_hash
+      run: |
+        if [ "${{ steps.commit.outputs.changes_detected }}" == "true" ]; then
+          echo "commit_hash=${{ steps.commit.outputs.commit_hash }}" >> $GITHUB_ENV
+        else
+          echo "commit_hash=${{ env.current_commit_hash }}" >> $GITHUB_ENV
+        fi
+      shell: bash
     
-    - name: "Get commit PR number"
-      shell: bash
-      run: echo "${{ github.event.number }}"
-
-    - name: "Get commit SHA"
-      shell: bash
-      run: echo "${{ steps.commit.outputs.commit_hash }}"
-
     - name: "Add comment if changes were detected"
       if: steps.commit.outputs.changes_detected == 'true'
       uses: actions/github-script@v5
