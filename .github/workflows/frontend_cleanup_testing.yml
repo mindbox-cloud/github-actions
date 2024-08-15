@@ -29,7 +29,7 @@ on:
         required: true
       kube_dev_config:
         description: 'A DEV_FRONTEND_GHA_KUBE_CONFIG_DATA token passed from the caller workflow'
-        required: true
+        required: false
       container_registry_key:
         description: 'A CONTAINER_REGISTRY_KEY token passed from the caller workflow'
         required: true
