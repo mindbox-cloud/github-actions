@@ -123,7 +123,7 @@ jobs:
           MKF_NAMESPACE: ${{ env.mcf_namespace }}
       
       - name: Setup kubeconfig.yaml
-        working-directory: ./deploy/common-testing
+        working-directory: ./deploy/testing-common
         run: |
           cat ./kubeconfig.yaml
           sed -i "s~$TOKEN~$TOKEN~g" ./kubeconfig.yaml
