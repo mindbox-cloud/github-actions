@@ -84,11 +84,13 @@ public class BumpPackagesNotifierTests
             _repositories,
             _authors,
             1,
+            "testTeam",
             1,
             "http://localhots");
 
         await _notifier.ScanAndNotifyAsync();
 
+        Assert.AreEqual("testTeam", _request.Team);
         Assert.AreEqual(TestAuthor, _request.PullRequests[0].Author);
         Assert.AreEqual(1, _request.PullRequests.Count);
         Assert.AreEqual("t1", _request.PullRequests[0].Title);
@@ -118,6 +120,7 @@ public class BumpPackagesNotifierTests
             _repositories,
             _authors,
             1,
+            "testTeam",
             2,
             "http://localhots");
 
@@ -146,6 +149,7 @@ public class BumpPackagesNotifierTests
             _repositories,
             _authors,
             1,
+            "testTeam",
             2,
             "http://localhots");
 

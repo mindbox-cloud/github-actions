@@ -12,6 +12,7 @@ public class BumpPackagesNotifier
     private readonly IGitHubClient _githubClient;
     private readonly IEnumerable<string> _authors;
     private readonly int _timeout;
+    private readonly string _team;
     private readonly int _retries;
     private readonly string _grafanaUri;
     private readonly HttpClient _httpClient;
@@ -22,12 +23,14 @@ public class BumpPackagesNotifier
         IEnumerable<string> repositories,
         IEnumerable<string> authors,
         int timeout,
+        string team,
         int retries,
         string grafanaUri)
     {
         _repositories = repositories;
         _authors = authors;
         _timeout = timeout;
+        _team = team;
         _retries = retries;
         _grafanaUri = grafanaUri;
         _httpClient = httpClient;
@@ -38,6 +41,7 @@ public class BumpPackagesNotifier
     {
         var _messageToGrafana = new MessageToGrafanaDto()
         {
+            Team = _team,
             PullRequests = new List<ForgottenPullRequestDto>()
         };
 
