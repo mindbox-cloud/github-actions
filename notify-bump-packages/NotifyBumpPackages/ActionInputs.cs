@@ -9,10 +9,10 @@ public class ActionInputs
         HelpText = "Github token")]
     public string Token { get; set; } = null!;
 
-    [Option('i', "integration-uri",
+    [Option('t', "team",
         Required = true,
-        HelpText = "Grafana integration URI")]
-    public string IntegrationURI { get; set; } = null!;
+        HelpText = "Team to route warning message")]
+    public string Team { get; set; } = null!;
 
     [Option('a', "authors",
         Required = true,

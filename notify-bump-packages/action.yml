@@ -8,9 +8,9 @@ inputs:
     description:
       'Github token.'
     required: true
-  integration-uri:
+  team:
     description:
-      'Grafana integration URI which will receive alert messages'
+      'Team. For routing and group in grafana.'
     required: true
   authors:
     description:
@@ -34,8 +34,8 @@ runs:
   args:
     - '-k'
     - ${{ inputs.token }}
-    - '-i'
-    - ${{ inputs.integration-uri }}
+    - '-t'
+    - ${{ inputs.team }}
     - '-a'
     - ${{ inputs.authors }}
     - '-d'

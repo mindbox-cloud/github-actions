@@ -2,6 +2,9 @@
 using NotifyBumpPackages;
 using Octokit;
 
+const string grafanaUri =
+    @"https://a-prod-us-central-0.grafana.net/integrations/v1/formatted_webhook/4kI3HQb0Tg0G7pt25YXURTvBP/";
+
 var _options = Parser.Default.ParseArguments<ActionInputs>(args).Value;
 
 var _githubClient = new GitHubClient(new ProductHeaderValue("notify-bump-packages"))
@@ -19,7 +22,8 @@ var _notifier = new BumpPackagesNotifier(
     _repositories,
     _authors,
     _options.Timeout,
+    _options.Team,
     _options.Retries,
-    _options.IntegrationURI);
+    grafanaUri);
 
 await _notifier.ScanAndNotifyAsync();
