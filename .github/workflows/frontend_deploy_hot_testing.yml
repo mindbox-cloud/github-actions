@@ -28,7 +28,7 @@ on:
         description: "A FRONTEND_GHA_FULL_TOKEN token passed from the caller workflow"
         required: true
       kube_dev_config_k8:
-        description: "A A SA_TOKEN_DTLN_KUBE_CDP_STAGING_MICROFRONTENDS token passed from the caller workflow for new deploy"
+        description: "A SA_TOKEN_DTLN_KUBE_CDP_STAGING_MICROFRONTENDS token passed from the caller workflow for new deploy"
         required: false
       kube_token:
         description: "A SA_TOKEN_RU_STAGING_YC_KUBE_CDP_MIXED1_MICROFRONTENDS token passed from the caller workflow for deploy"
