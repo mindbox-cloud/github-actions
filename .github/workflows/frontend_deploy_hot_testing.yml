@@ -122,12 +122,27 @@ jobs:
           FRONTEND_CORE_SERVICE_NAME: ${{ env.frontend_core_service }}
           MKF_NAMESPACE: ${{ env.mcf_namespace }}
       
-      - name: Setup kubeconfig.yaml
-        working-directory: ./deploy/testing-common
+      - name: Setup kubeconfig
         run: |
-          cat ./kubeconfig.yaml
-          sed -i "s~$TOKEN~$TOKEN~g" ./kubeconfig.yaml
-          kubeconfig_encoded=$(base64 -w 0 ./kubeconfig.yaml)
+          kubeconfig_encoded=$(echo -n "apiVersion: v1
+          kind: Config
+          clusters:
+          - name: teleport.mindbox.ru-ru-staging-yc-kube-cdp-mixed1
+            cluster:
+              server: 'https://158.160.136.227'
+              certificate-authority-data: >-
+                LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM1ekNDQWMrZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJME1ERXlOVEUyTURRMU1Wb1hEVE0wTURFeU1qRTJNRFExTVZvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBS2ppCi90M2J4WXROeEcrdVZxVU1MbEpXZHpxVm55bDBTbXorbUxNYUJ5cWVGQXVPU0RacnRXek1keVFjZS9OV1dWNFEKNFRWb2xvc1dtcGI5TElFamVLSDc2N1lqOGx2Mmd4Vm9KRHlod0tPUEprWWk4aUVSYk9hb0tNSmdyUzVpNG1oUQpMT0NhZWpzZjg3Wi8zbGFpb1FQUm85cVptOFlVSndRN05CUzlvdmljaXRmZUttbUpZOHB2UVVucWNVL1luVnA5CkV5cm9jSUIwS1NkVkNSQVRtck5TRno4MjYrSXdUbnJ3K3ZFeEVhc2hBVVdTMGFERGRrSUtyc0FFZmg1WlFsQmUKejFDVmlkK2hHbXlKSGFGbGlIQm1xTWRQZWJmMnBmNWJDMTFCRm9KNCtrMndpeDQwTThWK1VHUlQrZEVZbi92cQpiNldhR1ZScTM4T0lTVU1PTHhjQ0F3RUFBYU5DTUVBd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0hRWURWUjBPQkJZRUZDL0lZVmlsSThpUFBrNXRuZkcvUEtEc2RoMlhNQTBHQ1NxR1NJYjMKRFFFQkN3VUFBNElCQVFDZ0Z1Qk5XczZpVVNFMTZiL3ZJbzBtQnI2amlrelhuekl1blBIZVUwZXNoNXBzRStqTAp5QVpzcVBvc3Z3S1QzS3N3djBGcFhPMWFFTTI0WjNRYUJIWldMbkVYSld2YnFySmpJOUpyNnkvbTl0VGtBY01rCjg5QVlMc2lqQWYyMS81WjlZTGVjSFN1WWd6ZUZSZFlCd25NUnpUeDNUazdHR1NXRE5kekd1aEl6MzhqRGdxL2IKLzcySTlEQ1hLTks2WUViOTJsT3JVRDBaM3ZTZUJSeHdNWlZ1dHlOKzE4UmI0ZDBCd2R4dXA0aktnNXlyU1o4ZApESnA3emZnRVN2NnF3ekpvdXhmS1crcGZ1eWM1bGlhSVJnUjhVbUYyK2g4VEVaZzc3L1ppd3J0YWorSkx5V2MvCk10aHFONkNhYkt6bEN0Z0FlNlArbk5sZjh1eHNnTlBWZzhyVQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+          users:
+          - name: frontend-gha
+            user:
+              token: $TOKEN
+          contexts:
+          - name: teleport.mindbox.ru-ru-staging-yc-kube-cdp-mixed1-frontend-gha
+            context:
+              user: frontend-gha
+              cluster: teleport.mindbox.ru-ru-staging-yc-kube-cdp-mixed1
+              namespace: microfrontends
+          current-context: teleport.mindbox.ru-ru-staging-yc-kube-cdp-mixed1-frontend-gha" | base64 -w 0)
           echo "KUBECONFIG_ENCODED=$kubeconfig_encoded" >> $GITHUB_ENV
         shell: bash
         env:
