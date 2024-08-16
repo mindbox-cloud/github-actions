@@ -57,16 +57,16 @@ on:
         required: true
       kube_dev_config:
         description: "A DEV_FRONTEND_GHA_KUBE_CONFIG_DATA token passed from the caller workflow"
-        required: true
+        required: false
       container_registry_key:
         description: "A CONTAINER_REGISTRY_KEY token passed from the caller workflow"
         required: true
       bucket_access_id:
         description: "A NEW_FRONTEND_STAGING_TEMPLATE_BUCKET_KEY_ID token passed from the caller workflow"
-        required: true
+        required: false
       bucket_access_key:
         description: "A NEW_FRONTEND_STAGING_TEMPLATE_BUCKET_ACCESS_KEY token passed from the caller workflow"
-        required: true
+        required: false
       cypress_login:
         description: "A CYPRESS_LOGIN token passed from the caller workflow"
         required: true
@@ -75,6 +75,9 @@ on:
         required: true
       kube_dev_config_k8:
         description: "A SA_TOKEN_DTLN_KUBE_CDP_STAGING_MICROFRONTENDS token passed from the caller workflow for new deploy"
+        required: false
+      kube_token:
+        description: "A SA_TOKEN_RU_STAGING_YC_KUBE_CDP_MIXED1_MICROFRONTENDS token passed from the caller workflow for deploy"
         required: false
 
 env:
