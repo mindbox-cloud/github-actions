@@ -36,6 +36,9 @@ on:
       slack_webhook_url:
         description: "A FRONTEND_PIPELINE_SLACK_WEBHOOK_URL token passed from the caller workflow"
         required: false
+      kube_token:
+        description: "A SA_TOKEN_RU_STAGING_YC_KUBE_CDP_MIXED1_MICROFRONTENDS token passed from the caller workflow for deploy"
+        required: true
     outputs:
       hot_testing_url:
         description: "Hot-testing url"
