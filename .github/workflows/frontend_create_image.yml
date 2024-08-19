@@ -122,8 +122,7 @@ jobs:
 
       - name: Copy Dockerfile to build folder
         run: |
-          cp ./deploy/mcf-release/Dockerfile ./build
-          cp ./deploy/mcf-release/nginx.conf ./build
+          cp ./deploy/hot-tesing/Dockerfile ./build/Dockerfile
 
       - name: Build docker image
         working-directory: ./build
