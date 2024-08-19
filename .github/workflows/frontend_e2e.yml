@@ -111,9 +111,9 @@ jobs:
         id: set_project
 
       - name: Checkout frontend-deploy repository
-        ref: ovchinnikova/ss/e2e-to-yc
         uses: actions/checkout@v3
         with:
+          ref: ovchinnikova/ss/e2e-to-yc
           repository: mindbox-cloud/frontend-deploy
           token: ${{ secrets.frontend_gha_full_token }}
           path: ./deploy
