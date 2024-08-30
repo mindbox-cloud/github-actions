@@ -92,7 +92,7 @@ jobs:
         run: mv ./hot_build/hot-testing/kubernetes/deploy-k8-micro.yml ./hot_build/hot-testing/kubernetes/deploy-k8.yml
       
       - name: Setup kubeconfig.yaml
-        working-directory: ./deploy/testing-common
+        working-directory: ./hot_build/testing-common
         run: |
           sed -i "s~TOKEN~$TOKEN~g" ./kubeconfig.yaml
           kubeconfig_encoded=$(base64 -w 0 ./kubeconfig.yaml)
