@@ -76,7 +76,7 @@ runs:
         node-version: 18
 
     - name: "Download Providers Artifact"
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       if: ${{ inputs.tfUseLocalSetup == 'true' }}
       with:
         name: tf-providers
