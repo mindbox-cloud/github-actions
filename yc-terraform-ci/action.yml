@@ -1,7 +1,7 @@
 name: 'Composite Terraform'
 description: 'Composite Terraform GitHub Actions'
 env:
-  
+
 inputs:
   tfUseLocalSetup:
     description: ''
@@ -14,7 +14,7 @@ inputs:
   terraformVersion:
     description: ''
     required: true
-  githubToken: 
+  githubToken:
     description: ''
     required: true
   mindboxOrgGithubToken:
@@ -71,7 +71,6 @@ runs:
 
     - name: "Setup Node & NPM"
       uses: actions/setup-node@v3
-      if: ${{ inputs.tfUseLocalSetup == 'true' }}
       with:
         node-version: 18
 
@@ -150,7 +149,7 @@ runs:
         fi
       working-directory: ${{ inputs.workingDir }}
       shell: bash
-      
+
     # - name: "---REMOVE THIS JOB---"
     #   run: |
     #     for line in ${{ inputs.planAdditionalVars }}
@@ -161,7 +160,7 @@ runs:
     #   working-directory: ${{ inputs.workingDir }}
     #   shell: bash
 
-    # FIXME: 
+    # FIXME:
     # https://github.com/actions/runner/issues/646
     - name: "Terraform Plan"
       id: plan
@@ -201,7 +200,7 @@ runs:
           if test "$(terraform show plan.tfplan | grep -oP '# module\.kafka.*[broker|zookeeper]\[\K(".*")(?=\]\..*updated in\-place)' | sort -u | wc -l)" -gt 1; then
             RED='\033[0;31m'
             echo -e "${RED} You must update kafka brokers and zookeepers one by one only!"
-          fi 
+          fi
         fi
       working-directory: ${{ inputs.workingDir }}
       shell: bash
@@ -222,7 +221,7 @@ runs:
         echo "${plan:0:65536}" >> $GITHUB_OUTPUT
         echo "$EOF" >> $GITHUB_OUTPUT
 
-    # for escape github debug stdout 
+    # for escape github debug stdout
     - name: "Create truncated plan file"
       id: create-truncated-plan-file
       working-directory: ${{ inputs.workingDir }}
@@ -261,11 +260,11 @@ runs:
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
             #### Terraform Validation 🤖${{ steps.validate.outputs.stdout }}
             #### Terraform Plan 📖\`Success with non-empty diff\`
-            
+
             <details><summary>Show Plan</summary>
-            
+
             ${planMessage}
-            
+
             </details>
 
             *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ inputs.workingDir }}\`, Workflow: \`${{ github.workflow }}\`*`;
