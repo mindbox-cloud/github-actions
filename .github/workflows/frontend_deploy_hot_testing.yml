@@ -148,7 +148,6 @@ jobs:
           retry_wait_seconds: 10
           command: |
             dig @8.8.8.8 -t cname +short hot-testing-${{ env.hash_payload }}-staging.mindbox.ru. | grep -q "ru-staging-yc-kube-cdp-mixed1-services.mindbox.ru." || \
-            dig @8.8.8.8 -t cname +short hot-testing-${{ env.hash_payload }}-staging.mindbox.ru. | grep -q "dtln-kube-cdp-staging-01-a-services.mindbox.ru." || \
             exit 1
         continue-on-error: true
 
