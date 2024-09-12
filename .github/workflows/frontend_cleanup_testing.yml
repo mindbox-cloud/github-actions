@@ -114,7 +114,7 @@ jobs:
 
       - name: Cleanup cluster from hot-testing
         if: ${{ inputs.hot_testing_k8 || inputs.hot_testing }}
-        uses: actions-hub/kubectl@master
+        uses: actions-hub/kubectl@v1.31.0
         env:
           KUBE_CONFIG: ${{ env.KUBECONFIG_ENCODED }}
         with:
@@ -133,7 +133,7 @@ jobs:
 
       - name: Cleanup cluster from e2e
         if: ${{ inputs.e2e_testing_k8 || inputs.e2e_testing }}
-        uses: actions-hub/kubectl@master
+        uses: actions-hub/kubectl@v1.31.0
         env:
           KUBE_CONFIG: ${{ env.KUBECONFIG_ENCODED }}
         with:
