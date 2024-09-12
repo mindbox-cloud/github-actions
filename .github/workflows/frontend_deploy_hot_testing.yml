@@ -132,7 +132,7 @@ jobs:
           TOKEN: ${{ secrets.kube_token }}
 
       - name: Deploy to cluster
-        uses: actions-hub/kubectl@master
+        uses: actions-hub/kubectl@v1.31.0
         env:
           KUBE_CONFIG: ${{ env.KUBECONFIG_ENCODED }}
         with:
