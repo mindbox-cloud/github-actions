@@ -43,6 +43,11 @@ on:
         default: false
         required: false
         type: boolean
+      component_tests:
+        description: "True if need run component tests"
+        default: false
+        required: false
+        type: boolean
       e2e_typechecking:
         description: "True if need to run check-types for E2E"
         default: false
@@ -176,6 +181,10 @@ jobs:
       - name: Run tests
         if: ${{ inputs.tests }}
         run: npm run test -- --maxConcurrency=1 --maxWorkers=1
+
+      - name: Run component tests
+        if: ${{ inputs.component_tests }}
+        run: npm run component-testing
 
       - name: Install E2E deps
         if: ${{ inputs.e2e_typechecking || inputs.e2e_linters }}
@@ -320,7 +329,7 @@ jobs:
         run: cp ./package.json ./build/
 
       - name: Upload statoscope artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.project_name }}-master-stats
           if-no-files-found: warn
@@ -339,6 +348,9 @@ jobs:
         run: |
           wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/master/mcf-release/Dockerfile
           wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/master/mcf-release/nginx.conf
+          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/master/mcf-release/current.conf
+          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/master/mcf-release/source.conf.template
+          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/master/mcf-release/edge.conf.template
         working-directory: ./build
 
         # needed for frontend discovery(build initial.js)
@@ -373,6 +385,9 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
         working-directory: ./e2e
+
+      - name: Authenticate in yandex registry
+        run: echo '${{ secrets.CONTAINER_REGISTRY_KEY }}' | docker login -u json_key --password-stdin cr.yandex
 
       - name: Download e2e tests Dockerfile
         if: ${{ inputs.e2e_tag }}
@@ -440,8 +455,10 @@ jobs:
             --server ${{ secrets.OCTOPUS_SERVER }}
             --project "${{ steps.set_variables.outputs.repository_name }}"-k8-deploy
             --version ${{ steps.release-number.outputs.release-number }}
+            --gitRef master
             --channel Default
             --tenant=*
             --apikey ${{ secrets.OCTOPUS_API_KEY }}
             --releasenotes "${{ steps.create-release.outputs.release-notes-body }}"
             --packageVersion ${{ steps.release-number.outputs.release-number }}
+            --forcePackageDownload
