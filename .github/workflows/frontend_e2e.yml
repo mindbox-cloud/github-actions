@@ -266,6 +266,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.npm_token }}
 
+      - name: Extract pull request number
+        if: ${{ inputs.cypress_dashboard_enabled }}
+        run: echo "E2E_PR_NUMBER=$(echo ${github.ref} | cut -d'/' -f3)" >> $GITHUB_ENV
+
       - name: Run E2E tests on not core project with dashboard
         uses: cypress-io/github-action@v5
         if: ${{ inputs.cypress_dashboard_enabled }}
@@ -280,6 +284,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
           NPM_TOKEN: ${{ secrets.npm_token }}
           CYPRESS_RECORD_KEY: ${{ secrets.cypress_record_key }}
+
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_RUN_ID: ${{ github.run_id }}
@@ -287,6 +292,9 @@ jobs:
           GITHUB_HEAD_REF: ${{ github.head_ref }}
           GITHUB_REF: ${{ github.ref }}
           GITHUB_SERVER_URL: ${{ github.server_url }}
+
+          CYPRESS_PULL_REQUEST_ID: ${{ env.E2E_PR_NUMBER }}
+          CYPRESS_PULL_REQUEST_URL: ${{ github.server_url }}/${{ github.repository }}/pull/${{ env.E2E_PR_NUMBER }}
 
       - name: Upload test results artifacts
         uses: actions/upload-artifact@v4
