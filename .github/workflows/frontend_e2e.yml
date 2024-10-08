@@ -271,7 +271,7 @@ jobs:
           browser: chrome
         env:
           NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.frontend_gha_full_token }}
           NPM_TOKEN: ${{ secrets.npm_token }}
 
       - name: Run E2E tests on not core project with dashboard
@@ -286,7 +286,7 @@ jobs:
           parallel: false
         env:
           NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.frontend_gha_full_token }}
           NPM_TOKEN: ${{ secrets.npm_token }}
           CYPRESS_RECORD_KEY: ${{ secrets.cypress_record_key }}
 
@@ -461,7 +461,7 @@ jobs:
         uses: mshick/add-pr-comment@v2
         with:
           message: ":negative_squared_cross_mark: E2E tests failed. Check logs at\nhttps://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token: ${{ secrets.frontend_gha_full_token }}
 
   clean-up-e2e-tests:
     needs: [e2e-tests, core-e2e-tests-runner]
