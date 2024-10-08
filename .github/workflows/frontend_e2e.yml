@@ -48,11 +48,11 @@ on:
         description: "The port for k8 services"
         required: false
         default: 8080
-      cypress_project_id:
-        description: "Cypress dashboard project id"
-        default: ""
+      cypress_dashboard_enabled:
+        description: "Cypress dashboard enabled"
+        default: false
         required: false
-        type: string
+        type: boolean
     secrets:
       npm_token:
         description: "A GH_NPM_REGISTRY token passed from the caller workflow"
@@ -263,7 +263,7 @@ jobs:
 
       - name: Run E2E tests on not core project
         uses: cypress-io/github-action@v5
-        if: ${{ inputs.cypress_project_id == '' }}
+        if: ${{ !inputs.cypress_dashboard_enabled }}
         with:
           install: true
           config: baseUrl=https://e2e-testing-${{ env.hash_payload }}-staging.mindbox.ru,retries=${{ env.retries }},videoUploadOnPasses=false,videoCompression=false
@@ -276,7 +276,7 @@ jobs:
 
       - name: Run E2E tests on not core project with dashboard
         uses: cypress-io/github-action@v5
-        if: ${{ inputs.cypress_project_id != '' }}
+        if: ${{ inputs.cypress_dashboard_enabled }}
         with:
           install: true
           config: baseUrl=https://e2e-testing-${{ env.hash_payload }}-staging.mindbox.ru,retries=${{ env.retries }},videoUploadOnPasses=false,videoCompression=false
@@ -288,7 +288,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.npm_token }}
-          CYPRESS_PROJECT_ID: ${{ inputs.cypress_project_id }}
           CYPRESS_RECORD_KEY: ${{ secrets.cypress_record_key }}
 
       - name: Upload test results artifacts
