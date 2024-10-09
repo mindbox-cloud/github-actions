@@ -280,14 +280,12 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
           NPM_TOKEN: ${{ secrets.npm_token }}
           CYPRESS_RECORD_KEY: ${{ secrets.cypress_record_key }}
-
           COMMIT_INFO_BRANCH: ${{ github.head_ref }}
           COMMIT_INFO_MESSAGE: ${{ github.event.pull_request.title }}
           COMMIT_INFO_EMAIL: ${{ github.event.pull_request.user.email }}
           COMMIT_INFO_AUTHOR: ${{ github.event.pull_request.user.login }}
           COMMIT_INFO_SHA: ${{ github.event.pull_request.head.sha }}
           COMMIT_INFO_REMOTE: ${{ github.server_url }}/${{ github.repository }}.git
-
           CYPRESS_PULL_REQUEST_ID: ${{ github.event.pull_request.number }}
           CYPRESS_PULL_REQUEST_URL: ${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.pull_request.number }}
 
