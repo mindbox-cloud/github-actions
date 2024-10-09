@@ -266,11 +266,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.npm_token }}
 
-      - name: Extract pull request number
-        if: ${{ inputs.cypress_dashboard_enabled }}
-        shell: bash
-        run: echo "E2E_PR_NUMBER=$(echo ${github.ref} | cut -d'/' -f3)" >> $GITHUB_ENV
-
       - name: Run E2E tests on not core project with dashboard
         uses: cypress-io/github-action@v5
         if: ${{ inputs.cypress_dashboard_enabled }}
@@ -288,8 +283,8 @@ jobs:
 
           COMMIT_INFO_BRANCH: ${{ github.head_ref }}
           COMMIT_INFO_MESSAGE: ${{ github.event.pull_request.title }}
-          COMMIT_INFO_EMAIL: ${{ github.event.pull_request.head.user.email }}
-          COMMIT_INFO_AUTHOR: ${{ github.event.pull_request.head.user.name }}
+          COMMIT_INFO_EMAIL: ${{ github.event.pull_request.user.email }}
+          COMMIT_INFO_AUTHOR: ${{ github.event.pull_request.user.login }}
           COMMIT_INFO_SHA: ${{ github.event.pull_request.head.sha }}
           COMMIT_INFO_REMOTE: ${{ github.server_url }}/${{ github.repository }}.git
 
