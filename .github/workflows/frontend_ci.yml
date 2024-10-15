@@ -349,7 +349,7 @@ jobs:
           wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/master/mcf-release/Dockerfile
           wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/master/mcf-release/nginx.conf
           wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/master/mcf-release/current.conf
-          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/zlebnik-patch-1/mcf-release/source.conf.template
+          wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/master/mcf-release/source.conf.template
         working-directory: ./build
 
         # needed for frontend discovery(build initial.js)
