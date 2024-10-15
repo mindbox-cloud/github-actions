@@ -119,11 +119,12 @@ jobs:
         id: set_project
 
       - name: Checkout frontend-deploy repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: mindbox-cloud/frontend-deploy
           token: ${{ secrets.frontend_gha_full_token }}
           path: ./deploy
+          ref: fix-less-requests
 
       - name: Select core deploy.yml
         if: ${{ env.repository_name == 'frontend-core-v2' }}
