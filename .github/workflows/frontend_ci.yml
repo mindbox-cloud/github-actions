@@ -73,15 +73,6 @@ on:
         default: ""
         required: false
         type: string
-      sentry_autobugs_enabled:
-        description: "Sentry autobugs mindbox enabled"
-        required: false
-        type: boolean
-      sentry_autobugs_project:
-        description: "Sentry autobugs mindbox project"
-        required: false
-        default: ""
-        type: string
       commit_release_version:
         type: boolean
         description: "True if need to commit release version to package.json"
@@ -115,12 +106,6 @@ on:
         required: true
       frontend_webhook_to_amixr:
         description: "A url where to send a crash notification"
-        required: false
-      sentry_autobugs_auth_token:
-        description: "Sentry autobugs mindbox auth token"
-        required: false
-      sentry_autobugs_dsn:
-        description: "Sentry autobugs mindbox dsn"
         required: false
       pipelines_release_submit_token:
         description: "Pipeline metrics auth token"
@@ -228,8 +213,6 @@ jobs:
       registry: cr.yandex/${{ inputs.registry_id }}
       e2e-image: ${{ inputs.e2e_image }}
       e2e-tag: ${{ inputs.e2e_tag }}
-      sentry_autobugs_url: https://autobugs.mindbox.ru
-      sentry_autobugs_org: mindbox
 
     steps:
       - name: Set variables
@@ -315,13 +298,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_NPM_REGISTRY: ${{ secrets.gh_npm_registry }}
-          SENTRY_AUTOBUGS_AUTH_TOKEN: ${{ secrets.sentry_autobugs_auth_token }}
-          SENTRY_AUTOBUGS_DSN: ${{ secrets.sentry_autobugs_dsn }}
-          SENTRY_AUTOBUGS_ENABLED: ${{ inputs.sentry_autobugs_enabled }}
-          SENTRY_AUTOBUGS_ORG: ${{ env.sentry_autobugs_org }}
-          SENTRY_AUTOBUGS_PROJECT: ${{ inputs.sentry_autobugs_project }}
-          SENTRY_AUTOBUGS_URL: ${{ env.sentry_autobugs_url }}
-          SENTRY_AUTOBUGS_RELEASE: ${{ steps.release-number.outputs.release-number }} (${{ github.sha }})
           MCF_STATIC_FOLDER: v2_static
 
       - name: Copy package.json to build folder
