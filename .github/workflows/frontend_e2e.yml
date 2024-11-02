@@ -216,6 +216,9 @@ jobs:
       - name: downgrade npm
         run: npm -g install npm@9
 
+      - name: uninstall edge
+        run: apt-get -y remove microsoft-edge-stable
+
       - name: install additional tools
         run: apt-get update && apt-get -y install jq
 
