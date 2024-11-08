@@ -217,6 +217,7 @@ jobs:
 
       - name: Run bundlemon
         env:
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
           LIMIT: ${{ inputs.bundle_limit }}
         run: npm i @mindbox-cloud/frontend-shared-configs@3.1.0 && npx -y bundlemon --config ./node_modules/@mindbox-cloud/frontend-shared-configs/bundlemon/index.js
   
