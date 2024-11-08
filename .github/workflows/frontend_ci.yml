@@ -215,11 +215,14 @@ jobs:
         run: npm run e2e:check-scripts
         working-directory: ./e2e
 
-      - name: Run bundlemon
+      - name: Install shared configs
         env:
           NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
+        run: npm i @mindbox-cloud/frontend-shared-configs@3.1.1
+      - name: Run bundlemon
+        env:
           LIMIT: ${{ inputs.bundle_limit }}
-        run: npm i @mindbox-cloud/frontend-shared-configs@3.1.0 && npx -y bundlemon --config ./node_modules/@mindbox-cloud/frontend-shared-configs/bundlemon/index.js
+        run: npx -y bundlemon --config ./node_modules/@mindbox-cloud/frontend-shared-configs/bundlemon/index.js
   
   autoapprove:
     needs: checking
