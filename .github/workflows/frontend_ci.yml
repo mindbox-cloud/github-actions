@@ -215,6 +215,10 @@ jobs:
         run: npm run e2e:check-scripts
         working-directory: ./e2e
 
+      - name: Build for bundlemon
+        env:
+          NODE_ENV: production
+        run: npm run build
       - name: Install shared configs
         env:
           NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
