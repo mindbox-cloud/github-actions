@@ -30,7 +30,7 @@ inputs:
     required: true
   sourceRegistry:
     description: 'Registry or namespace where the Docker image originates before re-tagging for deployment.'
-    required: true
+    required: false
     default: 'local'
   repositories:
     description: 'Comma separated (e.g. a,b,c). Images local/repo[0]/localTag MUST be pre-built'
