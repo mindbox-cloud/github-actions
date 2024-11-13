@@ -4,18 +4,18 @@ inputs:
   awsAccessKey:
     description: 'Required if "aws" registry is set.'
     required: false
-  awsSecretKey: 
+  awsSecretKey:
     description: 'Required if "aws" registry is set.'
     required: false
-  awsRegion: 
+  awsRegion:
     description: 'Required if "aws" registry is set.'
     required: false
     default: 'eu-central-1'
-  awsAccountId: 
+  awsAccountId:
     description: 'Required if "aws" registry is set.'
     required: false
     default: '515260921971'
-  awsOrganizationId: 
+  awsOrganizationId:
     description: 'Required if "aws" registry is set.'
     required: false
   yandexContainerRegistryId:
@@ -28,13 +28,17 @@ inputs:
   registries:
     description: 'Comma separated registries. Valid values are: "yc", "aws"'
     required: true
-  repositories: 
+  sourceRegistry:
+    description: 'Registry or namespace where the Docker image originates before re-tagging for deployment.'
+    required: true
+    default: 'local'
+  repositories:
     description: 'Comma separated (e.g. a,b,c). Images local/repo[0]/localTag MUST be pre-built'
     required: true
-  localTag: 
+  localTag:
     description: 'Tag for locally built image.'
     required: true
-  targetTags: 
+  targetTags:
     description: 'Comma separated (e.g. a,b,c).'
     required: true
 outputs: {}
@@ -49,7 +53,7 @@ runs:
         aws configure set aws_secret_access_key ${{ inputs.awsSecretKey }}
         aws configure set region ${{ inputs.awsRegion }}
 
-    - name: Login to Amazon ECR Private
+    - name: Login to Amazon ECR
       if: ${{ contains(inputs.registries, 'aws') }}
       uses: nick-fields/retry@v3
       env:
@@ -74,7 +78,7 @@ runs:
       run: |
         sed -i -e 's/ORGANIZATION_ID/${{ inputs.awsOrganizationId }}/g' ecr-policy.json
 
-    - name: Define try create AWS repositories function
+    - name: Create AWS ECR repositories if needed
       if: ${{ contains(inputs.registries, 'aws') }}
       uses: nick-fields/retry@v3
       with:
@@ -83,11 +87,13 @@ runs:
         max_attempts: 3
         shell: bash
         command: |
-          rc=/tmp/rc
-
-          echo 'function try_create_aws_ecr { aws ecr describe-repositories --repository-names $1 || {
-          aws ecr create-repository --repository-name $1
-          && aws ecr set-repository-policy --repository-name $1 --policy-text file://ecr-policy.json; }; }' >> $rc
+          IFS=',' read -r -a array <<< "${{ inputs.repositories }}"
+          for repo in "${array[@]}"
+          do
+            aws ecr describe-repositories --repository-names $repo || \
+            aws ecr create-repository --repository-name $repo && \
+            aws ecr set-repository-policy --repository-name $repo --policy-text file://${{ github.action_path }}/ecr-policy.json
+          done
         on_retry_command: |
           ping -c 5 aws.amazon.com
           nslookup aws.amazon.com
@@ -104,15 +110,13 @@ runs:
         max_attempts: 3
         shell: bash
         command: |
-          source /tmp/rc
           IFS=',' read -r -a array <<< "${{ inputs.repositories }}"
           for repo in "${array[@]}"
           do
-            try_create_aws_ecr "$repo"
             IFS=',' read -r -a tags <<< "${{ inputs.targetTags }}"
             for targetTag in "${tags[@]}"
             do
-              docker tag local/$repo:${{ inputs.localTag }} ${{ env.AWS_REGISTRY }}/$repo:$targetTag
+              docker tag ${{ inputs.sourceRegistry }}/$repo:${{ inputs.localTag }} ${{ env.AWS_REGISTRY }}/$repo:$targetTag
               docker push ${{ env.AWS_REGISTRY }}/$repo:$targetTag
             done
           done
@@ -121,7 +125,7 @@ runs:
           nslookup ${{ env.AWS_REGISTRY }}
           nc -vz4 ${{ env.AWS_REGISTRY }} 443
     
-    - name: authenticate in yandex registry
+    - name: Authenticate in Yandex CR
       if: ${{ contains(inputs.registries, 'yc') }}
       uses: nick-fields/retry@v3
       with:
@@ -135,7 +139,7 @@ runs:
           nslookup cr.yandex
           nc -vz4 cr.yandex 443
 
-    - name: Push to yandex CR
+    - name: Push to Yandex CR
       if: ${{ contains(inputs.registries, 'yc') }}
       uses: nick-fields/retry@v3
       env:
@@ -152,7 +156,7 @@ runs:
             IFS=',' read -r -a tags <<< "${{ inputs.targetTags }}"
             for targetTag in "${tags[@]}"
             do
-              docker tag local/$repo:${{ inputs.localTag }} ${{ env.YC_REGISTRY }}/$repo:$targetTag
+              docker tag ${{ inputs.sourceRegistry }}/$repo:${{ inputs.localTag }} ${{ env.YC_REGISTRY }}/$repo:$targetTag
               docker push ${{ env.YC_REGISTRY }}/$repo:$targetTag
             done
           done
