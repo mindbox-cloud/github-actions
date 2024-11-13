@@ -216,6 +216,9 @@ jobs:
       - name: downgrade npm
         run: npm -g install npm@9
 
+      - name: uninstall edge
+        run: apt-get -y remove microsoft-edge-stable
+
       - name: install additional tools
         run: apt-get update && apt-get -y install jq
 
@@ -255,26 +258,12 @@ jobs:
 
       - name: Run E2E tests on not core project
         uses: cypress-io/github-action@v5
-        if: ${{ !inputs.cypress_dashboard_enabled }}
         with:
           install: true
           config: baseUrl=https://e2e-testing-${{ env.hash_payload }}-staging.mindbox.ru,retries=${{ env.retries }},videoUploadOnPasses=false,videoCompression=false
           working-directory: e2e
           browser: chrome
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.npm_token }}
-
-      - name: Run E2E tests on not core project with dashboard
-        uses: cypress-io/github-action@v5
-        if: ${{ inputs.cypress_dashboard_enabled }}
-        with:
-          install: true
-          config: baseUrl=https://e2e-testing-${{ env.hash_payload }}-staging.mindbox.ru,retries=${{ env.retries }},videoUploadOnPasses=false,videoCompression=false
-          working-directory: e2e
-          browser: chrome
-          record: true
+          record: false
           parallel: false
         env:
           NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
