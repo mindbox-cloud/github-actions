@@ -11,17 +11,9 @@ inputs:
     description: 'Required if "aws" registry is set.'
     required: false
     default: 'eu-central-1'
-  awsAccountId: 
-    description: 'Required if "aws" registry is set.'
-    required: false
-    default: '515260921971'
   awsOrganizationId: 
     description: 'Required if "aws" registry is set.'
     required: false
-  yandexContainerRegistryId:
-    description: 'Required if "yc" registry is set.'
-    required: false
-    default: 'crpo9tj76o3c7pi8i72n'
   yandexContainerRegistryKey:
     description: 'Required if "yc" registry is set.'
     required: false
@@ -43,29 +35,16 @@ runs:
   steps:
     - name: Configure AWS Credentials
       if: ${{ contains(inputs.registries, 'aws') }}
-      shell: bash
-      run: |
-        aws configure set aws_access_key_id ${{ inputs.awsAccessKey }}
-        aws configure set aws_secret_access_key ${{ inputs.awsSecretKey }}
-        aws configure set region ${{ inputs.awsRegion }}
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ inputs.awsAccessKey }}
+        aws-secret-access-key: ${{ inputs.awsSecretKey }}
+        aws-region: ${{ inputs.awsRegion }}
 
     - name: Login to Amazon ECR Private
       if: ${{ contains(inputs.registries, 'aws') }}
-      uses: nick-fields/retry@v3
-      env:
-        AWS_REGISTRY: "${{ inputs.awsAccountId }}.dkr.ecr.${{ inputs.awsRegion }}.amazonaws.com"
-      with:
-        timeout_seconds: 60
-        retry_wait_seconds: 1
-        max_attempts: 3
-        shell: bash
-        command: |
-          aws ecr get-login-password --region ${{ inputs.awsRegion }} | \
-          docker login --username AWS --password-stdin ${{ env.AWS_REGISTRY }}
-        on_retry_command: |
-          ping -c 5 aws.amazon.com
-          nslookup aws.amazon.com
-          nc -vz4 aws.amazon.com 443
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
 
     - name: Prepare policy file
       if: ${{ contains(inputs.registries, 'aws') }}
@@ -76,87 +55,53 @@ runs:
 
     - name: Define try create AWS repositories function
       if: ${{ contains(inputs.registries, 'aws') }}
-      uses: nick-fields/retry@v3
-      with:
-        timeout_seconds: 60
-        retry_wait_seconds: 1
-        max_attempts: 3
-        shell: bash
-        command: |
-          rc=/tmp/rc
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: >
+        rc=/tmp/rc
 
-          echo 'function try_create_aws_ecr { aws ecr describe-repositories --repository-names $1 || {
-          aws ecr create-repository --repository-name $1
-          && aws ecr set-repository-policy --repository-name $1 --policy-text file://ecr-policy.json; }; }' >> $rc
-        on_retry_command: |
-          ping -c 5 aws.amazon.com
-          nslookup aws.amazon.com
-          nc -vz4 aws.amazon.com 443
+        echo 'function try_create_aws_ecr { aws ecr describe-repositories --repository-names $1 || {
+        aws ecr create-repository --repository-name $1
+        && aws ecr set-repository-policy --repository-name $1 --policy-text file://ecr-policy.json; }; }' >> $rc
 
     - name: Push to AWS ECR
       if: ${{ contains(inputs.registries, 'aws') }}
-      uses: nick-fields/retry@v3
+      shell: bash
+      working-directory: ${{ github.action_path }}
       env:
-        AWS_REGISTRY: "${{ inputs.awsAccountId }}.dkr.ecr.${{ inputs.awsRegion }}.amazonaws.com"
-      with:
-        timeout_seconds: 120
-        retry_wait_seconds: 1
-        max_attempts: 3
-        shell: bash
-        command: |
-          source /tmp/rc
-          IFS=',' read -r -a array <<< "${{ inputs.repositories }}"
-          for repo in "${array[@]}"
+        registry: ${{ steps.login-ecr.outputs.registry }}
+      run: |
+        source /tmp/rc
+        IFS=',' read -r -a array <<< "${{ inputs.repositories }}"
+        for repo in "${array[@]}"
+        do          
+          try_create_aws_ecr "$repo"
+          IFS=',' read -r -a tags <<< "${{ inputs.targetTags }}"
+          for targetTag in "${tags[@]}"
           do
-            try_create_aws_ecr "$repo"
-            IFS=',' read -r -a tags <<< "${{ inputs.targetTags }}"
-            for targetTag in "${tags[@]}"
-            do
-              docker tag local/$repo:${{ inputs.localTag }} ${{ env.AWS_REGISTRY }}/$repo:$targetTag
-              docker push ${{ env.AWS_REGISTRY }}/$repo:$targetTag
-            done
+            docker tag local/$repo:${{ inputs.localTag }} ${{ env.registry }}/$repo:$targetTag
+            docker push ${{ env.registry }}/$repo:$targetTag
           done
-        on_retry_command: |
-          ping -c 5 ${{ env.AWS_REGISTRY }}
-          nslookup ${{ env.AWS_REGISTRY }}
-          nc -vz4 ${{ env.AWS_REGISTRY }} 443
+        done
     
     - name: authenticate in yandex registry
       if: ${{ contains(inputs.registries, 'yc') }}
-      uses: nick-fields/retry@v3
-      with:
-        timeout_seconds: 60
-        retry_wait_seconds: 1
-        max_attempts: 3
-        shell: bash
-        command: echo '${{ inputs.yandexContainerRegistryKey }}' | docker login -u json_key --password-stdin cr.yandex
-        on_retry_command: |
-          ping -c 5 cr.yandex
-          nslookup cr.yandex
-          nc -vz4 cr.yandex 443
+      shell: bash
+      run: echo '${{ inputs.yandexContainerRegistryKey }}' | docker login -u json_key --password-stdin cr.yandex
 
     - name: Push to yandex CR
       if: ${{ contains(inputs.registries, 'yc') }}
-      uses: nick-fields/retry@v3
+      shell: bash
       env:
-        YC_REGISTRY: "cr.yandex/${{ inputs.yandexContainerRegistryId }}"
-      with:
-        timeout_seconds: 120
-        retry_wait_seconds: 1
-        max_attempts: 3
-        shell: bash
-        command: |
-          IFS=',' read -r -a array <<< "${{ inputs.repositories }}"
-          for repo in "${array[@]}"
+        registry: cr.yandex/crpo9tj76o3c7pi8i72n
+      run: |
+        IFS=',' read -r -a array <<< "${{ inputs.repositories }}"
+        for repo in "${array[@]}"
+        do
+          IFS=',' read -r -a tags <<< "${{ inputs.targetTags }}"
+          for targetTag in "${tags[@]}"
           do
-            IFS=',' read -r -a tags <<< "${{ inputs.targetTags }}"
-            for targetTag in "${tags[@]}"
-            do
-              docker tag local/$repo:${{ inputs.localTag }} ${{ env.YC_REGISTRY }}/$repo:$targetTag
-              docker push ${{ env.YC_REGISTRY }}/$repo:$targetTag
-            done
+            docker tag local/$repo:${{ inputs.localTag }} ${{ env.registry }}/$repo:$targetTag
+            docker push ${{ env.registry }}/$repo:$targetTag
           done
-        on_retry_command: |
-          ping -c 5 cr.yandex
-          nslookup cr.yandex
-          nc -vz4 cr.yandex 443
+        done
