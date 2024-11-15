@@ -33,7 +33,7 @@ jobs:
       amixrWebhookUrl: ${{ secrets.amixrWebhookUrl }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: phrase pull
         uses: mindbox-cloud/github-actions/localization/phrase-pull@master
