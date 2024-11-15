@@ -47,7 +47,7 @@ jobs:
 
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Change Dockerd param
         run: |
@@ -81,7 +81,7 @@ jobs:
         id: set_project
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           always-auth: true
           node-version: ${{ inputs.node_version }}
@@ -100,7 +100,7 @@ jobs:
         run: echo '${{ secrets.container_registry_key }}' | docker login -u json_key --password-stdin cr.yandex
 
       - name: Checkout frontend-deploy repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: mindbox-cloud/frontend-deploy
           token: ${{ secrets.frontend_gha_full_token }}
