@@ -85,7 +85,7 @@ jobs:
 
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Change Dockerd param
         run: |
@@ -119,7 +119,7 @@ jobs:
         id: set_project
 
       - name: Checkout frontend-deploy repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: mindbox-cloud/frontend-deploy
           token: ${{ secrets.frontend_gha_full_token }}
@@ -223,7 +223,7 @@ jobs:
         run: apt-get update && apt-get -y install jq
 
       - name: Checkout the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set variables
         run: |
@@ -301,7 +301,7 @@ jobs:
 
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set variables
         run: |
@@ -369,7 +369,7 @@ jobs:
         run: echo "previous steps are failed" && exit 1
 
       - name: Checkout the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set variables
         run: |
