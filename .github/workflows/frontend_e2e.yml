@@ -250,7 +250,7 @@ jobs:
         id: set_project
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           always-auth: true
           node-version: ${{ inputs.node_version }}
@@ -328,7 +328,7 @@ jobs:
         id: set_project
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           always-auth: true
           node-version: ${{ inputs.node_version }}
@@ -396,7 +396,7 @@ jobs:
         id: set_project
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           always-auth: true
           node-version: ${{ inputs.node_version }}
