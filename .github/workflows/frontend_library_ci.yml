@@ -52,7 +52,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -62,7 +62,7 @@ jobs:
           skipInclusionCheck: true
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.node_version }}
           registry-url: "https://npm.pkg.github.com/mindbox-cloud"
@@ -76,7 +76,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
 
       - name: Cache node modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./node_modules
           key: npm-ci-${{ github.sha }}
@@ -105,19 +105,19 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.frontend_gha_full_token }}
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           always-auth: true
           node-version: ${{ inputs.node_version }}
           registry-url: "https://npm.pkg.github.com/mindbox-cloud"
 
       - name: Cache node modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cache_node_modules
         with:
           path: ./node_modules
