@@ -45,7 +45,7 @@ jobs:
     steps:
 
       - name: Checkout frontend-deploy repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: mindbox-cloud/frontend-deploy
           token: ${{ secrets.frontend_gha_full_token }}
