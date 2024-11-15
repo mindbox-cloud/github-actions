@@ -16,7 +16,7 @@ jobs:
       amixrWebhookUrl: ${{ secrets.amixrWebhookUrl }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: phrase push
         uses: mindbox-cloud/github-actions/localization/phrase-push@master
