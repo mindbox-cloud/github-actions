@@ -118,6 +118,7 @@ runs:
             do
               docker tag ${{ inputs.sourceRegistry }}/$repo:${{ inputs.localTag }} ${{ env.AWS_REGISTRY }}/$repo:$targetTag
               docker push ${{ env.AWS_REGISTRY }}/$repo:$targetTag
+              docker image rm ${{ env.AWS_REGISTRY }}/$repo:$targetTag
               docker pull ${{ env.AWS_REGISTRY }}/$repo:$targetTag
             done
           done
@@ -159,6 +160,7 @@ runs:
             do
               docker tag ${{ inputs.sourceRegistry }}/$repo:${{ inputs.localTag }} ${{ env.YC_REGISTRY }}/$repo:$targetTag
               docker push ${{ env.YC_REGISTRY }}/$repo:$targetTag
+              docker image rm ${{ env.YC_REGISTRY }}/$repo:$targetTag
               docker pull ${{ env.YC_REGISTRY }}/$repo:$targetTag
             done
           done
