@@ -118,31 +118,9 @@ runs:
             do
               docker tag ${{ inputs.sourceRegistry }}/$repo:${{ inputs.localTag }} ${{ env.AWS_REGISTRY }}/$repo:$targetTag
               docker push ${{ env.AWS_REGISTRY }}/$repo:$targetTag
-            done
-          done
-        on_retry_command: |
-          ping -c 5 ${{ env.AWS_REGISTRY }}
-          nslookup ${{ env.AWS_REGISTRY }}
-          nc -vz4 ${{ env.AWS_REGISTRY }} 443
-
-    - name: Pull from AWS ECR
-      if: ${{ contains(inputs.registries, 'aws') }}
-      uses: nick-fields/retry@v3
-      env:
-        AWS_REGISTRY: "${{ inputs.awsAccountId }}.dkr.ecr.${{ inputs.awsRegion }}.amazonaws.com"
-      with:
-        timeout_seconds: 120
-        retry_wait_seconds: 1
-        max_attempts: 3
-        shell: bash
-        command: |
-          IFS=',' read -r -a array <<< "${{ inputs.repositories }}"
-          for repo in "${array[@]}"
-          do
-            IFS=',' read -r -a tags <<< "${{ inputs.targetTags }}"
-            for targetTag in "${tags[@]}"
-            do
-              docker pull ${{ env.AWS_REGISTRY }}/$repo:$targetTag
+              docker manifest inspect ${{ env.AWS_REGISTRY }}/$repo:$targetTag > /dev/null \
+                && echo "Image was pushed to the registry" \
+                || echo "Image wasn't pushed to the registry. Check logs above for details"
             done
           done
         on_retry_command: |
@@ -183,31 +161,9 @@ runs:
             do
               docker tag ${{ inputs.sourceRegistry }}/$repo:${{ inputs.localTag }} ${{ env.YC_REGISTRY }}/$repo:$targetTag
               docker push ${{ env.YC_REGISTRY }}/$repo:$targetTag
-            done
-          done
-        on_retry_command: |
-          ping -c 5 cr.yandex
-          nslookup cr.yandex
-          nc -vz4 cr.yandex 443
-
-    - name: Pull from Yandex CR
-      if: ${{ contains(inputs.registries, 'yc') }}
-      uses: nick-fields/retry@v3
-      env:
-        YC_REGISTRY: "cr.yandex/${{ inputs.yandexContainerRegistryId }}"
-      with:
-        timeout_seconds: 120
-        retry_wait_seconds: 1
-        max_attempts: 3
-        shell: bash
-        command: |
-          IFS=',' read -r -a array <<< "${{ inputs.repositories }}"
-          for repo in "${array[@]}"
-          do
-            IFS=',' read -r -a tags <<< "${{ inputs.targetTags }}"
-            for targetTag in "${tags[@]}"
-            do
-              docker pull ${{ env.YC_REGISTRY }}/$repo:$targetTag
+              docker manifest inspect ${{ env.YC_REGISTRY }}/$repo:$targetTag > /dev/null \
+                && echo "Image was pushed to the registry" \
+                || echo "Image wasn't pushed to the registry. Check logs above for details"
             done
           done
         on_retry_command: |
