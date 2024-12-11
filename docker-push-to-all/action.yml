@@ -120,7 +120,7 @@ runs:
               docker push ${{ env.AWS_REGISTRY }}/$repo:$targetTag
               docker manifest inspect ${{ env.AWS_REGISTRY }}/$repo:$targetTag \
                 && echo "Image was pushed to the registry" \
-                || echo "Image wasn't pushed to the registry. Check logs above for details"
+                || (echo "Image wasn't pushed to the registry. Check logs above for details" && exit 1)
             done
           done
         on_retry_command: |
@@ -163,7 +163,7 @@ runs:
               docker push ${{ env.YC_REGISTRY }}/$repo:$targetTag
               docker manifest inspect ${{ env.YC_REGISTRY }}/$repo:$targetTag \
                 && echo "Image was pushed to the registry" \
-                || echo "Image wasn't pushed to the registry. Check logs above for details"
+                || (echo "Image wasn't pushed to the registry. Check logs above for details" && exit 1)
             done
           done
         on_retry_command: |
