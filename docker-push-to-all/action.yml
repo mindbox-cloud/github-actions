@@ -118,7 +118,7 @@ runs:
             do
               docker tag ${{ inputs.sourceRegistry }}/$repo:${{ inputs.localTag }} ${{ env.AWS_REGISTRY }}/$repo:$targetTag
               docker push ${{ env.AWS_REGISTRY }}/$repo:$targetTag
-              docker manifest inspect ${{ env.AWS_REGISTRY }}/$repo:$targetTag > /dev/null \
+              docker manifest inspect ${{ env.AWS_REGISTRY }}/$repo:$targetTag \
                 && echo "Image was pushed to the registry" \
                 || echo "Image wasn't pushed to the registry. Check logs above for details"
             done
@@ -161,7 +161,7 @@ runs:
             do
               docker tag ${{ inputs.sourceRegistry }}/$repo:${{ inputs.localTag }} ${{ env.YC_REGISTRY }}/$repo:$targetTag
               docker push ${{ env.YC_REGISTRY }}/$repo:$targetTag
-              docker manifest inspect ${{ env.YC_REGISTRY }}/$repo:$targetTag > /dev/null \
+              docker manifest inspect ${{ env.YC_REGISTRY }}/$repo:$targetTag \
                 && echo "Image was pushed to the registry" \
                 || echo "Image wasn't pushed to the registry. Check logs above for details"
             done
