@@ -120,7 +120,7 @@ runs:
               docker push ${{ env.AWS_REGISTRY }}/$repo:$targetTag
               docker pull ${{ env.AWS_REGISTRY }}/$repo:$targetTag \
                 && echo "Test image pulling was successful" \
-                || (echo "Test image pulling was unsuccessful. Check logs above for details" && exit 1)
+                || { echo "Test image pulling was unsuccessful. Check logs above for details"; exit 1; }
             done
           done
         on_retry_command: |
@@ -163,7 +163,7 @@ runs:
               docker push ${{ env.YC_REGISTRY }}/$repo:$targetTag
               docker pull ${{ env.YC_REGISTRY }}/$repo:$targetTag \
                 && echo "Test image pulling was successful" \
-                || (echo "Test image pulling was unsuccessful. Check logs above for details" && exit 1)
+                || { echo "Test image pulling was unsuccessful. Check logs above for details"; exit 1; }
             done
           done
         on_retry_command: |
