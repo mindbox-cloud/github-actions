@@ -35,7 +35,7 @@ on:
         required: true
 
 env:
-  NODE_OPTIONS: --unhandled-rejections=strict
+  NODE_OPTIONS: --unhandled-rejections=strict --max_old_space_size=4096
 
 jobs:
   create-image:
