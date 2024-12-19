@@ -115,8 +115,7 @@ env:
   # temporarily increase Node.js memory limits to support double-builds
   # more info: https://tracker.yandex.ru/FRONTEND-4
   # TODO remove when fully migrated to Module Federation 2
-  env:
-    NODE_OPTIONS: --max_old_space_size=4096
+  NODE_OPTIONS: --max_old_space_size=4096
 
 jobs:
   checking:
