@@ -324,10 +324,6 @@ jobs:
           GH_NPM_REGISTRY: ${{ secrets.gh_npm_registry }}
           MCF_STATIC_FOLDER: v2_static
 
-      - name: Copy package.json to build folder
-        if: ${{ inputs.use_k8_deploy_process }}
-        run: cp ./package.json ./build/
-
       - name: Upload statoscope artifacts
         uses: actions/upload-artifact@v4
         with:
