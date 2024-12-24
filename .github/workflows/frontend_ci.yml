@@ -352,13 +352,6 @@ jobs:
           wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-deploy/master/mcf-release/source.conf.template
         working-directory: ./build
 
-        # needed for frontend discovery(build initial.js)
-      - name: copy remoteEntry to v2_static folder
-        if: ${{ inputs.use_k8_deploy_process }}
-        run: |
-          find . -type f -name "remoteEntry.js" -exec cp {} ./v2_static/ \;
-        working-directory: ./build
-
       - name: Build release docker image
         if: ${{ inputs.use_k8_deploy_process }}
         run: docker build . -t ${{ env.registry }}/${{ env.project_name }}:${{ steps.release-number.outputs.release-number }} -t ${{ env.registry }}/${{ env.project_name }}:latest
