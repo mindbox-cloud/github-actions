@@ -119,7 +119,7 @@ env:
 
 jobs:
   checking:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, frontend]
     timeout-minutes: ${{ inputs.checking_timeout_minutes }}
     steps:
       - name: Checkout the repository
@@ -230,7 +230,7 @@ jobs:
   release:
     needs: checking
     concurrency: release
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, frontend]
     if: ${{ !inputs.template_repo && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') }}
     timeout-minutes: ${{ inputs.release_timeout_minutes }}
     env:
