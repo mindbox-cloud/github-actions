@@ -88,6 +88,11 @@ on:
         default: false
         required: false
         type: boolean
+      runs_on:
+        description: "What runners to use"
+        default: '["self-hosted", "frontend"]'
+        required: false
+        type: string
     secrets:
       gh_npm_registry:
         description: "A GH_NPM_REGISTRY token passed from the caller workflow"
@@ -119,7 +124,7 @@ env:
 
 jobs:
   checking:
-    runs-on: [self-hosted, frontend]
+    runs-on: ${{ fromJSON(inputs.runs_on) }}
     timeout-minutes: ${{ inputs.checking_timeout_minutes }}
     steps:
       - name: Checkout the repository
