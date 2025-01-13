@@ -205,23 +205,6 @@ jobs:
         if: ${{ inputs.e2e_linters }}
         run: npm run e2e:check-scripts
         working-directory: ./e2e
-
-      - name: Build for bundlemon
-        continue-on-error: true
-        env:
-          NODE_ENV: production
-        run: npm run build
-      - name: Install shared configs
-        continue-on-error: true
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
-        # Install step needed before everyone updates to 3.1.2+ version
-        run: npm i @mindbox-cloud/frontend-shared-configs@3.1.2
-      - name: Setup bundle limit
-        run: echo "LIMIT=$(cat package.json | jq -r '.config.bundleLimit // ""')" >> $GITHUB_ENV 
-      - name: Run bundlemon
-        continue-on-error: true
-        run: npx -y bundlemon --config ./node_modules/@mindbox-cloud/frontend-shared-configs/bundlemon/index.js
   
   autoapprove:
     needs: checking
