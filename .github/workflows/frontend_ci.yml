@@ -90,7 +90,7 @@ on:
         type: boolean
       runs_on:
         description: "What runners to use"
-        default: '["self-hosted", "frontend"]'
+        default: '"ubuntu-latest"'
         required: false
         type: string
     secrets:
