@@ -124,8 +124,6 @@ runs:
       id: truncate-plan
       working-directory: ${{ inputs.workingDir }}
       shell: bash
-      env:
-        ACTIONS_STEP_DEBUG: false
       run: |
         plan="$(terraform show -no-color plan.tfplan)"
         plan=$(echo "$plan" | sed -r 's/^([[:blank:]]*)([-+~])/\2\1/g')
@@ -143,8 +141,6 @@ runs:
       id: create-truncated-plan-file
       working-directory: ${{ inputs.workingDir }}
       shell: bash
-      env:
-        ACTIONS_STEP_DEBUG: false
       run: |
         plan_file_name='plan.stdout'
         cat << EOF > $plan_file_name
@@ -156,6 +152,7 @@ runs:
       name: "Comment plan"
       env:
         SHOW_PLAN: "${{ steps.truncate-plan.outputs.truncated != 'true' }}"
+        ACTIONS_STEP_DEBUG: false
         CONDITION: "${{ steps.plan.outputs.planExitCode }}"
       with:
         github-token: ${{ inputs.githubToken }}
