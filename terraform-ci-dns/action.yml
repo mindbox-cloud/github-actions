@@ -125,7 +125,7 @@ runs:
       working-directory: ${{ inputs.workingDir }}
       shell: bash
       run: |
-        plan="$(terraform show -no-color plan.tfplan)"
+        plan=""$(terraform show -no-color plan.tfplan | sed -r '/^::debug::/d')""
         plan=$(echo "$plan" | sed -r 's/^([[:blank:]]*)([-+~])/\2\1/g')
         plan=$(echo "$plan" | sed -r 's/^~/!/g')
         original_length=${#plan}
@@ -152,7 +152,6 @@ runs:
       name: "Comment plan"
       env:
         SHOW_PLAN: "${{ steps.truncate-plan.outputs.truncated != 'true' }}"
-        ACTIONS_STEP_DEBUG: false
         CONDITION: "${{ steps.plan.outputs.planExitCode }}"
       with:
         github-token: ${{ inputs.githubToken }}
