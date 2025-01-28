@@ -151,7 +151,6 @@ runs:
     - uses: actions/github-script@v6
       name: "Comment plan"
       env:
-        PLAN: "${{ steps.show.outputs.stdout }}"
         SHOW_PLAN: "${{ steps.truncate-plan.outputs.truncated != 'true' }}"
         CONDITION: "${{ steps.plan.outputs.planExitCode }}"
       with:
