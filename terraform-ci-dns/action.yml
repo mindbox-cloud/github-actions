@@ -162,7 +162,7 @@ runs:
             if (process.env.SHOW_PLAN == "true") {
               const { readFile } = require("fs/promises")
               const plan = await readFile('${{ inputs.workingDir }}/${{ steps.create-truncated-plan-file.outputs.plan_file_name }}')
-              planMessage = `\`\`\`diff\n ${plan} \n\`\`\``
+              planMessage = `\`\`\`terraform\n ${plan} \n\`\`\``
             }
             else {
               planMessage = "Please, refer to [Github Action logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
@@ -175,9 +175,7 @@ runs:
 
             <details><summary>Show Plan</summary>
 
-            \`\`\`terraform\n
             ${planMessage}
-            \`\`\`
 
             </details>
 
