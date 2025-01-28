@@ -164,7 +164,7 @@ runs:
               planMessage = `\`\`\`terraform\n ${plan} \n\`\`\``
             }
             else {
-              planMessage = "Please, refer to [Github Action logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+              planMessage = "Plan too long for a message. Please, refer to [Github Action logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})."
             }
 
             const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
