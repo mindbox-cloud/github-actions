@@ -214,8 +214,11 @@ jobs:
       - name: uninstall edge
         run: apt-get -y remove microsoft-edge-stable
 
+      - name: setup signing key
+        run: wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo tee /etc/apt/trusted.gpg.d/google.asc >/dev/null
+
       - name: install additional tools
-        run: apt-get -y install jq
+        run: apt-get update && apt-get -y install jq
 
       - name: Checkout the repository
         uses: actions/checkout@v4
