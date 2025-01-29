@@ -323,7 +323,7 @@ jobs:
       - name: Create e2e tests list for k8
         if: ${{ inputs.use_k8_deploy_process }}
         run: |
-          curl -s -H "Authorization: Bearer $(yc iam create-token)" $URL?repositoryName=${{ inputs.registry_id }}/frontend-e2e | jq -r ".images[].tags[]" | sed 's/-latest//g'  > ./build/e2e_tests.txt
+          curl -s -H "Authorization: Bearer $(yc iam create-token)" $URL?repositoryName=${{ inputs.registry_id }}/frontend-e2e | jq -r ".images[] | (.tags // []) | .[]" | sed 's/-latest//g'  > ./build/e2e_tests.txt
         env:
           URL: "https://container-registry.api.cloud.yandex.net/container-registry/v1/images"
 
