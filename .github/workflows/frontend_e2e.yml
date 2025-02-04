@@ -304,7 +304,6 @@ jobs:
     env:
       adminsite_username: "${{ secrets.cypress_login }}"
       adminsite_password: "${{ secrets.cypress_pass }}"
-      registry: cr.yandex/crpo9tj76o3c7pi8i72n
       image: frontend-e2e-pr
 
     steps:
@@ -327,23 +326,9 @@ jobs:
         id: branch_and_repo_hash
         env:
           BRANCH_AND_REPO: "${{ env.repository_name }} ${{ env.ref_name }}"
-      
-      - name: Install YC
-        run: |
-          sudo curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
-          sudo ln -s /home/runner/yandex-cloud/bin/yc /bin/yc
-
-      - name: Create yc profile
-        run: |
-          yc config profile create frontend-ci
-          echo '${{ secrets.CONTAINER_REGISTRY_KEY }}' >> iam_key.json | yc config set service-account-key iam_key.json
-          rm iam_key.json
-
-      - name: Authenticate in yandex registry
-        run: echo '${{ secrets.CONTAINER_REGISTRY_KEY }}' | docker login -u json_key --password-stdin cr.yandex
 
       - name: Build docker image
-        run: docker build . -t ${{ env.registry }}/${{ env.image }}:${{ env.hash_payload }}
+        run: docker build . -t ${{ env.image }}:${{ env.hash_payload }}
         working-directory: ./playwright
 
       - name: Run E2E tests on core project.
@@ -355,7 +340,7 @@ jobs:
             -e ADMINSITE_USERNAME=${{ secrets.cypress_login }} \ 
             -e ADMINSITE_PASSWORD=${{ secrets.cypress_pass }} \
             -v $(pwd)/playwright-report:/e2e/playwright-report \
-            cr.yandex/${{ inputs.registry_id }}/frontend-e2e:${{ matrix.project }}-latest 2>&1
+            ${{ env.image }}:${{ env.hash_payload }} 2>&1
 
       - name: Upload test results artifacts
         uses: actions/upload-artifact@v4
