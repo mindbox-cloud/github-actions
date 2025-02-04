@@ -75,6 +75,14 @@ on:
       kube_dev_config_k8:
         description: "A SA_TOKEN_DTLN_KUBE_CDP_STAGING_MICROFRONTENDS token passed from the caller workflow for new deploy"
         required: false
+      e2e_adminsite_username:
+        description: "Username for admin site e2e test user"
+        required: false
+        default: ""
+      e2e_adminsite_password:
+        description: "Password for admin site e2e test user"
+        required: false
+        default: ""
       kube_token:
         description: "A SA_TOKEN_RU_STAGING_YC_KUBE_CDP_MIXED1_MICROFRONTENDS token passed from the caller workflow for deploy"
         required: true
@@ -87,9 +95,6 @@ jobs:
     timeout-minutes: 20
     runs-on: ubuntu-latest
     env:
-      retries: ${{ inputs.retries }}
-      CYPRESS_username: "${{ secrets.cypress_login }}"
-      CYPRESS_password: "${{ secrets.cypress_pass }}"
       registry: cr.yandex/${{ inputs.registry_id }}
       image: ${{ inputs.image_name }}
 
@@ -302,8 +307,6 @@ jobs:
     timeout-minutes: ${{ inputs.e2e-timeout }}
     if: ${{ always() && !cancelled() && !inputs.core_project && inputs.e2e_runner == 'playwright' }}
     env:
-      adminsite_username: "${{ secrets.cypress_login }}"
-      adminsite_password: "${{ secrets.cypress_pass }}"
       image: frontend-e2e-pr
 
     steps:
@@ -337,8 +340,8 @@ jobs:
           docker run -i \
             -e BASE_URL="https://e2e-testing-${{ env.hash_payload }}-staging.mindbox.ru" \
             -e RETRIES="${{ env.retries }}" \
-            -e ADMINSITE_USERNAME=${{ secrets.cypress_login }} \ 
-            -e ADMINSITE_PASSWORD=${{ secrets.cypress_pass }} \
+            -e ADMINSITE_USERNAME=${{ secrets.e2e_adminsite_username }} \ 
+            -e ADMINSITE_PASSWORD=${{ secrets.e2e_adminsite_password }} \
             -v $(pwd)/playwright-report:/e2e/playwright-report \
             ${{ env.image }}:${{ env.hash_payload }} 2>&1
 
@@ -490,8 +493,8 @@ jobs:
             -e CYPRESS_password=${{ secrets.cypress_pass }} \
             -e CYPRESS_grepTags="@smoke" \
             -e CYPRESS_grepOmitFiltered=true \
-            -e ADMINSITE_USERNAME=${{ secrets.cypress_login }} \ 
-            -e ADMINSITE_PASSWORD=${{ secrets.cypress_pass }} \
+            -e ADMINSITE_USERNAME=${{ secrets.e2e_adminsite_username }} \ 
+            -e ADMINSITE_PASSWORD=${{ secrets.e2e_adminsite_password }} \
             -e GREP_TAGS="@smoke"
             -v $(pwd)/cypress/${{ matrix.project }}/videos:/e2e/cypress/videos \
             -v $(pwd)/cypress/${{ matrix.project }}/screenshots:/e2e/cypress/screenshots \
