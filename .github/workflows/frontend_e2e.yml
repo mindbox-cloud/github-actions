@@ -50,9 +50,9 @@ on:
         type: boolean
       e2e_runner:
         description: "E2E runner"
+        default: "cypress"
         required: false
         type: string
-        default: "cypress"
     secrets:
       npm_token:
         description: "A GH_NPM_REGISTRY token passed from the caller workflow"
@@ -78,11 +78,9 @@ on:
       e2e_adminsite_username:
         description: "Username for admin site e2e test user"
         required: false
-        default: ""
       e2e_adminsite_password:
         description: "Password for admin site e2e test user"
         required: false
-        default: ""
       kube_token:
         description: "A SA_TOKEN_RU_STAGING_YC_KUBE_CDP_MIXED1_MICROFRONTENDS token passed from the caller workflow for deploy"
         required: true
