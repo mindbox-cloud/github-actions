@@ -95,7 +95,7 @@ on:
         type: boolean
       runs_on:
         description: "What runners to use"
-        default: '["self-hosted", "frontend"]'
+        default: '"ubuntu-latest"'
         required: false
         type: string
     secrets:
@@ -210,23 +210,6 @@ jobs:
         if: ${{ inputs.e2e_linters }}
         run: npm run e2e:check-scripts
         working-directory: ./e2e
-
-      - name: Build for bundlemon
-        continue-on-error: true
-        env:
-          NODE_ENV: production
-        run: npm run build
-      - name: Install shared configs
-        continue-on-error: true
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
-        # Install step needed before everyone updates to 3.1.2+ version
-        run: npm i @mindbox-cloud/frontend-shared-configs@3.1.2
-      - name: Setup bundle limit
-        run: echo "LIMIT=$(cat package.json | jq -r '.config.bundleLimit // ""')" >> $GITHUB_ENV 
-      - name: Run bundlemon
-        continue-on-error: true
-        run: npx -y bundlemon --config ./node_modules/@mindbox-cloud/frontend-shared-configs/bundlemon/index.js
   
   autoapprove:
     needs: checking
@@ -345,7 +328,7 @@ jobs:
       - name: Create e2e tests list for k8
         if: ${{ inputs.use_k8_deploy_process }}
         run: |
-          curl -s -H "Authorization: Bearer $(yc iam create-token)" $URL?repositoryName=${{ inputs.registry_id }}/frontend-e2e | jq -r ".images[].tags[]" | sed 's/-latest//g'  > ./build/e2e_tests.txt
+          curl -s -H "Authorization: Bearer $(yc iam create-token)" $URL?repositoryName=${{ inputs.registry_id }}/frontend-e2e | jq -r ".images[] | (.tags // []) | .[]" | sed 's/-latest//g'  > ./build/e2e_tests.txt
         env:
           URL: "https://container-registry.api.cloud.yandex.net/container-registry/v1/images"
 

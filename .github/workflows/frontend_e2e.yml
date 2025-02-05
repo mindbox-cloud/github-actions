@@ -100,11 +100,6 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v4
 
-      - name: Change Dockerd param
-        run: |
-          sudo sed -i 's/ }/, \"max-concurrent-uploads\": 2 }/' /etc/docker/daemon.json
-          sudo systemctl restart docker
-
       - name: Set variables
         run: |
           echo "ref_name=$(echo $GITHUB_HEAD_REF | tr '[A-Z]' '[a-z]')" >> $GITHUB_ENV
@@ -231,6 +226,9 @@ jobs:
 
       - name: uninstall edge
         run: apt-get -y remove microsoft-edge-stable
+
+      - name: setup signing key
+        run: wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | tee /etc/apt/trusted.gpg.d/google.asc >/dev/null
 
       - name: install additional tools
         run: apt-get update && apt-get -y install jq
