@@ -404,7 +404,7 @@ jobs:
           retry_wait_seconds: 1
           max_attempts: 3
           shell: bash
-          command: docker push ${{ env.registry }}/${{ env.e2e-image }}:${{ env.e2e_tag_playwright }}
+          command: docker push ${{ env.registry }}/${{ env.e2e-image }}:${{ inputs.e2e_tag_playwright }}
 
       - name: Post release to pipelines
         run: |
