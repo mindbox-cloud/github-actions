@@ -491,9 +491,9 @@ jobs:
             -e CYPRESS_password=${{ secrets.cypress_pass }} \
             -e CYPRESS_grepTags="@smoke" \
             -e CYPRESS_grepOmitFiltered=true \
-            -e ADMINSITE_USERNAME=${{ secrets.e2e_adminsite_username }} \ 
+            -e ADMINSITE_USERNAME=${{ secrets.e2e_adminsite_username }} \
             -e ADMINSITE_PASSWORD=${{ secrets.e2e_adminsite_password }} \
-            -e GREP_TAGS="@smoke"
+            -e GREP_TAGS="@smoke" \
             -v $(pwd)/cypress/${{ matrix.project }}/videos:/e2e/cypress/videos \
             -v $(pwd)/cypress/${{ matrix.project }}/screenshots:/e2e/cypress/screenshots \
             cr.yandex/${{ inputs.registry_id }}/frontend-e2e:${{ matrix.project }}-latest 2>&1
