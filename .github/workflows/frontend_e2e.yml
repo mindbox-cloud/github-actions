@@ -347,7 +347,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ failure() }}
         with:
-          name: playwright-${{ env.project_name }}
+          name: playwright-${{ env.hash_payload }}
           path: playwright-results
           retention-days: 1
 
