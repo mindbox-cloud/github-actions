@@ -196,7 +196,7 @@ jobs:
           echo "The DNS CNAME record for 'e2e-testing-${{ env.hash_payload }}-staging.mindbox.ru' was not created as expected."
           exit 1
 
-  e2e-tests-cypress:
+  e2e-tests:
     runs-on: [self-hosted, frontend]
     container:
       image: cr.yandex/crpo9tj76o3c7pi8i72n/cached/browsers:node-18.16.1-chrome-114.0.5735.133-1-ff-114.0.2-edge-114.0.1823.51-1
@@ -510,7 +510,7 @@ jobs:
 
   post-e2e-tests:
     runs-on: ubuntu-latest
-    needs: [e2e-tests-cypress, e2e-tests-playwright, core-e2e-tests-runner]
+    needs: [e2e-tests, e2e-tests-playwright, core-e2e-tests-runner]
     if: ${{ failure() }}
     steps:
       - name: Add comment to commit if the job has failed
@@ -521,8 +521,8 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
   clean-up-e2e-tests:
-    needs: [e2e-tests-cypress, e2e-tests-playwright, core-e2e-tests-runner]
-    if: ${{ always() && (needs.e2e-tests-cypress.result == 'success' && (inputs.e2e_runner != 'playwright' || needs.e2e-tests-playwright.result == 'success') || needs.core-e2e-tests-runner.result == 'success') }}
+    needs: [e2e-tests, e2e-tests-playwright, core-e2e-tests-runner]
+    if: ${{ always() && (needs.e2e-tests.result == 'success' && (inputs.e2e_runner != 'playwright' || needs.e2e-tests-playwright.result == 'success') || needs.core-e2e-tests-runner.result == 'success') }}
     uses: mindbox-cloud/github-actions/.github/workflows/frontend_cleanup_testing.yml@master
     with:
       hot_testing: false
