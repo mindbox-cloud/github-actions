@@ -345,7 +345,7 @@ jobs:
 
       - name: Upload test results artifacts
         uses: actions/upload-artifact@v4
-        if: ${{ alaways() }}
+        if: ${{ always() }}
         with:
           name: playwright-${{ env.hash_payload }}
           path: playwright-results
