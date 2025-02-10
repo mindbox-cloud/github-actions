@@ -73,11 +73,6 @@ on:
         default: ""
         required: false
         type: string
-      e2e_tag_playwright:
-        description: "Image tag to creating e2e tests via playwright"
-        default: ""
-        required: false
-        type: string
       commit_release_version:
         type: boolean
         description: "True if need to commit release version to package.json"
@@ -96,6 +91,11 @@ on:
       runs_on:
         description: "What runners to use"
         default: '"ubuntu-latest"'
+        required: false
+        type: string
+      e2e_runner:
+        description: "E2E runner"
+        default: "cypress"
         required: false
         type: string
     secrets:
@@ -371,7 +371,7 @@ jobs:
         run: echo '${{ secrets.CONTAINER_REGISTRY_KEY }}' | docker login -u json_key --password-stdin cr.yandex
 
       - name: Download e2e tests Dockerfile
-        if: ${{ inputs.e2e_tag }}
+        if: ${{ inputs.e2e_tag && inputs.e2e_runner == 'cypress' }}
         run: |
           wget --header 'Authorization: token ${{ secrets.frontend_gha_full_token }}' https://raw.githubusercontent.com/mindbox-cloud/frontend-cypress/master/docker/Dockerfile
         working-directory: ./e2e
@@ -382,7 +382,6 @@ jobs:
         working-directory: ./e2e
 
       - name: Push e2e docker image to registry with retry
-        if: ${{ inputs.e2e_tag }}
         uses: nick-fields/retry@v2
         with:
           timeout_seconds: 180
@@ -390,21 +389,6 @@ jobs:
           max_attempts: 3
           shell: bash
           command: docker push ${{ env.registry }}/${{ env.e2e-image }}:${{ env.e2e-tag }}
-
-      - name: Build e2e playwright docker image
-        if: ${{ inputs.e2e_tag_playwright }}
-        run: docker build . -t ${{ env.registry }}/${{ env.e2e-image }}:${{ inputs.e2e_tag_playwright }}
-        working-directory: ./playwright
-
-      - name: Push e2e playwright docker image to registry with retry
-        if: ${{ inputs.e2e_tag_playwright }}
-        uses: nick-fields/retry@v2
-        with:
-          timeout_seconds: 180
-          retry_wait_seconds: 1
-          max_attempts: 3
-          shell: bash
-          command: docker push ${{ env.registry }}/${{ env.e2e-image }}:${{ inputs.e2e_tag_playwright }}
 
       - name: Post release to pipelines
         run: |
