@@ -336,7 +336,7 @@ jobs:
           mkdir -p ./playwright-results/test-results && mkdir -p ./playwright-results/report
           docker run -i \
             -e BASE_URL="https://e2e-testing-${{ env.hash_payload }}-staging.mindbox.ru" \
-            -e RETRIES="${{ env.retries }}" \
+            -e RETRIES="${{ inputs.retries }}" \
             -e ADMINSITE_USERNAME=${{ secrets.e2e_adminsite_username }} \
             -e ADMINSITE_PASSWORD=${{ secrets.e2e_adminsite_password }} \
             -v $(pwd)/playwright-results/report:/e2e/playwright-report \
