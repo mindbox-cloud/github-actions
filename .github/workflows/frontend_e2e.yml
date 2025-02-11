@@ -412,7 +412,7 @@ jobs:
           - campaigns
           - retail
           - auth-page
-          - email-editor-playwright
+          - email-editor
       max-parallel: 4
     timeout-minutes: ${{ inputs.e2e-timeout }}
     if: ${{ always() && !cancelled() && inputs.core_project }}
