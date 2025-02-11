@@ -323,7 +323,7 @@ jobs:
 
       - name: Build docker image
         run: docker build . -t ${{ env.image }}:${{ env.hash_payload }}
-        working-directory: ./playwright
+        working-directory: ./e2e
 
       - name: Run E2E tests on not core project.
         run: |
