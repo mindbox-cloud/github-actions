@@ -382,6 +382,7 @@ jobs:
         working-directory: ./e2e
 
       - name: Push e2e docker image to registry with retry
+        if: ${{ inputs.e2e_tag }}
         uses: nick-fields/retry@v2
         with:
           timeout_seconds: 180
