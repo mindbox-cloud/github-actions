@@ -322,7 +322,7 @@ jobs:
           BRANCH_AND_REPO: "${{ env.repository_name }} ${{ env.ref_name }}"
 
       - name: Build docker image
-        run: docker build . -t ${{ env.image }}:${{ env.hash_payload }}
+        run: docker build . -t ${{ env.image }}:${{ env.hash_payload }} --build-arg NODE_AUTH_TOKEN=${{ secrets.npm_token }}
         working-directory: ./playwright
 
       - name: Run E2E tests on not core project.

@@ -393,7 +393,7 @@ jobs:
 
       - name: Build e2e playwright docker image
         if: ${{ inputs.e2e_tag_playwright }}
-        run: docker build . -t ${{ env.registry }}/${{ env.e2e-image }}:${{ inputs.e2e_tag_playwright }}
+        run: docker build . -t ${{ env.registry }}/${{ env.e2e-image }}:${{ inputs.e2e_tag_playwright }} --build-arg NODE_AUTH_TOKEN=${{ secrets.gh_npm_registry }}
         working-directory: ./playwright
 
       - name: Push e2e playwright docker image to registry with retry
