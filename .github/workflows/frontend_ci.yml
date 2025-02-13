@@ -196,7 +196,7 @@ jobs:
 
       - name: Cache E2E node modules
         if: ${{ inputs.e2e_typechecking || inputs.e2e_linters }}
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./e2e/node_modules
           key: e2e-npm-ci-${{ github.sha }}
