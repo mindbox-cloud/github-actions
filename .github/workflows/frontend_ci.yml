@@ -223,7 +223,7 @@ jobs:
   release:
     needs: checking
     concurrency: release
-    runs-on: [self-hosted, frontend]
+    runs-on: gh-large-16c-ubuntu-latest
     if: ${{ !inputs.template_repo && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') }}
     timeout-minutes: ${{ inputs.release_timeout_minutes }}
     env:
