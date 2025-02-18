@@ -334,6 +334,7 @@ jobs:
             -e RETRIES="${{ inputs.retries }}" \
             -e ADMINSITE_USERNAME=${{ secrets.e2e_adminsite_username }} \
             -e ADMINSITE_PASSWORD=${{ secrets.e2e_adminsite_password }} \
+            -e TEST_ENVIRONMENT="pull-request" \
             -v $(pwd)/playwright-results/report:/e2e/playwright-report \
             -v $(pwd)/playwright-results/test-results:/e2e/test-results \
             ${{ env.image }}:${{ env.hash_payload }} 2>&1
@@ -488,6 +489,7 @@ jobs:
             -e CYPRESS_grepOmitFiltered=true \
             -e ADMINSITE_USERNAME=${{ secrets.e2e_adminsite_username }} \
             -e ADMINSITE_PASSWORD=${{ secrets.e2e_adminsite_password }} \
+            -e TEST_ENVIRONMENT="pull-request" \
             -e GREP_TAGS="@smoke" \
             -v $(pwd)/cypress/${{ matrix.project }}/videos:/e2e/cypress/videos \
             -v $(pwd)/cypress/${{ matrix.project }}/screenshots:/e2e/cypress/screenshots \
