@@ -463,6 +463,6 @@ jobs:
           release_number: ${{ steps.release-number.outputs.release-number }}
           release_notes: ${{ steps.create-release.outputs.release-notes-body }}
           package_version: ${{ steps.release-number.outputs.release-number }}
-          git_ref: ${{ github.event.repository.default_branch }}
+          git_ref: master
           packages: |
             ${{ github.event.repository.name }}:${{ steps.release-number.outputs.release-number }}
