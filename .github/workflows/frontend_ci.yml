@@ -235,11 +235,6 @@ jobs:
       OCTOPUS_SPACE: Default
 
     steps:
-      - name: Set variables
-        id: set_variables
-        run: |
-          echo "repository_name=$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}')" >> $GITHUB_OUTPUT
-
       - name: Checkout the repository
         uses: actions/checkout@v4
         with:
@@ -255,7 +250,7 @@ jobs:
             echo "project_name=$REPOSITORY" >> $GITHUB_ENV
           fi
         env:
-          REPOSITORY: ${{ steps.set_variables.outputs.repository_name }}
+          REPOSITORY: ${{ github.event.repository.name }}
 
       - name: Generate release number
         id: release-number
@@ -447,11 +442,12 @@ jobs:
       - name: Create Octopus package
         uses: OctopusDeploy/create-zip-package-action@v3
         with:
-          package_id: ${{ steps.set_variables.outputs.repository_name }}
+          package_id: ${{ github.event.repository.name }}
           version: ${{ steps.release-number.outputs.release-number }}
           output_folder: './packages/'
+          base_path: '.'
           files: |
-            build
+            build/**/*.*
 
       - name: Upload Octopus package
         uses: OctopusDeploy/push-package-action@v3
@@ -463,10 +459,10 @@ jobs:
         uses: OctopusDeploy/create-release-action@v3
         with:
           channel: Default
-          project: ${{ steps.set_variables.outputs.repository_name }}-k8-deploy
+          project: ${{ github.event.repository.name }}-k8-deploy
           release_number: ${{ steps.release-number.outputs.release-number }}
           release_notes: ${{ steps.create-release.outputs.release-notes-body }}
           package_version: ${{ steps.release-number.outputs.release-number }}
           git_ref: ${{ github.event.repository.default_branch }}
           packages: |
-            ${{ steps.set_variables.outputs.repository_name }}:${{ steps.release-number.outputs.release-number }}
+            ${{ github.event.repository.name }}:${{ steps.release-number.outputs.release-number }}
