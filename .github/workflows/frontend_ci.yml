@@ -231,7 +231,8 @@ jobs:
       e2e-image: ${{ inputs.e2e_image }}
       e2e-tag: ${{ inputs.e2e_tag }}
       OCTOPUS_URL: ${{ secrets.OCTOPUS_SERVER }}
-      OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_KEY  }}
+      OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_KEY }}
+      OCTOPUS_SPACE: Default
 
     steps:
       - name: Set variables
