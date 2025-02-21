@@ -43,6 +43,11 @@ on:
         default: false
         required: false
         type: boolean
+      tests-coverage:
+        description: "True if need run tests with coverage"
+        default: false
+        required: false
+        type: boolean
       component_tests:
         description: "True if need run component tests"
         default: false
@@ -131,6 +136,8 @@ jobs:
   checking:
     runs-on: ${{ fromJSON(inputs.runs_on) }}
     timeout-minutes: ${{ inputs.checking_timeout_minutes }}
+    env:
+      check-coverage: ${{ inputs.tests-coverage && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v4
@@ -180,8 +187,19 @@ jobs:
         run: npm run check-styles -- --allow-empty-input
 
       - name: Run tests
-        if: ${{ inputs.tests }}
+        if: ${{ inputs.tests && !env.check-coverage }}
         run: npm run test -- --maxConcurrency=1 --maxWorkers=1
+
+      - name: Get list of changed files
+        if: ${{ inputs.tests && env.check-coverage }}
+        id: changed_files
+        run: echo "files=$(git diff --name-only ${{ github.base_ref }}...${{ github.head_ref }} | grep -E '\.(ts|tsx|js|jsx)$' | paste -sd ',' -)" >> $GITHUB_OUTPUT
+
+      - name: Run tests with coverage
+        if: ${{ inputs.tests && env.check-coverage }}
+        run: npm run test -- --maxConcurrency=1 --maxWorkers=1
+        env: 
+          GIT_DIFF_SOURCE_FILES: ${{ steps.changed_files.outputs.files }}
 
       - name: Run component tests
         if: ${{ inputs.component_tests }}
