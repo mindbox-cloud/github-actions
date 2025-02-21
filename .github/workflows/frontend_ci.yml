@@ -195,9 +195,7 @@ jobs:
 
       - name: Run tests with coverage
         if: ${{ inputs.tests && env.check-coverage }}
-        run: npm run test -- --maxConcurrency=1 --maxWorkers=1
-        env: 
-          JEST_COVERAGE_THRESHOLD_FILES: ${{ steps.changed_files.outputs.files }}
+        run: npm run test -- --maxConcurrency=1 --maxWorkers=1 --collectCoverageFrom='${{ steps.changed_files.outputs.files }}'
 
       - name: Run component tests
         if: ${{ inputs.component_tests }}
