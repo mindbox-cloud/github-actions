@@ -197,7 +197,7 @@ jobs:
         if: ${{ inputs.tests && env.check-coverage }}
         run: npm run test -- --maxConcurrency=1 --maxWorkers=1
         env: 
-          GIT_DIFF_SOURCE_FILES: ${{ steps.changed_files.outputs.files }}
+          JEST_COVERAGE_TRESHOLD_FILES: ${{ steps.changed_files.outputs.files }}
 
       - name: Run component tests
         if: ${{ inputs.component_tests }}
