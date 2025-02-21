@@ -43,11 +43,6 @@ on:
         default: false
         required: false
         type: boolean
-      tests-coverage:
-        description: "True if need run tests with coverage"
-        default: false
-        required: false
-        type: boolean
       component_tests:
         description: "True if need run component tests"
         default: false
@@ -137,7 +132,7 @@ jobs:
     runs-on: ${{ fromJSON(inputs.runs_on) }}
     timeout-minutes: ${{ inputs.checking_timeout_minutes }}
     env:
-      check-coverage: ${{ inputs.tests-coverage && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
+      check-coverage: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v4
