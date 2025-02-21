@@ -189,7 +189,7 @@ jobs:
       - name: Get list of changed files
         if: ${{ inputs.tests && env.check-coverage }}
         id: changed_files
-        run: echo "files=$(git diff --name-only ${{ github.base_ref }}...${{ github.head_ref }} | grep -E '\.(ts|tsx|js|jsx)$' | paste -sd ',' -)" >> $GITHUB_OUTPUT
+        run: echo "files=$(git diff --name-only origin/${{ github.base_ref }}...${{ github.head_ref }} | grep -E '\.(ts|tsx|js|jsx)$' | paste -sd ',' -)" >> $GITHUB_OUTPUT
 
       - name: Run tests with coverage
         if: ${{ inputs.tests && env.check-coverage }}
