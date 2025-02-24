@@ -191,7 +191,7 @@ jobs:
         if: ${{ inputs.tests }}
         run: npm run test -- --maxConcurrency=1 --maxWorkers=1
 
-      - name: Run tests
+      - name: Run tests coverage check
         if: ${{ inputs.tests && env.check-coverage }}
         run: npm run check-coverage -- --mode=ci
 
