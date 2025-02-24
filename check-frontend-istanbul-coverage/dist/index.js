@@ -27255,12 +27255,10 @@ function normalizeSummaryJson(summaryJson) {
   const entries = Object.entries(summaryJson);
   const currentDir = process.cwd();
 
-  const normalizedEntries = entries.map(([file, coverage]) => {
-    return {
-      file: file.replace(currentDir, ''),
-      coverage: coverage
-    };
-  });
+  const normalizedEntries = entries.map(([file, coverage]) => [
+    file.replace(currentDir, ''),
+    coverage
+  ]);
 
   return Object.fromEntries(normalizedEntries);
 }
