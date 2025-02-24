@@ -198,7 +198,7 @@ jobs:
         uses: mindbox-cloud/github-actions/check-frontend-istanbul-coverage@rudentsov/test-coverage
         with:
           changed_files_list: ${{ steps.changed_files.outputs.files }}
-          json_summary: reports/jest-coverage/coverage-summary.json
+          json_summary_path: reports/jest-coverage/coverage-summary.json
           required_branches_coverage: 80
 
       - name: Run component tests
