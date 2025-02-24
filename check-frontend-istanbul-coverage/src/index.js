@@ -1,5 +1,5 @@
 import fs from 'fs';
-import * as core from '@actions/core'
+import core from '@actions/core';
 
 function normalizeSummaryJson(summaryJson) {
   const entries = Object.entries(summaryJson);
