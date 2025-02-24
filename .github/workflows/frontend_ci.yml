@@ -195,7 +195,7 @@ jobs:
 
       - name: Check changed files coverage
         if: ${{ inputs.tests && env.check-coverage }}
-        uses: ../../check-frontend-istanbul-coverage
+        uses: ./check-frontend-istanbul-coverage
         with:
           changed_files_list: ${{ steps.changed_files.outputs.files }}
           json_summary: reports/jest-coverage/coverage-summary.json
