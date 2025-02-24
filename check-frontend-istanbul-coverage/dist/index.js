@@ -27307,7 +27307,7 @@ async function run() {
     const changed_files_list = core.getInput('changed_files_list', { required: true });
     const required_branches_coverage = core.getInput('required_branches_coverage', { required: true });
 
-    const jsonSummaryContent = require$$1.promises.readFile(json_summary_path, 'utf-8');
+    const jsonSummaryContent = await require$$1.promises.readFile(json_summary_path, 'utf-8');
     core.info('JSON summary content: ' + jsonSummaryContent);
     const jsonSummary = JSON.parse(jsonSummaryContent);
     const normalizedJsonSummary = normalizeSummaryJson(jsonSummary);
