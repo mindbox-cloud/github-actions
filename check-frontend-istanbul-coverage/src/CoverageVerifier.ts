@@ -1,5 +1,5 @@
 import { CoverageReport } from "./CoverageReport";
-import { CoverageVerifierReport } from "./CoverageVerifierReport";
+import { CoverageVerificationReport } from "./CoverageVerificationReport";
 import { CoverageRequiredStats } from "./types";
 
 interface ICoverageVerifierParams {
@@ -11,7 +11,7 @@ const DEFAULT_REQUIRED_STATS: CoverageRequiredStats = {
   lines: 0,
   functions: 0,
   statements: 0,
-  branches: 0
+  branches: 50
 };
 
 export class CoverageVerifier {
@@ -30,14 +30,14 @@ export class CoverageVerifier {
     };
   }
 
-  public verify(fileNameList: string[]): CoverageVerifierReport {
+  public verify(fileNameList: string[]): CoverageVerificationReport {
     const itemReports = fileNameList.map(fileName => this.getItemReport(fileName));
-    return CoverageVerifierReport.merge(itemReports);
+    return CoverageVerificationReport.merge(itemReports);
   }
 
-  private getItemReport(fileName: string): CoverageVerifierReport {
+  private getItemReport(fileName: string): CoverageVerificationReport {
     const coverageItem = this.report.getCoverageForItem(fileName);
-    const report = new CoverageVerifierReport();
+    const report = new CoverageVerificationReport();
 
     if (!coverageItem) {
       return report;

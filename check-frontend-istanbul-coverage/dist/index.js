@@ -44,6 +44,20 @@ PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
 /* global Reflect, Promise, SuppressedError, Symbol, Iterator */
 
+var extendStatics = function(d, b) {
+    extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+    return extendStatics(d, b);
+};
+
+function __extends(d, b) {
+    if (typeof b !== "function" && b !== null)
+        throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+    extendStatics(d, b);
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
 
 var __assign = function() {
     __assign = Object.assign || function __assign(t) {
@@ -27342,38 +27356,39 @@ var CoverageReport = /** @class */ (function () {
     return CoverageReport;
 }());
 
-var CoverageVerifierReport = /** @class */ (function () {
-    function CoverageVerifierReport() {
+var CoverageVerificationReport = /** @class */ (function () {
+    function CoverageVerificationReport() {
         this.unmatchedStatInfoList = [];
     }
-    CoverageVerifierReport.prototype.addUnmatchedStat = function (statInfo) {
+    CoverageVerificationReport.prototype.addUnmatchedStat = function (statInfo) {
         this.unmatchedStatInfoList.push(statInfo);
     };
-    CoverageVerifierReport.prototype.isAllCovered = function () {
-        return !this.unmatchedStatInfoList.length;
+    CoverageVerificationReport.prototype.applyOutput = function (output) {
+        if (this.isAllCovered()) {
+            output.success();
+        }
+        output.failure(this.unmatchedStatInfoList);
     };
-    CoverageVerifierReport.prototype.getErrorMessage = function () {
-        return this.unmatchedStatInfoList.map(function (report) {
-            return "Required ".concat(report.statName, " coverage for file \"").concat(report.fileName, "\": ").concat(report.required, ", actual: ").concat(report.actual);
-        }).join('\n');
-    };
-    CoverageVerifierReport.merge = function (reports) {
+    CoverageVerificationReport.merge = function (reports) {
         var _a;
-        var report = new CoverageVerifierReport();
+        var report = new CoverageVerificationReport();
         for (var _i = 0, reports_1 = reports; _i < reports_1.length; _i++) {
             var itemReport = reports_1[_i];
             (_a = report.unmatchedStatInfoList).push.apply(_a, itemReport.unmatchedStatInfoList);
         }
         return report;
     };
-    return CoverageVerifierReport;
+    CoverageVerificationReport.prototype.isAllCovered = function () {
+        return !this.unmatchedStatInfoList.length;
+    };
+    return CoverageVerificationReport;
 }());
 
 var DEFAULT_REQUIRED_STATS = {
     lines: 0,
     functions: 0,
     statements: 0,
-    branches: 0
+    branches: 50
 };
 var CoverageVerifier = /** @class */ (function () {
     function CoverageVerifier(_a) {
@@ -27384,11 +27399,11 @@ var CoverageVerifier = /** @class */ (function () {
     CoverageVerifier.prototype.verify = function (fileNameList) {
         var _this = this;
         var itemReports = fileNameList.map(function (fileName) { return _this.getItemReport(fileName); });
-        return CoverageVerifierReport.merge(itemReports);
+        return CoverageVerificationReport.merge(itemReports);
     };
     CoverageVerifier.prototype.getItemReport = function (fileName) {
         var coverageItem = this.report.getCoverageForItem(fileName);
-        var report = new CoverageVerifierReport();
+        var report = new CoverageVerificationReport();
         if (!coverageItem) {
             return report;
         }
@@ -27429,9 +27444,39 @@ var CoverageVerifier = /** @class */ (function () {
     return CoverageVerifier;
 }());
 
+var CoverageVerificationReportOutput = /** @class */ (function () {
+    function CoverageVerificationReportOutput() {
+    }
+    return CoverageVerificationReportOutput;
+}());
+
+var CoverageVerificationReportGithubOutput = /** @class */ (function (_super) {
+    __extends(CoverageVerificationReportGithubOutput, _super);
+    function CoverageVerificationReportGithubOutput() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    CoverageVerificationReportGithubOutput.prototype.success = function () {
+        coreExports.info('All files are covered');
+    };
+    CoverageVerificationReportGithubOutput.prototype.failure = function (unmatchedStatInfoList) {
+        var errorMessages = this.getErrorMessages(unmatchedStatInfoList);
+        errorMessages.forEach(function (errorMessage) {
+            coreExports.error(errorMessage);
+        });
+        coreExports.setFailed('Some files are not covered');
+    };
+    CoverageVerificationReportGithubOutput.prototype.getErrorMessages = function (unmatchedStatInfoList) {
+        var errorMessages = unmatchedStatInfoList.map(function (errorStat) {
+            return "File: ".concat(errorStat.fileName, "; Stat: ").concat(errorStat.statName, "; Required: ").concat(errorStat.required, "; Actual: ").concat(errorStat.actual);
+        });
+        return errorMessages;
+    };
+    return CoverageVerificationReportGithubOutput;
+}(CoverageVerificationReportOutput));
+
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var json_summary_path, changed_files_list, required_branches_coverage, report, coverageVerifier, coverageVerifierReport, error_1;
+        var json_summary_path, changed_files_list, required_branches_coverage, report, coverageVerifier, coverageVerifierReport, output, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -27448,13 +27493,9 @@ function run() {
                             branches: parseInt(required_branches_coverage),
                         },
                     });
-                    coverageVerifierReport = coverageVerifier.verify(changed_files_list.split(','));
-                    if (coverageVerifierReport.isAllCovered()) {
-                        coreExports.info('All coverage is covered');
-                    }
-                    else {
-                        coreExports.setFailed(coverageVerifierReport.getErrorMessage());
-                    }
+                    coverageVerifierReport = coverageVerifier.verify(JSON.parse(changed_files_list));
+                    output = new CoverageVerificationReportGithubOutput();
+                    coverageVerifierReport.applyOutput(output);
                     return [3 /*break*/, 3];
                 case 2:
                     error_1 = _a.sent();

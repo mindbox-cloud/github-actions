@@ -2,6 +2,7 @@ import * as core from '@actions/core';
 
 import { CoverageReport } from './CoverageReport';
 import { CoverageVerifier } from './CoverageVerifier';
+import { CoverageVerificationReportGithubOutput } from './coverage-verification-report-output';
 
 async function run() {
   try {
@@ -17,13 +18,12 @@ async function run() {
       },
     });
 
-    const coverageVerifierReport = coverageVerifier.verify(changed_files_list.split(','));
+    const coverageVerifierReport = coverageVerifier.verify(
+      JSON.parse(changed_files_list)
+    );
     
-    if (coverageVerifierReport.isAllCovered()) {
-      core.info('All coverage is covered');
-    } else {
-      core.setFailed(coverageVerifierReport.getErrorMessage());
-    }
+    const output = new CoverageVerificationReportGithubOutput();
+    coverageVerifierReport.applyOutput(output);
   } catch (error) {
     core.setFailed(error.message)
   }

@@ -15,3 +15,10 @@ export interface CoverageReportContent {
 }
 
 export type CoverageRequiredStats = Record<CoverageStatName, number>;
+
+export interface UnmatchedStatInfo {
+  fileName: string;
+  statName: CoverageStatName;
+  required: number;
+  actual: number;
+}
