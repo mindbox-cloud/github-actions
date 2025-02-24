@@ -183,7 +183,7 @@ jobs:
         run: npm run check-styles -- --allow-empty-input
 
       - name: Run tests
-        if: ${{ inputs.tests && !env.check-coverage }}
+        if: ${{ inputs.tests }}
         run: npm run test -- --maxConcurrency=1 --maxWorkers=1
 
       - name: Get list of changed files
@@ -193,9 +193,13 @@ jobs:
           files=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }} | grep -E '\.(ts|tsx|js|jsx)$' | sed 's/^/"/;s/$/"/' | paste -sd ',' -)
           echo "files=[$files]" >> $GITHUB_OUTPUT
 
-      - name: Run tests with coverage
+      - name: Check changed files coverage
         if: ${{ inputs.tests && env.check-coverage }}
-        run: npm run test -- --maxConcurrency=1 --maxWorkers=1 --collectCoverageFrom='${{ steps.changed_files.outputs.files }}'
+        uses: ../../check-frontend-istanbul-coverage
+        with:
+          changed_files_list: ${{ steps.changed_files.outputs.files }}
+          json_summary: reports/jest-coverage/coverage-summary.json
+          required_branches_coverage: 80
 
       - name: Run component tests
         if: ${{ inputs.component_tests }}

@@ -1,0 +1,15 @@
+name: 'Check frontend istanbul coverage'
+description: 'Check frontend istanbul coverage by summary json'
+inputs:
+  changed_files_list:
+    description: 'Changed files list in json array format'
+    required: true
+  json_summary_path:
+    description: 'Hot-test base admin url'
+    required: true
+  required_branches_coverage:
+    description: 'Required branches coverage'
+    required: true
+runs:
+  using: node20
+  main: dist/index.js
