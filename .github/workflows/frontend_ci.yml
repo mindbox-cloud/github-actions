@@ -193,7 +193,7 @@ jobs:
 
       - name: Run tests coverage check
         if: ${{ inputs.tests && env.check-coverage }}
-        run: npm run check-coverage -- --mode=ci
+        run: npm run check-coverage -- --mode=ci --base-branch=origin/${{ github.base_ref }}
 
       - name: Run component tests
         if: ${{ inputs.component_tests }}
