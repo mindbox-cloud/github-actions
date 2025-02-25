@@ -98,6 +98,11 @@ on:
         default: '"ubuntu-latest"'
         required: false
         type: string
+      check_coverage:
+        type: boolean
+        description: "Check test coverage"
+        required: false
+        default: false
     secrets:
       gh_npm_registry:
         description: "A GH_NPM_REGISTRY token passed from the caller workflow"
@@ -131,11 +136,14 @@ jobs:
   checking:
     runs-on: ${{ fromJSON(inputs.runs_on) }}
     timeout-minutes: ${{ inputs.checking_timeout_minutes }}
+    env:
+      check_coverage: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' && inputs.check_coverage }}
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Run translation checker
         if: ${{ !inputs.template_repo }}
@@ -182,6 +190,10 @@ jobs:
       - name: Run tests
         if: ${{ inputs.tests }}
         run: npm run test -- --maxConcurrency=1 --maxWorkers=1
+
+      - name: Run tests coverage check
+        if: ${{ inputs.tests && fromJSON(env.check_coverage) }}
+        run: npm run check-coverage -- --mode=ci --base-branch=origin/${{ github.base_ref }}
 
       - name: Run component tests
         if: ${{ inputs.component_tests }}
