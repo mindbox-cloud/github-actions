@@ -1,0 +1,44 @@
+name: Prepare CI environment
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        description: "Node.js version"
+        default: "18.18.2"
+        required: false
+        type: string
+    secrets:
+      gh_npm_registry:
+        description: "A GH_NPM_REGISTRY token passed from the caller workflow"
+        required: true
+
+jobs:
+  prepare_env:
+    runs-on: 'ubuntu-latest'
+    timeout-minutes: 15
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.JS
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          registry-url: "https://npm.pkg.github.com/mindbox-cloud"
+
+      - name: Clean cache
+        run: npm cache clean -f
+
+      - name: Install deps
+        run: npm ci --loglevel verbose
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: ./node_modules
+          key: npm-ci-${{ github.sha }}

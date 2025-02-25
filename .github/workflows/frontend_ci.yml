@@ -103,6 +103,11 @@ on:
         description: "Check test coverage"
         required: false
         default: false
+      prepare_environment:
+        type: boolean
+        description: "Prepare environment"
+        required: false
+        default: true
     secrets:
       gh_npm_registry:
         description: "A GH_NPM_REGISTRY token passed from the caller workflow"
@@ -158,14 +163,17 @@ jobs:
           registry-url: "https://npm.pkg.github.com/mindbox-cloud"
 
       - name: Clean cache
+        if: ${{ inputs.prepare_environment}}
         run: npm cache clean -f
 
       - name: Install deps
+        if: ${{ inputs.prepare_environment}}
         run: npm ci --loglevel verbose
         env:
           NODE_AUTH_TOKEN: ${{ secrets.gh_npm_registry }}
 
       - name: Cache node modules
+        if: ${{ inputs.prepare_environment}}
         uses: actions/cache@v4
         with:
           path: ./node_modules
