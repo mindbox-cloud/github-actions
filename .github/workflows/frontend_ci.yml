@@ -137,7 +137,7 @@ jobs:
     runs-on: ${{ fromJSON(inputs.runs_on) }}
     timeout-minutes: ${{ inputs.checking_timeout_minutes }}
     env:
-      check-coverage: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' && inputs.check_coverage }}
+      check_coverage: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' && inputs.check_coverage }}
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v4
@@ -192,7 +192,7 @@ jobs:
         run: npm run test -- --maxConcurrency=1 --maxWorkers=1
 
       - name: Run tests coverage check
-        if: ${{ inputs.tests && env.check-coverage }}
+        if: ${{ inputs.tests && fromJSON(env.check_coverage) }}
         run: npm run check-coverage -- --mode=ci --base-branch=origin/${{ github.base_ref }}
 
       - name: Run component tests
